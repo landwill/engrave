@@ -1,0 +1,1 @@
+export const DARK_MODE_LOCALSTORAGE_KEY = 'darkMode'

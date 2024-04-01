@@ -1,22 +1,31 @@
+import React from 'react'
+import { Document, DocumentSelectorItem } from './DocumentSelectorItem.tsx'
 import { PanelBox } from './PanelBox.tsx'
-
-interface Document {
-  documentName: string
-}
 
 const files: Document[] = [
   {
+    key: 'e98e1ef3-24c8-4d27-8a7d-560f8c899c7e',
     documentName: 'Sample document'
   }, {
+    key: '83f99248-f453-46a8-8210-5c32d65226a7',
     documentName: 'Sample document 2'
+  }, {
+    key: 'c327fd8e-394a-4588-b38c-9a72c7c2f967',
+    documentName: 'Sample document with a very long name'
   }
 ]
 
-export function DocumentSelectorPanel() {
+interface DocumentSelectorPanelProps {
+  selectedDocument: string
+  setSelectedDocument: React.Dispatch<React.SetStateAction<string>>
+}
+
+export function DocumentSelectorPanel({ selectedDocument, setSelectedDocument }: DocumentSelectorPanelProps) {
   return <PanelBox>
-    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px' }}>
       {
-        files.map(file => <span style={{ marginBottom: '0.25em'}}>{file.documentName}</span>)
+        files.map(file =>
+          <DocumentSelectorItem selectedDocument={selectedDocument} file={file} onClick={() => {setSelectedDocument(file.key)}} />)
       }
     </div>
   </PanelBox>

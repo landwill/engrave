@@ -29,6 +29,7 @@
 
   --border-color: #ccc;
   --panel-background-color: #333;
+  --active-document-text-color: #A56EFF;
 }
 
 html, body {
@@ -40,6 +41,10 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
+}
+
+.active {
+  color: var(--active-document-text-color);
 }
 
 @media (prefers-color-scheme: light) {

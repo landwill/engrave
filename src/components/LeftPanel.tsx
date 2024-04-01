@@ -1,21 +1,21 @@
 import { PanelBox } from './PanelBox.tsx'
 
 interface LeftPanelIcon {
-  icon: any // todo
+  icon: string // todo add icons instead of text
   action?: any // todo implement pages
 }
 
 const icons: LeftPanelIcon[] = [
   {
-    icon: 'Files'
+    icon: 'Files',
   }, {
-    icon: 'Search'
+    icon: 'Search',
   }, {
-    icon: 'Git'
+    icon: 'Git',
   }, {
-    icon: 'Import'
+    icon: 'Import',
   }, {
-    icon: 'Export'
+    icon: 'Export',
   }
 ]
 
@@ -23,7 +23,7 @@ export function LeftPanel() {
   return <PanelBox>
     <div style={{ margin: '1em', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
       {
-        icons.map(icon => <div style={{ marginBottom: '1em' }}>{icon.icon}</div>)
+        icons.map(icon => <div style={{ marginBottom: '1em', opacity: icon.action == null ? 0.5 : 1, pointerEvents: icon.action == null ? 'none' : undefined }}>{icon.icon}</div>)
       }
       <div style={{ marginTop: 'auto', opacity: 0.5 }}>Dark / light</div>{/* todo implement toggle*/}
     </div>

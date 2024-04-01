@@ -1,31 +1,41 @@
+import { DownloadIcon, FileIcon, GitCommitIcon, HelpCircleIcon, SearchIcon, SunMoonIcon, UploadIcon } from 'lucide-react'
+import { LeftPanelButton, LeftPanelIcon } from './LeftPanelButton.tsx'
 import { PanelBox } from './PanelBox.tsx'
-
-interface LeftPanelIcon {
-  icon: string // todo add icons instead of text
-  action?: any // todo implement pages
-}
 
 const icons: LeftPanelIcon[] = [
   {
-    icon: 'Files',
+    buttonName: 'Files',
+    Icon: FileIcon
   }, {
-    icon: 'Search',
+    buttonName: 'Search files',
+    Icon: SearchIcon
   }, {
-    icon: 'Git',
+    buttonName: 'Git',
+    Icon: GitCommitIcon
   }, {
-    icon: 'Import',
+    buttonName: 'Import',
+    Icon: UploadIcon,
   }, {
-    icon: 'Export',
+    buttonName: 'Export',
+    Icon: DownloadIcon
+  }, {
+    buttonName: 'About',
+    Icon: HelpCircleIcon,
+    action: () => {alert('Coming soon!') /*todo*/}
+  }, {
+    buttonName: 'Toggle light/dark mode',
+    Icon: SunMoonIcon,
+    action: () => {alert('Coming soon!') /*todo*/},
+    additionalProps: { marginTop: 'auto' }
   }
 ]
 
 export function LeftPanel() {
   return <PanelBox>
-    <div style={{ margin: '1em', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ marginTop: '1em', marginLeft: '1em', marginRight: '1em', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
       {
-        icons.map(icon => <div style={{ marginBottom: '1em', opacity: icon.action == null ? 0.5 : 1, pointerEvents: icon.action == null ? 'none' : undefined }}>{icon.icon}</div>)
+        icons.map(icon => <LeftPanelButton key={icon.buttonName} icon={icon} />)
       }
-      <div style={{ marginTop: 'auto', opacity: 0.5 }}>Dark / light</div>{/* todo implement toggle*/}
     </div>
   </PanelBox>
 }

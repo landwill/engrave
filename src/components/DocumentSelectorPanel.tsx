@@ -25,7 +25,7 @@ export function DocumentSelectorPanel({ selectedDocument, setSelectedDocument }:
     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px' }}>
       {
         files.map(file =>
-          <DocumentSelectorItem selectedDocument={selectedDocument} file={file} onClick={() => {setSelectedDocument(file.key)}} />)
+          <DocumentSelectorItem key={file.key} selectedDocument={selectedDocument} file={file} onClick={() => {setSelectedDocument(file.key)}} />)
       }
     </div>
   </PanelBox>

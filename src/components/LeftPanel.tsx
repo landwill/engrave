@@ -1,23 +1,9 @@
 import { DownloadIcon, FileIcon, GitCommitIcon, HelpCircleIcon, SearchIcon, SunMoonIcon, UploadIcon } from 'lucide-react'
-import { DARK_MODE_LOCALSTORAGE_KEY } from '../consts.ts'
-import { setRootTheme, Theme } from '../utils.ts'
-import { LeftPanelButton, LeftPanelIcon } from './LeftPanelButton.tsx'
-import { PanelBox } from './PanelBox.tsx'
+import { toggleDarkMode } from '../utils.ts'
+import { IconPanel } from './IconPanel.tsx'
+import { PanelIcon } from './IconPanelButton.tsx'
 
-const getCurrentLightDarkMode = (): Theme => {
-  const localStorageDarkMode = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
-  if (localStorageDarkMode != null) {
-    return localStorageDarkMode === 'true' ? Theme.DARK : Theme.LIGHT
-  }
-  return Theme.LIGHT
-}
-
-const toggleDarkMode = () => {
-  const currentMode = getCurrentLightDarkMode()
-  setRootTheme(currentMode === Theme.DARK ? Theme.LIGHT : Theme.DARK)
-}
-
-const icons: LeftPanelIcon[] = [
+const LEFT_PANEL_ICONS: PanelIcon[] = [
   {
     buttonName: 'Files',
     Icon: FileIcon
@@ -29,7 +15,7 @@ const icons: LeftPanelIcon[] = [
     Icon: GitCommitIcon
   }, {
     buttonName: 'Import',
-    Icon: UploadIcon,
+    Icon: UploadIcon
   }, {
     buttonName: 'Export',
     Icon: DownloadIcon
@@ -41,16 +27,10 @@ const icons: LeftPanelIcon[] = [
     buttonName: 'Toggle light/dark mode',
     Icon: SunMoonIcon,
     action: toggleDarkMode,
-    additionalProps: { marginTop: 'auto' }
+    additionalProps: { marginTop: 'auto', marginBottom: 0 }
   }
 ]
 
 export function LeftPanel() {
-  return <PanelBox>
-    <div style={{ marginTop: '1em', marginLeft: '1em', marginRight: '1em', flexGrow: 1, display: 'flex', flexDirection: 'column', userSelect: 'none' }}>
-      {
-        icons.map(icon => <LeftPanelButton key={icon.buttonName} icon={icon} />)
-      }
-    </div>
-  </PanelBox>
+  return <IconPanel icons={LEFT_PANEL_ICONS} direction='vertical' />
 }

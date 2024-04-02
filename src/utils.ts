@@ -19,3 +19,14 @@ export const setRootTheme = (theme: Theme) => {
     console.warn(error)
   }
 }
+const getCurrentLightDarkMode = (): Theme => {
+  const localStorageDarkMode = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
+  if (localStorageDarkMode != null) {
+    return localStorageDarkMode === 'true' ? Theme.DARK : Theme.LIGHT
+  }
+  return Theme.LIGHT
+}
+export const toggleDarkMode = () => {
+  const currentMode = getCurrentLightDarkMode()
+  setRootTheme(currentMode === Theme.DARK ? Theme.LIGHT : Theme.DARK)
+}

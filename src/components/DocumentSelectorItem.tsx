@@ -1,3 +1,5 @@
+import { MouseEventHandler } from 'react'
+
 export interface Document {
   key: string
   documentName: string
@@ -6,7 +8,7 @@ export interface Document {
 interface DocumentSelectorItemProps {
   selectedDocument: string
   file: Document
-  onClick: () => void
+  onClick: MouseEventHandler
 }
 
 export function DocumentSelectorItem({ selectedDocument, onClick, file }: DocumentSelectorItemProps) {

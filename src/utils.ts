@@ -19,6 +19,7 @@ export const setRootTheme = (theme: Theme) => {
     console.warn(error)
   }
 }
+
 const getCurrentLightDarkMode = (): Theme => {
   const localStorageDarkMode = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
   if (localStorageDarkMode != null) {
@@ -26,7 +27,17 @@ const getCurrentLightDarkMode = (): Theme => {
   }
   return Theme.LIGHT
 }
+
 export const toggleDarkMode = () => {
   const currentMode = getCurrentLightDarkMode()
   setRootTheme(currentMode === Theme.DARK ? Theme.LIGHT : Theme.DARK)
+}
+
+export const lazyDarkModeRetrieve = () => {
+  try {
+    const darkMode = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
+    if (darkMode === 'true') setRootTheme(Theme.DARK)
+  } catch (error) {
+    console.warn('Failed to fetch your light/dark mode preferences.')
+  }
 }

@@ -1,29 +1,31 @@
-import { useState } from 'react'
-import { DocumentSelectorPanel } from './components/DocumentSelectorPanel.tsx'
-import { EditorBody } from './components/EditorBody.tsx'
+import { useEffect, useState } from 'react'
+import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
-import { DARK_MODE_LOCALSTORAGE_KEY } from './consts.ts'
-import { setRootTheme, Theme } from './utils.ts'
+import { IndexedDBContext } from './contexts/IndexedDBContext.tsx'
+import { setupIndexedDB } from './indexeddx/utils.ts'
+import { lazyDarkModeRetrieve } from './utils.ts'
 
-const lazyDarkModeRetrieve = () => {
-  try {
-    const darkMode = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
-    if (darkMode === 'true') setRootTheme(Theme.DARK)
-  } catch (error) {
-    console.warn('Failed to fetch your light/dark mode preferences.')
-  }
+const handleSetupIndexedDBError = (error: unknown) => {
+  console.error(error)
 }
 
 function App() {
-  const [selectedDocument, setSelectedDocument] = useState<string>('')
+  const [db, setDb] = useState<IDBDatabase | null>(null)
+
+  useEffect(() => {
+    setupIndexedDB()
+      .then(setDb)
+      .catch(handleSetupIndexedDBError)
+  }, [])
 
   lazyDarkModeRetrieve()
 
-  return <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
-    <LeftPanel />
-    <DocumentSelectorPanel selectedDocument={selectedDocument} setSelectedDocument={setSelectedDocument}/>
-    <EditorBody selectedDocument={selectedDocument}/>
-  </div>
+  return <IndexedDBContext.Provider value={db}>
+    <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
+      <LeftPanel />
+      <DocumentSelectorAndEditor />
+    </div>
+  </IndexedDBContext.Provider>
 }
 
 export default App

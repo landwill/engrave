@@ -1,22 +1,24 @@
 import { MouseEventHandler } from 'react'
 
-export interface Document {
-  key: string
-  documentName: string
+export interface EngraveDocument {
+  fileId: string
+  filename: string
+  body: string
 }
 
 interface DocumentSelectorItemProps {
   selectedDocument: string
-  file: Document
-  onClick: MouseEventHandler
+  fileId: string
+  filename: string
+  onClick?: MouseEventHandler
 }
 
-export function DocumentSelectorItem({ selectedDocument, onClick, file }: DocumentSelectorItemProps) {
-  const className = selectedDocument === file.key ? 'active' : undefined
+export function DocumentSelectorItem({ selectedDocument, fileId, filename, onClick }: DocumentSelectorItemProps) {
+  const className = selectedDocument === fileId ? 'active' : undefined
 
   return <span className={className}
                style={{ marginBottom: '0.25em', textOverflow: 'ellipsis', textWrap: 'nowrap', overflow: 'hidden' }}
                onClick={onClick}>
-            {file.documentName}
+            {filename}
         </span>
 }

@@ -1,47 +1,70 @@
 import { FilePlusIcon, FolderPlusIcon } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { v4 as uuid } from 'uuid'
+import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
+import { INDEXEDDB_STORE_NAME_FILES } from '../indexeddx/consts.ts'
 import { DocumentOperationsTopPanel } from './DocumentOperationsTopPanel.tsx'
-import { Document, DocumentSelectorItem } from './DocumentSelectorItem.tsx'
+import { DocumentSelectorItem, EngraveDocument } from './DocumentSelectorItem.tsx'
 import { PanelIcon } from './IconPanelButton.tsx'
 import { PanelBox } from './PanelBox.tsx'
 
+const getDocumentOperationPanelIcons = (setSelectedDocument: React.Dispatch<React.SetStateAction<string>>): PanelIcon[] => {
+  console.log('Calculating icons')
+  return [
+    {
+      buttonName: 'New file',
+      Icon: FilePlusIcon,
+      action: () => {
+        const fileId = uuid()
+        setSelectedDocument(fileId)
+      }
+    }, {
+      buttonName: 'New folder',
+      Icon: FolderPlusIcon
+    }
+  ]
+}
 
-const DOCUMENT_OPERATIONS_TOP_PANEL_ICONS: PanelIcon[] = [
-  {
-    buttonName: 'New file',
-    Icon: FilePlusIcon
-  }, {
-    buttonName: 'New folder',
-    Icon: FolderPlusIcon
-  }
-]
+const getFiles = (db: IDBDatabase): Promise<EngraveDocument[]> => {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readonly')
+    const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
+    const request = store.getAll()
+    request.onsuccess = () => {resolve(request.result)}
+    request.onerror = () => {reject(new Error(request.error?.message))}
+  })
+}
 
-const files: Document[] = [
-  {
-    key: 'e98e1ef3-24c8-4d27-8a7d-560f8c899c7e',
-    documentName: 'Sample document'
-  }, {
-    key: '83f99248-f453-46a8-8210-5c32d65226a7',
-    documentName: 'Sample document 2'
-  }, {
-    key: 'c327fd8e-394a-4588-b38c-9a72c7c2f967',
-    documentName: 'Sample document with a very long name'
-  }
-]
+const handleGetFilesError = (error: unknown) => {
+  console.error(error)
+}
 
 interface DocumentSelectorPanelProps {
   selectedDocument: string
   setSelectedDocument: React.Dispatch<React.SetStateAction<string>>
 }
 
-export function DocumentSelectorPanel({ selectedDocument, setSelectedDocument }: DocumentSelectorPanelProps) {
+export function DocumentSelectorPanel({ selectedDocument, setSelectedDocument }: Readonly<DocumentSelectorPanelProps>) {
+  const [files, setFiles] = useState<EngraveDocument[]>([])
+  const icons = useMemo(() => getDocumentOperationPanelIcons(setSelectedDocument), [setSelectedDocument])
+  const db = useIndexedDB()
+
+  useEffect(() => {
+    if (db == null) return
+    getFiles(db).then(setFiles).catch(handleGetFilesError)
+  }, [db])
+
+  const documents: EngraveDocument[] = selectedDocument !== '' && !files.some(file => file.fileId === selectedDocument)
+    ? [{ fileId: selectedDocument, filename: 'New file', body: '' }, ...files]
+    : files
 
   return <PanelBox direction='vertical'>
-    <DocumentOperationsTopPanel icons={DOCUMENT_OPERATIONS_TOP_PANEL_ICONS} />
+    <DocumentOperationsTopPanel icons={icons} />
     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px' }}>
       {
-        files.map(file =>
-          <DocumentSelectorItem key={file.key} selectedDocument={selectedDocument} file={file} onClick={() => {setSelectedDocument(file.key)}} />)
+        documents.map(file =>
+          <DocumentSelectorItem key={file.fileId} selectedDocument={selectedDocument} fileId={file.fileId} filename={file.filename}
+                                onClick={() => {setSelectedDocument(file.fileId)}} />)
       }
     </div>
   </PanelBox>

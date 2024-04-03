@@ -1,4 +1,5 @@
 import React, { CSSProperties } from 'react'
+import { COMMON_BORDER_STYLE } from '../consts.ts'
 
 interface PanelBoxProps {
   direction: 'horizontal' | 'vertical'
@@ -6,12 +7,11 @@ interface PanelBoxProps {
   style?: CSSProperties
 }
 
-const PANEL_BOX_BORDER_STYLE = '1px solid var(--border-color)'
 const getBorders = (direction: 'horizontal' | 'vertical') => {
   if (direction === 'horizontal') {
-    return { borderRight: undefined, borderBottom: PANEL_BOX_BORDER_STYLE }
+    return { borderRight: undefined, borderBottom: COMMON_BORDER_STYLE }
   } else {
-    return { borderRight: PANEL_BOX_BORDER_STYLE, borderBottom: undefined }
+    return { borderRight: COMMON_BORDER_STYLE, borderBottom: undefined }
   }
 }
 

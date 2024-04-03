@@ -10,6 +10,7 @@ export function EditorBodyPanel({ body, editorBodyRef }: EditorBodyPanelProps): 
               style={{ padding: '1em', outline: 'none' }}
               tabIndex={2}
               contentEditable
+              suppressContentEditableWarning
   >
     {body ?? ''}
   </div>

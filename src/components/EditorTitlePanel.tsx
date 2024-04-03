@@ -24,11 +24,11 @@ export function EditorTitlePanel({ filename, newFile = false, setNewFile, editor
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     if (newFile) {
-      setTitle('')
       if (setNewFile) {
         setNewFile(false)
       }
       e.currentTarget.textContent = (e.nativeEvent as InputEvent).data
+      setTitle((e.nativeEvent as InputEvent).data)
       const range = document.createRange();
       const sel = window.getSelection();
       range.selectNodeContents(e.currentTarget);
@@ -47,6 +47,8 @@ export function EditorTitlePanel({ filename, newFile = false, setNewFile, editor
       console.log(editorBodyRef)
     }
   }
+
+  console.log(_title)
 
   return (
     <div

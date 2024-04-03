@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
 import { getDocument } from '../indexeddx/utils.ts'
+import { FileDetails } from '../interfaces.ts'
 import { WelcomePage } from '../WelcomePage.tsx'
 import { EditorBodyPanel } from './EditorBodyPanel.tsx'
 import { EditorTitlePanel } from './EditorTitlePanel.tsx'
@@ -15,25 +16,35 @@ interface EditorBodyProps {
 
 export function EditorPanel({ selectedDocument }: EditorBodyProps) {
   const db = useIndexedDB()
-  const [title, setTitle] = useState<string | null>(null)
-  const [body, setBody] = useState<string | null>(null)
-  const [newFile, setNewFile] = useState<boolean>(false)
+  const [localFile, setLocalFile] = useState<FileDetails | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const editorBodyRef = useRef<HTMLDivElement>(null)
 
+  const initialTitle = React.useMemo(() => localFile?.title ?? 'New file', [])
+
   useEffect(() => {
+    setIsLoading(true)
     if (db == null || selectedDocument == '') return
-    getDocument(selectedDocument, db).then(document => {
-      setTitle(document?.filename ?? 'New file')
-      setBody(document?.body ?? '')
-      setNewFile(document == null)
-    })
-      .catch(handleError)
+    getDocument(selectedDocument, db)
+      .then(document => {
+        if (document == null) {
+          setLocalFile({ fileId: selectedDocument, title: 'New file', body: null, isNewFile: true } satisfies FileDetails)
+        } else {
+          setLocalFile({ fileId: selectedDocument, title: document.filename, body: document.body, isNewFile: false } satisfies FileDetails)
+        }
+        setIsLoading(false)
+      })
+      .catch((error: unknown) => {
+        handleError(error)
+        setIsLoading(false)
+      })
   }, [db, selectedDocument])
 
-  if (selectedDocument === '') return <WelcomePage />
+  if (selectedDocument === '' || localFile == null) return <WelcomePage />
+  if (isLoading) return <div>Loading...</div>
 
   return <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-    <EditorTitlePanel filename={title} newFile={newFile} setNewFile={setNewFile} editorBodyRef={editorBodyRef}/>
-    <EditorBodyPanel body={body} editorBodyRef={editorBodyRef}/>
+    <EditorTitlePanel fileId={selectedDocument} editorBodyRef={editorBodyRef} initialTitle={initialTitle} initialIsNewFile={localFile.isNewFile} />
+    <EditorBodyPanel body={localFile.body} editorBodyRef={editorBodyRef} />
   </div>
 }

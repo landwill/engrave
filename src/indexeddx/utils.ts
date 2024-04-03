@@ -27,3 +27,9 @@ export const getDocument = (fileId: string, db: IDBDatabase): Promise<EngraveDoc
     request.onerror = () => {reject(new Error(request.error?.message))}
   })
 }
+
+export const createDocument = (fileId: string, filename: string, db: IDBDatabase) => {
+  const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
+  const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
+  store.put({ fileId, filename })
+}

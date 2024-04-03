@@ -2,41 +2,42 @@ import React, { KeyboardEventHandler, useEffect, useRef, useState } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
 
 interface EditorTitlePanelProps {
-  filename: string | null
-  newFile?: boolean
-  setNewFile?: React.Dispatch<React.SetStateAction<boolean>>
+  fileId: string
+  initialTitle: string
+  initialIsNewFile: boolean
   editorBodyRef: React.RefObject<HTMLDivElement>
 }
 
-export function EditorTitlePanel({ filename, newFile = false, setNewFile, editorBodyRef }: EditorTitlePanelProps): React.JSX.Element {
-  // todo; handle the title
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_title, setTitle] = useState<string | null>(filename)
+export function EditorTitlePanel({ fileId, initialTitle, initialIsNewFile, editorBodyRef }: Readonly<EditorTitlePanelProps>): React.JSX.Element {
   const divRef = useRef<HTMLDivElement>(null)
+  const [isNewFile, setIsNewFile] = useState<boolean>(initialIsNewFile)
 
   useEffect(() => {
-    setTitle(filename ?? '')
     if (divRef.current) {
-      divRef.current.textContent = filename ?? ''
+      divRef.current.textContent = initialTitle
       divRef.current.focus()
     }
-  }, [filename])
+  }, [])
+
+  const updateTitle = (newTitle: string) => {
+    console.debug(`Update ${fileId}; set title = ${newTitle}`)
+  }
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-    if (newFile) {
-      if (setNewFile) {
-        setNewFile(false)
-      }
-      e.currentTarget.textContent = (e.nativeEvent as InputEvent).data
-      setTitle((e.nativeEvent as InputEvent).data)
+    if (isNewFile) {
+      setIsNewFile(false)
+      console.log('executan')
+      const pressedChar = (e.nativeEvent as InputEvent).data
+      e.currentTarget.textContent = pressedChar
+      updateTitle(pressedChar ?? '')
       const range = document.createRange();
       const sel = window.getSelection();
       range.selectNodeContents(e.currentTarget);
-      range.collapse(false); // false to collapse the range to the end
+      range.collapse(false);
       sel?.removeAllRanges();
       sel?.addRange(range);
     } else {
-      setTitle(e.currentTarget.textContent)
+      updateTitle(e.currentTarget.textContent ?? '')
     }
   }
 
@@ -48,11 +49,9 @@ export function EditorTitlePanel({ filename, newFile = false, setNewFile, editor
     }
   }
 
-  console.log(_title)
-
   return (
     <div
-      style={{ padding: '1em', borderBottom: COMMON_BORDER_STYLE, width: '100%', fontSize: '1.25em', fontWeight: 500, outline: 'none' }}
+      style={{ padding: '1em', borderBottom: COMMON_BORDER_STYLE, fontSize: '1.25em', fontWeight: 500, outline: 'none' }}
       ref={divRef}
       contentEditable
       onInput={handleInput}

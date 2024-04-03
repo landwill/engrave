@@ -9,7 +9,6 @@ import { PanelIcon } from './IconPanelButton.tsx'
 import { PanelBox } from './PanelBox.tsx'
 
 const getDocumentOperationPanelIcons = (setSelectedDocument: React.Dispatch<React.SetStateAction<string>>): PanelIcon[] => {
-  console.log('Calculating icons')
   return [
     {
       buttonName: 'New file',

@@ -17,14 +17,6 @@ export const setupIndexedDB = (): Promise<IDBDatabase> => {
   })
 }
 
-
-// noinspection JSUnusedLocalSymbols
-const createDocument = (fileId: string, filename: string, db: IDBDatabase) => {
-  const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
-  const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
-  store.put({ fileId, filename })
-}
-
 export const getDocument = (fileId: string, db: IDBDatabase): Promise<EngraveDocument | null> => {
   return new Promise((resolve, reject) => {
 

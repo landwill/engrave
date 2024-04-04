@@ -1,12 +1,11 @@
-import React, { KeyboardEventHandler, useEffect, useRef, useState } from 'react'
+import { autorun, runInAction } from 'mobx'
+import { observer } from 'mobx-react-lite'
+import React, { useRef } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
-import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
-import { updateFileTitle } from '../indexeddx/utils.ts'
+import { DocumentStore } from '../stores/DocumentStore.ts'
 
-interface EditorTitlePanelProps {
-  fileId: string
-  initialTitle: string
-  initialIsNewFile: boolean
+interface EditorTitlePanelObserverProps {
+  documentStore: DocumentStore
   editorBodyRef: React.RefObject<HTMLDivElement>
 }
 
@@ -19,56 +18,51 @@ function moveCursorToElement(target: HTMLElement, toStart: boolean) {
   sel?.addRange(range)
 }
 
-export function EditorTitlePanel({ fileId, initialTitle, initialIsNewFile, editorBodyRef }: Readonly<EditorTitlePanelProps>): React.JSX.Element {
-  const db = useIndexedDB()
+export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: EditorTitlePanelObserverProps) => {
   const divRef = useRef<HTMLDivElement>(null)
-  const [isNewFile, setIsNewFile] = useState<boolean>(initialIsNewFile)
 
-  useEffect(() => {
-    if (divRef.current) {
-      divRef.current.textContent = initialTitle
-      divRef.current.focus()
-      if (!initialIsNewFile) moveCursorToElement(divRef.current, false)
+  autorun(() => {
+    const div = divRef.current
+    const currentDocument = documentStore.currentDocument
+    if (div && currentDocument) {
+      div.textContent = currentDocument.documentTitle
+      div.focus()
+      if (!currentDocument.isNew) {
+        moveCursorToElement(div, false)
+      }
     }
-  }, [initialIsNewFile, initialTitle])
-
-  const updateTitle = (newTitle: string) => {
-    if (db == null) {
-      console.warn('idb was null; not updating title.')
-      return
-    }
-    updateFileTitle(fileId, newTitle, db)
-    console.debug(`Update ${fileId}; set title = ${newTitle}`)
-  }
+  })
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-    if (isNewFile) {
-      setIsNewFile(false)
-      const pressedChar = (e.nativeEvent as InputEvent).data
-      e.currentTarget.textContent = pressedChar
-      updateTitle(pressedChar ?? '')
-      moveCursorToElement(e.currentTarget, false)
-    } else {
-      updateTitle(e.currentTarget.textContent ?? '')
-    }
+    runInAction(() => {
+      if (documentStore.currentDocument) {
+        const newTitle = e.currentTarget.textContent ?? ''
+        documentStore.renameCurrentDocument(newTitle)
+      }
+    })
   }
 
-  const handleKeyDown: KeyboardEventHandler = (event) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
       editorBodyRef.current?.focus()
     }
   }
 
+  if (!documentStore.currentDocument) {
+    return <div>E04</div>
+  }
+
   return (
     <div
-      style={{ padding: '1em', borderBottom: COMMON_BORDER_STYLE, fontSize: '1.25em', fontWeight: 500, outline: 'none' }}
       ref={divRef}
       contentEditable
       onInput={handleInput}
       tabIndex={1}
       onKeyDown={handleKeyDown}
       suppressContentEditableWarning
+      style={{ padding: '1em', borderBottom: COMMON_BORDER_STYLE, fontSize: '1.25em', fontWeight: 500, outline: 'none' }}
     />
   )
-}
+})
+

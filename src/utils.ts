@@ -41,3 +41,8 @@ export const lazyDarkModeRetrieve = () => {
     console.warn('Failed to fetch your light/dark mode preferences.')
   }
 }
+
+// Extracted primarily to silence ESLint's issue with the otherwise lack of 'unknown' typing.
+export const lazyErrorHandler = (error: unknown) => {
+  console.error(error)
+}

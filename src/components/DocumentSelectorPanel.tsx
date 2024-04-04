@@ -1,10 +1,10 @@
 import { FilePlusIcon, FolderPlusIcon } from 'lucide-react'
-import React, { useEffect, useMemo, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import React, { useCallback, useMemo } from 'react'
 import { v4 as uuid } from 'uuid'
-import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
-import { INDEXEDDB_STORE_NAME_FILES } from '../indexeddx/consts.ts'
+import { DocumentStore } from '../stores/DocumentStore.ts'
 import { DocumentOperationsTopPanel } from './DocumentOperationsTopPanel.tsx'
-import { DocumentSelectorItem, EngraveDocument } from './DocumentSelectorItem.tsx'
+import { DocumentSelectorItem } from './DocumentSelectorItem.tsx'
 import { PanelIcon } from './IconPanelButton.tsx'
 import { PanelBox } from './PanelBox.tsx'
 
@@ -24,50 +24,22 @@ const getDocumentOperationPanelIcons = (setSelectedDocument: React.Dispatch<Reac
   ]
 }
 
-const getFiles = (db: IDBDatabase): Promise<EngraveDocument[]> => {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readonly')
-    const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
-    const request = store.getAll()
-    request.onsuccess = () => {resolve(request.result)}
-    request.onerror = () => {reject(new Error(request.error?.message))}
-  })
-}
-
-const handleGetFilesError = (error: unknown) => {
-  console.error(error)
-}
-
-interface DocumentSelectorPanelProps {
-  selectedDocument: string
-  setSelectedDocument: React.Dispatch<React.SetStateAction<string>>
-}
-
-export function DocumentSelectorPanel({ selectedDocument, setSelectedDocument }: Readonly<DocumentSelectorPanelProps>) {
-  const [files, setFiles] = useState<EngraveDocument[]>([])
-  const icons = useMemo(() => getDocumentOperationPanelIcons(setSelectedDocument), [setSelectedDocument])
-  const db = useIndexedDB()
-
-  useEffect(() => {
-    if (db == null) return
-    getFiles(db).then(setFiles).catch(handleGetFilesError)
-  }, [db])
-
-  const documents: EngraveDocument[] = selectedDocument !== '' && !files.some(file => file.fileId === selectedDocument)
-    ? [{ fileId: selectedDocument, filename: 'New file', body: '' }, ...files]
-    : files
+export const DocumentSelectorPanel = observer(({ documentStore }: { documentStore: DocumentStore }) => {
+  const icons = useMemo(() => getDocumentOperationPanelIcons(() => {documentStore.selectedDocumentUuid = null}), [])
+  const selectedDocumentUuid = documentStore.selectedDocumentUuid
+  const documentIdentifiers = documentStore.documentIdentifiers
+  const setSelectedDocument = useCallback((documentUuid: string) => {documentStore.selectedDocumentUuid = documentUuid}, [documentStore])
 
   return <PanelBox direction='vertical'>
     <DocumentOperationsTopPanel icons={icons} />
-    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px', userSelect: 'none' }}>
       {
-        documents.map(file =>
-          <DocumentSelectorItem key={file.fileId}
-                                selectedDocument={selectedDocument}
-                                fileId={file.fileId}
-                                filename={file.filename === '' ? 'Untitled' : file.filename}
-                                onClick={() => {setSelectedDocument(file.fileId)}} />)
+        documentIdentifiers.map(document =>
+          <DocumentSelectorItem key={document.documentUuid}
+                                isActive={selectedDocumentUuid === document.documentUuid}
+                                filename={document.documentTitle === '' ? 'Untitled' : document.documentTitle}
+                                onClick={() => {setSelectedDocument(document.documentUuid)}} />)
       }
     </div>
   </PanelBox>
-}
+})

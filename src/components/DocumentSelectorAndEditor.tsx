@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
+import { DocumentStore } from '../stores/DocumentStore.ts'
 import { DocumentSelectorPanel } from './DocumentSelectorPanel.tsx'
 import { EditorPanel } from './EditorPanel.tsx'
 
 export function DocumentSelectorAndEditor() {
-  const [selectedDocument, setSelectedDocument] = useState<string>('')
+  const db = useIndexedDB()
+  if (db == null) return <div>Loading</div>
+  const documentStore = new DocumentStore(db)
 
   return <>
-    <DocumentSelectorPanel selectedDocument={selectedDocument} setSelectedDocument={setSelectedDocument} />
-    <EditorPanel selectedDocument={selectedDocument} />
+    <DocumentSelectorPanel documentStore={documentStore} />
+    <EditorPanel documentStore={documentStore} />
   </>
 }

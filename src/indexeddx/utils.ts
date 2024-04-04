@@ -28,12 +28,12 @@ export const getDocument = (fileId: string, db: IDBDatabase): Promise<EngraveDoc
   })
 }
 
-export const updateFileTitle = (fileId: string, filename: string, db: IDBDatabase) => {
-  const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
-  const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
-  // store.get(fileId).onsuccess = (e) => {
-  //   const obj = e.target.result
-  //   obj.filename = filename
-  // }
-  store.put({ fileId, filename }).onerror = function(e) {console.error(e)}
+export const getDocuments = (db: IDBDatabase) => {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
+    const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
+    const allDocuments = store.getAll()
+    allDocuments.onsuccess = () => { resolve(allDocuments.result); }
+    allDocuments.onerror = () => { reject(new Error(allDocuments.error?.message)); }
+  })
 }

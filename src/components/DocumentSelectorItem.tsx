@@ -7,14 +7,13 @@ export interface EngraveDocument {
 }
 
 interface DocumentSelectorItemProps {
-  selectedDocument: string
-  fileId: string
+  isActive: boolean
   filename: string
   onClick?: MouseEventHandler
 }
 
-export function DocumentSelectorItem({ selectedDocument, fileId, filename, onClick }: DocumentSelectorItemProps) {
-  const className = selectedDocument === fileId ? 'active' : undefined
+export function DocumentSelectorItem({ isActive, filename, onClick }: DocumentSelectorItemProps) {
+  const className = isActive ? 'active' : undefined
 
   return <span className={className}
                style={{ marginBottom: '0.25em', textOverflow: 'ellipsis', textWrap: 'nowrap', overflow: 'hidden' }}

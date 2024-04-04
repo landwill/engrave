@@ -1,3 +1,4 @@
+import { configure } from 'mobx'
 import { useEffect, useState } from 'react'
 import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
@@ -8,6 +9,14 @@ import { lazyDarkModeRetrieve } from './utils.ts'
 const handleSetupIndexedDBError = (error: unknown) => {
   console.error(error)
 }
+
+configure({
+  enforceActions: 'always',
+  computedRequiresReaction: true,
+  reactionRequiresObservable: true,
+  observableRequiresReaction: true,
+  disableErrorBoundaries: true
+})
 
 function App() {
   const [db, setDb] = useState<IDBDatabase | null>(null)

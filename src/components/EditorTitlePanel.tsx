@@ -1,5 +1,7 @@
 import React, { KeyboardEventHandler, useEffect, useRef, useState } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
+import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
+import { updateFileTitle } from '../indexeddx/utils.ts'
 
 interface EditorTitlePanelProps {
   fileId: string
@@ -8,7 +10,17 @@ interface EditorTitlePanelProps {
   editorBodyRef: React.RefObject<HTMLDivElement>
 }
 
+function moveCursorToElement(target: HTMLElement, toStart: boolean) {
+  const range = document.createRange()
+  const sel = window.getSelection()
+  range.selectNodeContents(target)
+  range.collapse(toStart)
+  sel?.removeAllRanges()
+  sel?.addRange(range)
+}
+
 export function EditorTitlePanel({ fileId, initialTitle, initialIsNewFile, editorBodyRef }: Readonly<EditorTitlePanelProps>): React.JSX.Element {
+  const db = useIndexedDB()
   const divRef = useRef<HTMLDivElement>(null)
   const [isNewFile, setIsNewFile] = useState<boolean>(initialIsNewFile)
 
@@ -16,26 +28,26 @@ export function EditorTitlePanel({ fileId, initialTitle, initialIsNewFile, edito
     if (divRef.current) {
       divRef.current.textContent = initialTitle
       divRef.current.focus()
+      if (!initialIsNewFile) moveCursorToElement(divRef.current, false)
     }
-  }, [])
+  }, [initialIsNewFile, initialTitle])
 
   const updateTitle = (newTitle: string) => {
+    if (db == null) {
+      console.warn('idb was null; not updating title.')
+      return
+    }
+    updateFileTitle(fileId, newTitle, db)
     console.debug(`Update ${fileId}; set title = ${newTitle}`)
   }
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     if (isNewFile) {
       setIsNewFile(false)
-      console.log('executan')
       const pressedChar = (e.nativeEvent as InputEvent).data
       e.currentTarget.textContent = pressedChar
       updateTitle(pressedChar ?? '')
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(e.currentTarget);
-      range.collapse(false);
-      sel?.removeAllRanges();
-      sel?.addRange(range);
+      moveCursorToElement(e.currentTarget, false)
     } else {
       updateTitle(e.currentTarget.textContent ?? '')
     }
@@ -45,7 +57,6 @@ export function EditorTitlePanel({ fileId, initialTitle, initialIsNewFile, edito
     if (event.key === 'Enter') {
       event.preventDefault()
       editorBodyRef.current?.focus()
-      console.log(editorBodyRef)
     }
   }
 

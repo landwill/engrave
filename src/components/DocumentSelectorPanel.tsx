@@ -62,7 +62,10 @@ export function DocumentSelectorPanel({ selectedDocument, setSelectedDocument }:
     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px' }}>
       {
         documents.map(file =>
-          <DocumentSelectorItem key={file.fileId} selectedDocument={selectedDocument} fileId={file.fileId} filename={file.filename}
+          <DocumentSelectorItem key={file.fileId}
+                                selectedDocument={selectedDocument}
+                                fileId={file.fileId}
+                                filename={file.filename === '' ? 'Untitled' : file.filename}
                                 onClick={() => {setSelectedDocument(file.fileId)}} />)
       }
     </div>

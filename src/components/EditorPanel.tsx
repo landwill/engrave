@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
 import { getDocument } from '../indexeddx/utils.ts'
 import { FileDetails } from '../interfaces.ts'
@@ -20,8 +20,6 @@ export function EditorPanel({ selectedDocument }: EditorBodyProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const editorBodyRef = useRef<HTMLDivElement>(null)
 
-  const initialTitle = React.useMemo(() => localFile?.title ?? 'New file', [])
-
   useEffect(() => {
     setIsLoading(true)
     if (db == null || selectedDocument == '') return
@@ -41,10 +39,16 @@ export function EditorPanel({ selectedDocument }: EditorBodyProps) {
   }, [db, selectedDocument])
 
   if (selectedDocument === '' || localFile == null) return <WelcomePage />
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) {
+    console.debug('EditorPanel loading...')
+    return <div>Loading...</div>
+  } else if (db == null) {
+    console.debug('EditorPanel no db...')
+    return
+  }
 
   return <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-    <EditorTitlePanel fileId={selectedDocument} editorBodyRef={editorBodyRef} initialTitle={initialTitle} initialIsNewFile={localFile.isNewFile} />
+    <EditorTitlePanel fileId={selectedDocument} editorBodyRef={editorBodyRef} initialTitle={localFile.title} initialIsNewFile={localFile.isNewFile} />
     <EditorBodyPanel body={localFile.body} editorBodyRef={editorBodyRef} />
   </div>
 }

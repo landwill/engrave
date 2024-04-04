@@ -1,6 +1,6 @@
 export interface FileDetails {
   fileId: string
-  title: string | null
+  title: string
   body: string | null
   isNewFile: boolean
 }

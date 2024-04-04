@@ -33,7 +33,7 @@ interface DocumentSelectorPanelProps {
 export const DocumentSelectorPanel = observer(({ documentStore }: DocumentSelectorPanelProps) => {
   const icons = useMemo(() => getDocumentOperationPanelIcons((uuid: string) => {documentStore.selectedDocumentUuid = uuid}), [documentStore])
   const selectedDocumentUuid = documentStore.selectedDocumentUuid
-  const documentIdentifiers = documentStore.documentIdentifiers
+  const documentIdentifiers = documentStore.documentIdentifiers.slice().sort((a, b) => b.lastModified - a.lastModified)
 
   const documents: DocumentIdentifier[] = selectedDocumentUuid && !documentIdentifiers.some(file => file.documentUuid === selectedDocumentUuid)
     ? [{ documentTitle: 'New file', documentUuid: selectedDocumentUuid, lastModified: Date.now() } satisfies DocumentIdentifier, ...documentIdentifiers]
@@ -43,11 +43,13 @@ export const DocumentSelectorPanel = observer(({ documentStore }: DocumentSelect
     <DocumentOperationsTopPanel icons={icons} />
     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px', userSelect: 'none' }}>
       {
-        documents.map(document =>
-          <DocumentSelectorItem key={document.documentUuid}
+        documents.slice().sort((a, b) => b.lastModified - a.lastModified).map(document => {
+          console.log(document.lastModified, document.documentTitle)
+          return <DocumentSelectorItem key={document.documentUuid}
                                 isActive={selectedDocumentUuid === document.documentUuid}
                                 filename={document.documentTitle === '' ? 'New file' : document.documentTitle}
-                                onClick={() => {runInAction(() => {documentStore.selectedDocumentUuid = document.documentUuid})}} />)
+                                onClick={() => {runInAction(() => {documentStore.selectedDocumentUuid = document.documentUuid})}} />
+        })
       }
     </div>
   </PanelBox>

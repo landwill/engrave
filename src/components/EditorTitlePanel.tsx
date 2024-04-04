@@ -2,7 +2,7 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { ChangeEventHandler } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
-import { DocumentIdentifier } from '../interfaces.ts'
+import { DocumentDetail } from '../interfaces.ts'
 import { DocumentStore } from '../stores/DocumentStore.ts'
 
 interface EditorTitlePanelObserverProps {
@@ -16,7 +16,7 @@ export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: Edit
       if (documentStore.currentDocument) {
         documentStore.renameCurrentDocument(event.target.value)
       } else {
-        documentStore.documentIdentifiers.push({ documentUuid: documentStore.selectedDocumentUuid, documentTitle: event.target.value } as DocumentIdentifier)
+        documentStore.createDocument({ documentUuid: documentStore.selectedDocumentUuid, documentTitle: event.target.value } as DocumentDetail)
       }
     })
   }

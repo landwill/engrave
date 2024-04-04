@@ -33,7 +33,15 @@ export const getDocuments = (db: IDBDatabase) => {
     const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
     const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
     const allDocuments = store.getAll()
-    allDocuments.onsuccess = () => { resolve(allDocuments.result); }
-    allDocuments.onerror = () => { reject(new Error(allDocuments.error?.message)); }
+    allDocuments.onsuccess = () => { resolve(allDocuments.result) }
+    allDocuments.onerror = () => { reject(new Error(allDocuments.error?.message)) }
   })
 }
+
+export const putFileInStore = (documentUuid: string, documentTitle: string, db: IDBDatabase) => {
+  const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
+  const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
+  console.log('Putting', documentUuid, documentTitle)
+  store.put({ documentUuid, documentTitle, lastModified: Date.now() }).onerror = function (e) {console.error(e)}
+}
+

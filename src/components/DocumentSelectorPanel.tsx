@@ -1,6 +1,7 @@
 import { FilePlusIcon, FolderPlusIcon } from 'lucide-react'
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { v4 as uuid } from 'uuid'
 import { DocumentStore } from '../stores/DocumentStore.ts'
 import { DocumentOperationsTopPanel } from './DocumentOperationsTopPanel.tsx'
@@ -28,7 +29,6 @@ export const DocumentSelectorPanel = observer(({ documentStore }: { documentStor
   const icons = useMemo(() => getDocumentOperationPanelIcons(() => {documentStore.selectedDocumentUuid = null}), [])
   const selectedDocumentUuid = documentStore.selectedDocumentUuid
   const documentIdentifiers = documentStore.documentIdentifiers
-  const setSelectedDocument = useCallback((documentUuid: string) => {documentStore.selectedDocumentUuid = documentUuid}, [documentStore])
 
   return <PanelBox direction='vertical'>
     <DocumentOperationsTopPanel icons={icons} />
@@ -38,7 +38,7 @@ export const DocumentSelectorPanel = observer(({ documentStore }: { documentStor
           <DocumentSelectorItem key={document.documentUuid}
                                 isActive={selectedDocumentUuid === document.documentUuid}
                                 filename={document.documentTitle === '' ? 'Untitled' : document.documentTitle}
-                                onClick={() => {setSelectedDocument(document.documentUuid)}} />)
+                                onClick={() => {runInAction(() => {documentStore.selectedDocumentUuid = document.documentUuid})}} />)
       }
     </div>
   </PanelBox>

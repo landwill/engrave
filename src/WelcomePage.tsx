@@ -16,7 +16,7 @@ export function WelcomePage() {
       </p>
     </div>
     <p style={{ position: 'fixed', bottom: '0px' }}>
-      Being built with love by Lanny.
+      Being built with love, by Lanny.
     </p>
   </div>
 }

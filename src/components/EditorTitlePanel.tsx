@@ -1,6 +1,6 @@
-import { autorun, runInAction } from 'mobx'
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import React, { useRef } from 'react'
+import React, { ChangeEventHandler } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
 import { DocumentStore } from '../stores/DocumentStore.ts'
 
@@ -9,39 +9,12 @@ interface EditorTitlePanelObserverProps {
   editorBodyRef: React.RefObject<HTMLDivElement>
 }
 
-function moveCursorToElement(target: HTMLElement, toStart: boolean) {
-  const range = document.createRange()
-  const sel = window.getSelection()
-  range.selectNodeContents(target)
-  range.collapse(toStart)
-  sel?.removeAllRanges()
-  sel?.addRange(range)
-}
-
 export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: EditorTitlePanelObserverProps) => {
-  const divRef = useRef<HTMLDivElement>(null)
-
-  autorun(() => {
-    const div = divRef.current
-    const currentDocument = documentStore.currentDocument
-    if (div && currentDocument) {
-      div.textContent = currentDocument.documentTitle
-      div.focus()
-      if (!currentDocument.isNew) {
-        moveCursorToElement(div, false)
-      }
-    }
-  })
-
-  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     runInAction(() => {
-      if (documentStore.currentDocument) {
-        const newTitle = e.currentTarget.textContent ?? ''
-        documentStore.renameCurrentDocument(newTitle)
-      }
+      documentStore.renameCurrentDocument(event.target.value)
     })
   }
-
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
@@ -54,14 +27,16 @@ export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: Edit
   }
 
   return (
-    <div
-      ref={divRef}
+    <input
+      key={documentStore.currentDocument.documentUuid}
       contentEditable
-      onInput={handleInput}
+      autoFocus
+      onChange={handleChange}
       tabIndex={1}
       onKeyDown={handleKeyDown}
       suppressContentEditableWarning
-      style={{ padding: '1em', borderBottom: COMMON_BORDER_STYLE, fontSize: '1.25em', fontWeight: 500, outline: 'none' }}
+      style={{ padding: '1em', border: 'none', borderBottom: COMMON_BORDER_STYLE, outline: 'none', fontSize: '1.25em', fontWeight: 500, backgroundColor: 'var(--background-color)', color: 'var(--color)' }}
+      value={documentStore.currentDocument.documentTitle}
     />
   )
 })

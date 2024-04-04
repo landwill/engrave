@@ -4,11 +4,7 @@ import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEdito
 import { LeftPanel } from './components/LeftPanel.tsx'
 import { IndexedDBContext } from './contexts/IndexedDBContext.tsx'
 import { setupIndexedDB } from './indexeddx/utils.ts'
-import { lazyDarkModeRetrieve } from './utils.ts'
-
-const handleSetupIndexedDBError = (error: unknown) => {
-  console.error(error)
-}
+import { lazyDarkModeRetrieve, lazyErrorHandler } from './utils.ts'
 
 configure({
   enforceActions: 'always',
@@ -24,7 +20,7 @@ function App() {
   useEffect(() => {
     setupIndexedDB()
       .then(setDb)
-      .catch(handleSetupIndexedDBError)
+      .catch(lazyErrorHandler)
   }, [])
 
   lazyDarkModeRetrieve()

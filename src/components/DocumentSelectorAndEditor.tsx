@@ -5,7 +5,7 @@ import { EditorPanel } from './EditorPanel.tsx'
 
 export function DocumentSelectorAndEditor() {
   const db = useIndexedDB()
-  if (db == null) return <div>Loading</div>
+  if (db == null) return <></>
   const documentStore = new DocumentStore(db)
 
   return <>

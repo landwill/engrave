@@ -3,7 +3,6 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { v4 as uuid } from 'uuid'
-import { DocumentIdentifier } from '../interfaces.ts'
 import { DocumentStore } from '../stores/DocumentStore.ts'
 import { DocumentOperationsTopPanel } from './DocumentOperationsTopPanel.tsx'
 import { DocumentSelectorItem } from './DocumentSelectorItem.tsx'
@@ -33,18 +32,17 @@ interface DocumentSelectorPanelProps {
 export const DocumentSelectorPanel = observer(({ documentStore }: DocumentSelectorPanelProps) => {
   const icons = useMemo(() => getDocumentOperationPanelIcons((uuid: string) => {documentStore.selectedDocumentUuid = uuid}), [documentStore])
   const selectedDocumentUuid = documentStore.selectedDocumentUuid
-  const documentIdentifiers = documentStore.documentIdentifiers.slice().sort((a, b) => b.lastModified - a.lastModified)
+  const documentIdentifiers = documentStore.documentIdentifiers.slice()
 
-  const documents: DocumentIdentifier[] = selectedDocumentUuid && !documentIdentifiers.some(file => file.documentUuid === selectedDocumentUuid)
-    ? [{ documentTitle: 'New file', documentUuid: selectedDocumentUuid, lastModified: Date.now() } satisfies DocumentIdentifier, ...documentIdentifiers]
-    : documentIdentifiers
+  if (selectedDocumentUuid && !documentIdentifiers.some(file => file.documentUuid === selectedDocumentUuid)) {
+    documentIdentifiers.push({ documentTitle: 'New file', documentUuid: selectedDocumentUuid, lastModified: Date.now() })
+  }
 
   return <PanelBox direction='vertical'>
     <DocumentOperationsTopPanel icons={icons} />
     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em', marginTop: '1em', width: '180px', userSelect: 'none' }}>
       {
-        documents.slice().sort((a, b) => b.lastModified - a.lastModified).map(document => {
-          console.log(document.lastModified, document.documentTitle)
+        documentIdentifiers.sort((a, b) => b.lastModified - a.lastModified).map(document => {
           return <DocumentSelectorItem key={document.documentUuid}
                                 isActive={selectedDocumentUuid === document.documentUuid}
                                 filename={document.documentTitle === '' ? 'New file' : document.documentTitle}

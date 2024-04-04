@@ -41,7 +41,6 @@ export const getDocuments = (db: IDBDatabase) => {
 export const putFileInStore = (documentUuid: string, documentTitle: string, db: IDBDatabase) => {
   const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
   const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
-  console.log('Putting', documentUuid, documentTitle)
   store.put({ documentUuid, documentTitle, lastModified: Date.now() }).onerror = function (e) {console.error(e)}
 }
 

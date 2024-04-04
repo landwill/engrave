@@ -1,18 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { getDocuments } from '../indexeddx/utils.ts'
+import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../utils.ts'
-
-export interface DocumentIdentifier {
-  documentUuid: string
-  documentTitle: string
-  isNew: boolean
-}
-
-interface DocumentDetail {
-  fileId: string
-  filename: string
-  body: string
-}
 
 export class DocumentStore {
   documentIdentifiers: DocumentIdentifier[] = []
@@ -35,14 +24,17 @@ export class DocumentStore {
     const documents: DocumentDetail[] = await getDocuments(db) as DocumentDetail[]
     runInAction(() => {
       this.documentIdentifiers = documents.map(document => ({
-        documentUuid: document.fileId,
-        documentTitle: document.filename,
-        isNew: false
+        documentUuid: document.documentUuid,
+        documentTitle: document.documentTitle,
+        lastModified: document.lastModified
       } as DocumentIdentifier))
     })
   }
+
   renameCurrentDocument(documentTitle: string) {
-    if (this.currentDocument) this.currentDocument.documentTitle = documentTitle
+    if (this.currentDocument) {
+      this.currentDocument.documentTitle = documentTitle
+    }
   }
 
   get currentDocument(): DocumentIdentifier | undefined {

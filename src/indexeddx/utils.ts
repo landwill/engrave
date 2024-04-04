@@ -1,8 +1,8 @@
-import { EngraveDocument } from '../components/DocumentSelectorItem.tsx'
+import { DocumentDetail } from '../interfaces.ts'
 import { INDEXEDDB_DATABASE_NAME, INDEXEDDB_STORE_NAME_FILES } from './consts.ts'
 
 const initializeDatabase = (db: IDBDatabase) => {
-  db.createObjectStore('files', { keyPath: 'fileId' })
+  db.createObjectStore(INDEXEDDB_STORE_NAME_FILES, { keyPath: 'documentUuid' })
 }
 
 export const setupIndexedDB = (): Promise<IDBDatabase> => {
@@ -17,13 +17,13 @@ export const setupIndexedDB = (): Promise<IDBDatabase> => {
   })
 }
 
-export const getDocument = (fileId: string, db: IDBDatabase): Promise<EngraveDocument | null> => {
+export const getDocument = (documentUuid: string, db: IDBDatabase): Promise<DocumentDetail | null> => {
   return new Promise((resolve, reject) => {
 
     const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readonly')
     const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
-    const request = store.get(fileId)
-    request.onsuccess = () => {resolve(request.result as EngraveDocument)}
+    const request = store.get(documentUuid)
+    request.onsuccess = () => {resolve(request.result as DocumentDetail)}
     request.onerror = () => {reject(new Error(request.error?.message))}
   })
 }

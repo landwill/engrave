@@ -1,11 +1,5 @@
 import { MouseEventHandler } from 'react'
 
-export interface EngraveDocument {
-  fileId: string
-  filename: string
-  body: string
-}
-
 interface DocumentSelectorItemProps {
   isActive: boolean
   filename: string

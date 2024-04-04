@@ -2,6 +2,7 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { ChangeEventHandler } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
+import { DocumentIdentifier } from '../interfaces.ts'
 import { DocumentStore } from '../stores/DocumentStore.ts'
 
 interface EditorTitlePanelObserverProps {
@@ -12,7 +13,11 @@ interface EditorTitlePanelObserverProps {
 export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: EditorTitlePanelObserverProps) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     runInAction(() => {
-      documentStore.renameCurrentDocument(event.target.value)
+      if (documentStore.currentDocument) {
+        documentStore.renameCurrentDocument(event.target.value)
+      } else {
+        documentStore.documentIdentifiers.push({ documentUuid: documentStore.selectedDocumentUuid, documentTitle: event.target.value } as DocumentIdentifier)
+      }
     })
   }
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -22,13 +27,13 @@ export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: Edit
     }
   }
 
-  if (!documentStore.currentDocument) {
+  if (documentStore.currentDocument == null && !documentStore.selectedDocumentUuid) {
     return <div>E04</div>
   }
 
   return (
     <input
-      key={documentStore.currentDocument.documentUuid}
+      key={documentStore.selectedDocumentUuid}
       contentEditable
       autoFocus
       onChange={handleChange}
@@ -36,7 +41,7 @@ export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: Edit
       onKeyDown={handleKeyDown}
       suppressContentEditableWarning
       style={{ padding: '1em', border: 'none', borderBottom: COMMON_BORDER_STYLE, outline: 'none', fontSize: '1.25em', fontWeight: 500, backgroundColor: 'var(--background-color)', color: 'var(--color)' }}
-      value={documentStore.currentDocument.documentTitle}
+      value={documentStore.currentDocument?.documentTitle ?? 'New file'}
     />
   )
 })

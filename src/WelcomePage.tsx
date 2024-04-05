@@ -10,11 +10,9 @@ export function WelcomePage() {
   }}>
     <img src={engraveLogo} className='logo' alt='Engrave logo' style={{ width: 'fit-content', alignSelf: 'center' }} />
     <h1 style={{ fontSize: '3.2em', lineHeight: '1.1' }}>Engrave</h1>
-    <div>
-      <p>
-        A reactive text editor (in the making).
-      </p>
-    </div>
+    <p>
+      A reactive text editor (in the making).
+    </p>
     <p style={{ position: 'fixed', bottom: '0px' }}>
       Being built with love, by Lanny.
     </p>

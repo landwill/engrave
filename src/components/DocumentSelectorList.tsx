@@ -22,7 +22,7 @@ export const DocumentSelectorList = observer(() => {
       documentIdentifiers.slice().sort((a, b) => b.lastModified - a.lastModified).map(document => {
         return <DocumentSelectorItem key={document.documentUuid}
                                      isActive={selectedDocumentUuid === document.documentUuid}
-                                     filename={document.documentTitle === '' ? 'Untitled' : document.documentTitle}
+                                     filename={!document.documentTitle.trim() ? 'Untitled' : document.documentTitle}
                                      onClick={() => {runInAction(() => {documentStore.selectedDocumentUuid = document.documentUuid})}} />
       })
     }

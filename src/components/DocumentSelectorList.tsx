@@ -7,11 +7,10 @@ import { DocumentSelectorItem } from './DocumentSelectorItem.tsx'
 const DIV_STYLE: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: '1em',
-  marginRight: '1em',
-  marginTop: '1em',
-  width: '180px',
-  userSelect: 'none'
+  paddingTop: '1em',
+  width: '200px',
+  userSelect: 'none',
+  overflowY: 'auto'
 }
 
 export const DocumentSelectorList = observer(() => {

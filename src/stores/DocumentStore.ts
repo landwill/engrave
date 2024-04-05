@@ -4,7 +4,7 @@ import { getDocuments, putFileInStore } from '../indexeddx/utils.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../utils.ts'
 
-const NEW_FILE_NAME = 'Untitled'
+const NEW_FILE_NAME = ''
 
 export class DocumentStore {
   documentIdentifiers: DocumentIdentifier[] = []

@@ -50,6 +50,10 @@ body {
     background-color: var(--panel-background-color-hover);
 }
 
+.untitled {
+    opacity: 0.5;
+}
+
 .light-mode {
     --color: #213547;
     --background-color: #ffffff;

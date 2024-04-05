@@ -8,18 +8,21 @@ interface EditorTitlePanelObserverProps {
   editorBodyRef: React.RefObject<HTMLDivElement>
 }
 
+const INPUT_STYLE = { padding: '1em', border: 'none', borderBottom: COMMON_BORDER_STYLE, outline: 'none', fontSize: '1.25em', fontWeight: 500, backgroundColor: 'var(--background-color)', color: 'var(--color)' }
 export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObserverProps) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     runInAction(() => {
       documentStore.renameCurrentDocument(event.target.value)
     })
   }
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
       editorBodyRef.current?.focus()
     }
   }
+
   if (!documentStore.selectedDocumentUuid) {
     return <div>E04</div>
   }
@@ -33,7 +36,8 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
       tabIndex={1}
       onKeyDown={handleKeyDown}
       suppressContentEditableWarning
-      style={{ padding: '1em', border: 'none', borderBottom: COMMON_BORDER_STYLE, outline: 'none', fontSize: '1.25em', fontWeight: 500, backgroundColor: 'var(--background-color)', color: 'var(--color)' }}
+      style={INPUT_STYLE}
+      placeholder='Untitled'
       value={documentStore.currentDocument.documentTitle}
     />
   )

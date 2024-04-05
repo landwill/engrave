@@ -1,11 +1,13 @@
 import { configure } from 'mobx'
-import { useEffect, useState } from 'react'
+import { CSSProperties, useEffect, useState } from 'react'
 import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
 import { IndexedDBContext } from './contexts/IndexedDBContext.tsx'
 import { setupIndexedDB } from './indexeddx/utils.ts'
 import { documentStore } from './stores/DocumentStore.ts'
 import { lazyDarkModeRetrieve, lazyErrorHandler } from './utils.ts'
+
+const DIV_STYLE: CSSProperties = { display: 'flex', flexDirection: 'row', height: '100%' }
 
 configure({
   enforceActions: 'always',
@@ -30,7 +32,7 @@ function App() {
   documentStore.setup(db)
 
   return <IndexedDBContext.Provider value={db}>
-    <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
+    <div style={DIV_STYLE}>
       <LeftPanel />
       <DocumentSelectorAndEditor />
     </div>

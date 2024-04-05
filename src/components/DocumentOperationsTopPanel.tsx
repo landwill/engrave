@@ -1,14 +1,14 @@
 import { FilePlusIcon, FolderPlusIcon } from 'lucide-react'
-import { v4 as uuid } from 'uuid'
 import { documentStore } from '../stores/DocumentStore.ts'
 import { IconPanel } from './IconPanel.tsx'
+import { PanelIcon } from './IconPanelButton.tsx'
 
-const icons = [
+const icons: PanelIcon[] = [
   {
     buttonName: 'New file',
     Icon: FilePlusIcon,
     action: () => {
-      documentStore.selectedDocumentUuid = uuid()
+      documentStore.createAndSelectNewDocument()
     }
   }, {
     buttonName: 'New folder',

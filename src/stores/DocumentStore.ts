@@ -1,7 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import { v4 as uuid } from 'uuid'
 import { getDocuments, putFileInStore } from '../indexeddx/utils.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../utils.ts'
+
+const NEW_FILE_NAME = 'Untitled'
 
 export class DocumentStore {
   documentIdentifiers: DocumentIdentifier[] = []
@@ -38,26 +41,24 @@ export class DocumentStore {
 
   renameCurrentDocument(documentTitle: string) {
     if (this.idb == null) throw new Error('DocumentStore was not setup() properly.')
-    if (this.currentDocument) {
-      this.currentDocument.documentTitle = documentTitle
-      putFileInStore(this.currentDocument.documentUuid, documentTitle, this.idb)
-    } else {
-      throw new Error('E06')
-    }
+    this.currentDocument.documentTitle = documentTitle
+    putFileInStore(this.currentDocument.documentUuid, documentTitle, this.idb)
   }
 
-  createDocument(document: DocumentDetail) {
-    if (this.idb == null) throw new Error('DocumentStore was not setup() properly.')
-    this.documentIdentifiers.push({ ...document, lastModified: Date.now() } satisfies DocumentDetail)
-    putFileInStore(document.documentUuid, document.documentTitle, this.idb)
-  }
-
-  get currentDocument(): DocumentIdentifier | undefined {
-    return this.documentIdentifiers.find(document => document.documentUuid === this._selectedDocumentUuid)
+  get currentDocument(): DocumentIdentifier {
+    const document = this.documentIdentifiers.find(document => document.documentUuid === this._selectedDocumentUuid)
+    if (document == null) throw new Error('Unexpected scenario; document was found to have a nullish name.')
+    return document
   }
 
   get isNoDocumentSelected(): boolean {
     return this._selectedDocumentUuid == null
+  }
+
+  createAndSelectNewDocument() {
+    const documentUuid = uuid()
+    this.documentIdentifiers.push({ documentUuid: documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
+    this.selectedDocumentUuid = documentUuid
   }
 }
 

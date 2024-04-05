@@ -2,7 +2,6 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { ChangeEventHandler } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
-import { DocumentDetail } from '../interfaces.ts'
 import { documentStore } from '../stores/DocumentStore.ts'
 
 interface EditorTitlePanelObserverProps {
@@ -12,11 +11,7 @@ interface EditorTitlePanelObserverProps {
 export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObserverProps) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     runInAction(() => {
-      if (documentStore.currentDocument) {
-        documentStore.renameCurrentDocument(event.target.value)
-      } else {
-        documentStore.createDocument({ documentUuid: documentStore.selectedDocumentUuid, documentTitle: event.target.value } as DocumentDetail)
-      }
+      documentStore.renameCurrentDocument(event.target.value)
     })
   }
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -25,8 +20,7 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
       editorBodyRef.current?.focus()
     }
   }
-
-  if (documentStore.currentDocument == null && !documentStore.selectedDocumentUuid) {
+  if (!documentStore.selectedDocumentUuid) {
     return <div>E04</div>
   }
 
@@ -40,7 +34,7 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
       onKeyDown={handleKeyDown}
       suppressContentEditableWarning
       style={{ padding: '1em', border: 'none', borderBottom: COMMON_BORDER_STYLE, outline: 'none', fontSize: '1.25em', fontWeight: 500, backgroundColor: 'var(--background-color)', color: 'var(--color)' }}
-      value={documentStore.currentDocument?.documentTitle ?? 'New file'}
+      value={documentStore.currentDocument.documentTitle}
     />
   )
 })

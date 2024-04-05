@@ -40,6 +40,17 @@ body {
     min-width: 320px;
 }
 
+::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background-color: var(--scrollbar-color);
+}
+
+
 .active, .document-selector-item:hover {
     background-color: var(--panel-background-color-hover);
 }
@@ -50,6 +61,7 @@ body {
 
 .light-mode {
     --color: #213547;
+    --scrollbar-color: rgba(33, 53, 71, 0.3);
     --background-color: #ffffff;
 
     --border-color: #bbb;
@@ -59,6 +71,7 @@ body {
 
 .dark-mode {
     --color: rgba(255, 255, 255, 0.87);
+    --scrollbar-color: rgba(255, 255, 255, 0.43);
     --background-color: #242424;
 
     --border-color: #ccc;

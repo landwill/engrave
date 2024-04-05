@@ -3,7 +3,7 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { v4 as uuid } from 'uuid'
-import { DocumentStore } from '../stores/DocumentStore.ts'
+import { documentStore } from '../stores/DocumentStore.ts'
 import { DocumentOperationsTopPanel } from './DocumentOperationsTopPanel.tsx'
 import { DocumentSelectorItem } from './DocumentSelectorItem.tsx'
 import { PanelIcon } from './IconPanelButton.tsx'
@@ -25,12 +25,8 @@ const getDocumentOperationPanelIcons = (setSelectedDocument: (uuid: string) => v
   ]
 }
 
-interface DocumentSelectorPanelProps {
-  documentStore: DocumentStore
-}
-
-export const DocumentSelectorPanel = observer(({ documentStore }: DocumentSelectorPanelProps) => {
-  const icons = useMemo(() => getDocumentOperationPanelIcons((uuid: string) => {documentStore.selectedDocumentUuid = uuid}), [documentStore])
+export const DocumentSelectorPanel = observer(() => {
+  const icons = useMemo(() => getDocumentOperationPanelIcons((uuid: string) => {documentStore.selectedDocumentUuid = uuid}), [])
   const selectedDocumentUuid = documentStore.selectedDocumentUuid
   const documentIdentifiers = documentStore.documentIdentifiers.slice()
 

@@ -6,7 +6,7 @@ import { lazyErrorHandler } from '../utils.ts'
 export class DocumentStore {
   documentIdentifiers: DocumentIdentifier[] = []
   _selectedDocumentUuid: string | null = null
-  db: IDBDatabase
+  idb: IDBDatabase | null = null
 
   get selectedDocumentUuid() {
     return this._selectedDocumentUuid
@@ -16,10 +16,13 @@ export class DocumentStore {
     this._selectedDocumentUuid = documentUuid
   }
 
-  constructor(db: IDBDatabase) {
-    this.db = db
-    this.loadDocuments(db).catch(lazyErrorHandler)
+  constructor() {
     makeAutoObservable(this)
+  }
+
+  setup(idb: IDBDatabase) {
+    this.idb = idb
+    this.loadDocuments(idb).catch(lazyErrorHandler)
   }
 
   async loadDocuments(db: IDBDatabase) {
@@ -34,17 +37,19 @@ export class DocumentStore {
   }
 
   renameCurrentDocument(documentTitle: string) {
+    if (this.idb == null) throw new Error('DocumentStore was not setup() properly.')
     if (this.currentDocument) {
       this.currentDocument.documentTitle = documentTitle
-      putFileInStore(this.currentDocument.documentUuid, documentTitle, this.db)
+      putFileInStore(this.currentDocument.documentUuid, documentTitle, this.idb)
     } else {
       throw new Error('E06')
     }
   }
 
   createDocument(document: DocumentDetail) {
+    if (this.idb == null) throw new Error('DocumentStore was not setup() properly.')
     this.documentIdentifiers.push({ ...document, lastModified: Date.now() } satisfies DocumentDetail)
-    putFileInStore(document.documentUuid, document.documentTitle, this.db)
+    putFileInStore(document.documentUuid, document.documentTitle, this.idb)
   }
 
   get currentDocument(): DocumentIdentifier | undefined {
@@ -55,3 +60,5 @@ export class DocumentStore {
     return this._selectedDocumentUuid == null
   }
 }
+
+export const documentStore = new DocumentStore()

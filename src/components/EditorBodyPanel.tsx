@@ -2,15 +2,14 @@ import { observer } from 'mobx-react-lite'
 import React, { useEffect, useState } from 'react'
 import { useIndexedDB } from '../contexts/IndexedDBContext.tsx'
 import { getDocument } from '../indexeddx/utils.ts'
-import { DocumentStore } from '../stores/DocumentStore.ts'
+import { documentStore } from '../stores/DocumentStore.ts'
 import { lazyErrorHandler } from '../utils.ts'
 
 interface EditorBodyPanelProps {
-  documentStore: DocumentStore
   editorBodyRef: React.RefObject<HTMLDivElement>
 }
 
-export const EditorBodyPanel = observer(({ documentStore, editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
+export const EditorBodyPanel = observer(({ editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
   const db = useIndexedDB()
   const [body, setBody] = useState<string>('')
   const selectedDocumentId = documentStore.selectedDocumentUuid
@@ -20,10 +19,6 @@ export const EditorBodyPanel = observer(({ documentStore, editorBodyRef }: Edito
     const fetchDocumentBody = async () => {
       if (selectedDocumentId == null) {
         console.log('E01')
-        return
-      }
-      if (db == null) {
-        console.info('E02')
         return
       }
 

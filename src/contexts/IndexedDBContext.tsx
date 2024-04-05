@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-export const IndexedDBContext = createContext<IDBDatabase | undefined | null>(undefined)
+export const IndexedDBContext = createContext<IDBDatabase | undefined>(undefined)
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useIndexedDB() {

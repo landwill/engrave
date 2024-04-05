@@ -4,6 +4,7 @@ import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEdito
 import { LeftPanel } from './components/LeftPanel.tsx'
 import { IndexedDBContext } from './contexts/IndexedDBContext.tsx'
 import { setupIndexedDB } from './indexeddx/utils.ts'
+import { documentStore } from './stores/DocumentStore.ts'
 import { lazyDarkModeRetrieve, lazyErrorHandler } from './utils.ts'
 
 configure({
@@ -24,6 +25,9 @@ function App() {
   }, [])
 
   lazyDarkModeRetrieve()
+
+  if (db == null) return <div>Loading...</div>
+  documentStore.setup(db)
 
   return <IndexedDBContext.Provider value={db}>
     <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>

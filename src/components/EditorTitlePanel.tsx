@@ -3,14 +3,13 @@ import { observer } from 'mobx-react-lite'
 import React, { ChangeEventHandler } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
 import { DocumentDetail } from '../interfaces.ts'
-import { DocumentStore } from '../stores/DocumentStore.ts'
+import { documentStore } from '../stores/DocumentStore.ts'
 
 interface EditorTitlePanelObserverProps {
-  documentStore: DocumentStore
   editorBodyRef: React.RefObject<HTMLDivElement>
 }
 
-export const EditorTitlePanel = observer(({ documentStore, editorBodyRef }: EditorTitlePanelObserverProps) => {
+export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObserverProps) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     runInAction(() => {
       if (documentStore.currentDocument) {

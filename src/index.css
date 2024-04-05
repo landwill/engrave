@@ -27,8 +27,6 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    --active-document-text-color: #A56EFF;
 }
 
 html, body {
@@ -42,16 +40,12 @@ body {
     min-width: 320px;
 }
 
-.active {
-    color: var(--active-document-text-color);
-}
-
-.document-selector-item:hover {
+.active, .document-selector-item:hover {
     background-color: var(--panel-background-color-hover);
 }
 
 .untitled {
-    opacity: 0.5;
+    opacity: 0.55;
 }
 
 .light-mode {

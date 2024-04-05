@@ -11,8 +11,9 @@ const SPAN_STYLE: CSSProperties = {
   textOverflow: 'ellipsis',
   textWrap: 'nowrap',
   overflow: 'hidden',
-  paddingLeft: '1em',
-  paddingRight: '1em',
+  paddingLeft: '0.5em',
+  paddingRight: '0.5em',
+  borderRadius: '0.5em',
   flexShrink: 0
 }
 

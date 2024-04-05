@@ -10,6 +10,8 @@ const DIV_STYLE: CSSProperties = {
   paddingTop: '1em',
   width: '200px',
   userSelect: 'none',
+  marginLeft: '0.5em',
+  marginRight: '0.5em',
   overflowY: 'auto'
 }
 

@@ -17,6 +17,11 @@ module.exports = {
             'warn',
             {allowConstantExport: true},
         ],
+        'prefer-const': 'error',
+        'no-const-assign': 'error',
+        'no-var': 'error',
+        'no-new-object': 'error',
+        'object-shorthand': 'error'
     },
     parserOptions: {
         ecmaVersion: 'latest',

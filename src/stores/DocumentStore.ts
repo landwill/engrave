@@ -1,6 +1,6 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { action, makeAutoObservable, runInAction } from 'mobx'
 import { v4 as uuid } from 'uuid'
-import { getDocuments, putFileInStore } from '../indexeddx/utils.ts'
+import { getDocumentBody, getDocuments, updateDocumentBody, updateDocumentTitle } from '../indexeddx/utils.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../utils.ts'
 
@@ -12,7 +12,19 @@ export class DocumentStore {
   idb: IDBDatabase | null = null
 
   selectDocument(documentUuid: string) {
-    this.selectedDocument = this.documentIdentifiers.find(d => d.documentUuid === documentUuid) ?? null
+    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
+    if (document == null) throw new Error('No document found for the given uuid.')
+    this.selectedDocument = document
+    if (this.idb == null) throw new Error('Couldn\'t retrieve document, as the database connection was null.')
+    getDocumentBody(documentUuid, this.idb)
+      .then(
+        action('retrieveDocumentBody', body => {
+          if (this.selectedDocument == null) throw new Error('E06')
+          if (this.selectedDocument.documentUuid !== document.documentUuid) throw new Error('E02')
+          this.selectedDocument.body = body
+        })
+      )
+      .catch(lazyErrorHandler)
   }
 
   deselectDocument() {
@@ -39,16 +51,35 @@ export class DocumentStore {
     })
   }
 
-  renameCurrentDocument(documentTitle: string) {
+  renameDocument(documentUuid: string, documentTitle: string) {
     if (this.idb == null) throw new Error('DocumentStore was not setup() properly.')
-    if (this.selectedDocument == null) throw new Error('renameCurrentDocument called despite there being no selectedDocument.')
-    this.selectedDocument.documentTitle = documentTitle
-    putFileInStore(this.selectedDocument.documentUuid, documentTitle, this.idb)
+    const documentIdentifier = this.documentIdentifiers.find(d => d.documentUuid == documentUuid)
+    if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
+    documentIdentifier.documentTitle = documentTitle
+    updateDocumentTitle(documentUuid, documentTitle, this.idb)
   }
+
+  updateDocumentBody(documentUuid: string, newBody: string) {
+    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
+    if (!document) throw new Error('Document not found.')
+
+    runInAction(() => {
+      if (this.selectedDocument && this.selectedDocument.documentUuid === documentUuid) {
+        this.selectedDocument.body = newBody
+      } else {
+        console.error('E01')
+      }
+    })
+
+    if (!this.idb) throw new Error('IDB is not initialized')
+    updateDocumentBody(documentUuid, newBody, this.idb)
+      .catch(lazyErrorHandler)
+  }
+
 
   createAndSelectNewDocument() {
     const documentUuid = uuid()
-    this.documentIdentifiers.push({ documentUuid: documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
+    this.documentIdentifiers.push({ documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
     this.selectDocument(documentUuid)
   }
 }

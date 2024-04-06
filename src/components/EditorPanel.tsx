@@ -6,7 +6,7 @@ import { EditorBodyPanel } from './EditorBodyPanel.tsx'
 import { EditorTitlePanel } from './EditorTitlePanel.tsx'
 
 export const EditorPanel = observer(() => {
-  const editorBodyRef = useRef<HTMLDivElement>(null)
+  const editorBodyRef = useRef<HTMLTextAreaElement>(null)
   if (documentStore.selectedDocument == null) return <WelcomePage />
 
   return <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>

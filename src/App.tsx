@@ -2,7 +2,6 @@ import { configure } from 'mobx'
 import { CSSProperties, useEffect, useState } from 'react'
 import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
-import { IndexedDBContext } from './contexts/IndexedDBContext.tsx'
 import { setupIndexedDB } from './indexeddx/utils.ts'
 import { documentStore } from './stores/DocumentStore.ts'
 import { lazyDarkModeRetrieve, lazyErrorHandler } from './utils.ts'
@@ -31,12 +30,10 @@ function App() {
   if (db == null) return <div>Loading...</div>
   documentStore.setup(db)
 
-  return <IndexedDBContext.Provider value={db}>
-    <div style={DIV_STYLE}>
-      <LeftPanel />
-      <DocumentSelectorAndEditor />
-    </div>
-  </IndexedDBContext.Provider>
+  return <div style={DIV_STYLE}>
+    <LeftPanel />
+    <DocumentSelectorAndEditor />
+  </div>
 }
 
 export default App

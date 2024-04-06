@@ -3,17 +3,32 @@ import React from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
 
 interface EditorBodyPanelProps {
-  editorBodyRef: React.RefObject<HTMLDivElement>
+  editorBodyRef: React.RefObject<HTMLTextAreaElement>
+}
+
+const TEXTAREA_STYLE = {
+  padding: '1em',
+  height: '100%',
+  outline: 'none',
+  border: 'none',
+  backgroundColor: 'var(--background-color)',
+  color: 'var(--color)',
+  fontSize: '1.2em',
+  fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif'
 }
 
 export const EditorBodyPanel = observer(({ editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
-  if (documentStore.selectedDocument == null) throw new Error("EditorBodyPanel called for a null document.")
-  return <div ref={editorBodyRef}
-              style={{ padding: '1em', outline: 'none' }}
-              tabIndex={2}
-              contentEditable
-              suppressContentEditableWarning
-  >
-    {documentStore.selectedDocument.body}
-  </div>
+  const document = documentStore.selectedDocument
+  if (document == null) throw new Error('Body editor rendered for a null document')
+  const documentUuid = document.documentUuid
+
+  return <textarea ref={editorBodyRef}
+                   style={TEXTAREA_STYLE}
+                   key={documentUuid}
+                   tabIndex={2}
+                   onChange={e => {
+                     documentStore.updateDocumentBody(documentUuid, e.target.value)
+                   }}
+                   value={document.body}
+  />
 })

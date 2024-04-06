@@ -1,13 +1,20 @@
-import { useEffect, useState } from 'react'
+import { configure } from 'mobx'
+import { CSSProperties, useEffect, useState } from 'react'
 import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
-import { IndexedDBContext } from './contexts/IndexedDBContext.tsx'
 import { setupIndexedDB } from './indexeddx/utils.ts'
-import { lazyDarkModeRetrieve } from './utils.ts'
+import { documentStore } from './stores/DocumentStore.ts'
+import { lazyDarkModeRetrieve, lazyErrorHandler } from './utils.ts'
 
-const handleSetupIndexedDBError = (error: unknown) => {
-  console.error(error)
-}
+const DIV_STYLE: CSSProperties = { display: 'flex', flexDirection: 'row', height: '100%' }
+
+configure({
+  enforceActions: 'always',
+  computedRequiresReaction: true,
+  reactionRequiresObservable: true,
+  observableRequiresReaction: true,
+  disableErrorBoundaries: true
+})
 
 function App() {
   const [db, setDb] = useState<IDBDatabase | null>(null)
@@ -15,17 +22,18 @@ function App() {
   useEffect(() => {
     setupIndexedDB()
       .then(setDb)
-      .catch(handleSetupIndexedDBError)
+      .catch(lazyErrorHandler)
   }, [])
 
   lazyDarkModeRetrieve()
 
-  return <IndexedDBContext.Provider value={db}>
-    <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
-      <LeftPanel />
-      <DocumentSelectorAndEditor />
-    </div>
-  </IndexedDBContext.Provider>
+  if (db == null) return <div>Loading...</div>
+  documentStore.setup(db)
+
+  return <div style={DIV_STYLE}>
+    <LeftPanel />
+    <DocumentSelectorAndEditor />
+  </div>
 }
 
 export default App

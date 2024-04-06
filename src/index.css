@@ -20,15 +20,13 @@
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    color: var(--color);
+    background-color: var(--background-color);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    --active-document-text-color: #A56EFF;
 }
 
 html, body {
@@ -42,22 +40,41 @@ body {
     min-width: 320px;
 }
 
-.active {
-    color: var(--active-document-text-color);
+::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background-color: var(--scrollbar-color);
+}
+
+
+.active, .document-selector-item:hover {
+    background-color: var(--panel-background-color-hover);
+}
+
+.untitled {
+    opacity: 0.55;
 }
 
 .light-mode {
-    color: #213547;
-    background-color: #ffffff;
+    --color: #213547;
+    --scrollbar-color: rgba(33, 53, 71, 0.3);
+    --background-color: #ffffff;
 
     --border-color: #bbb;
     --panel-background-color: #eee;
+    --panel-background-color-hover: #ddd;
 }
 
 .dark-mode {
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    --color: rgba(255, 255, 255, 0.87);
+    --scrollbar-color: rgba(255, 255, 255, 0.43);
+    --background-color: #242424;
 
     --border-color: #ccc;
     --panel-background-color: #333;
+    --panel-background-color-hover: #555;
 }

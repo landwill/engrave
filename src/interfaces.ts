@@ -5,5 +5,5 @@ export interface DocumentIdentifier {
 }
 
 export interface DocumentDetail extends DocumentIdentifier {
-  body: string
+  body?: string
 }

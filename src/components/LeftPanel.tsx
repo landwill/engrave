@@ -23,7 +23,7 @@ const LEFT_PANEL_ICONS: PanelIcon[] = [
   }, {
     buttonName: 'About',
     Icon: HelpCircleIcon,
-    action: () => {documentStore.selectedDocumentUuid = null}
+    action: () => {documentStore.deselectDocument()}
   }, {
     buttonName: 'Toggle light/dark mode',
     Icon: SunMoonIcon,

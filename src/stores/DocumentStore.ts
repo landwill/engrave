@@ -8,15 +8,15 @@ const NEW_FILE_NAME = ''
 
 export class DocumentStore {
   documentIdentifiers: DocumentIdentifier[] = []
-  _selectedDocumentUuid: string | null = null
+  selectedDocument: DocumentDetail | null = null
   idb: IDBDatabase | null = null
 
-  get selectedDocumentUuid() {
-    return this._selectedDocumentUuid
+  selectDocument(documentUuid: string) {
+    this.selectedDocument = this.documentIdentifiers.find(d => d.documentUuid === documentUuid) ?? null
   }
 
-  set selectedDocumentUuid(documentUuid: string | null) {
-    this._selectedDocumentUuid = documentUuid
+  deselectDocument() {
+    this.selectedDocument = null
   }
 
   constructor() {
@@ -41,24 +41,15 @@ export class DocumentStore {
 
   renameCurrentDocument(documentTitle: string) {
     if (this.idb == null) throw new Error('DocumentStore was not setup() properly.')
-    this.currentDocument.documentTitle = documentTitle
-    putFileInStore(this.currentDocument.documentUuid, documentTitle, this.idb)
-  }
-
-  get currentDocument(): DocumentIdentifier {
-    const document = this.documentIdentifiers.find(document => document.documentUuid === this._selectedDocumentUuid)
-    if (document == null) throw new Error('Unexpected scenario; document was found to have a nullish name.')
-    return document
-  }
-
-  get isNoDocumentSelected(): boolean {
-    return this._selectedDocumentUuid == null
+    if (this.selectedDocument == null) throw new Error('renameCurrentDocument called despite there being no selectedDocument.')
+    this.selectedDocument.documentTitle = documentTitle
+    putFileInStore(this.selectedDocument.documentUuid, documentTitle, this.idb)
   }
 
   createAndSelectNewDocument() {
     const documentUuid = uuid()
     this.documentIdentifiers.push({ documentUuid: documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
-    this.selectedDocumentUuid = documentUuid
+    this.selectDocument(documentUuid)
   }
 }
 

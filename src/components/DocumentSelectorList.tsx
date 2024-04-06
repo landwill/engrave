@@ -16,7 +16,7 @@ const DIV_STYLE: CSSProperties = {
 }
 
 export const DocumentSelectorList = observer(() => {
-  const selectedDocumentUuid = documentStore.selectedDocumentUuid
+  const selectedDocumentUuid = documentStore.selectedDocument?.documentUuid
   const documentIdentifiers = documentStore.documentIdentifiers
 
   return <div style={DIV_STYLE}>
@@ -25,7 +25,7 @@ export const DocumentSelectorList = observer(() => {
         return <DocumentSelectorItem key={document.documentUuid}
                                      isActive={selectedDocumentUuid === document.documentUuid}
                                      title={document.documentTitle}
-                                     onClick={() => {runInAction(() => {documentStore.selectedDocumentUuid = document.documentUuid})}} />
+                                     onClick={() => {runInAction(() => {documentStore.selectDocument(document.documentUuid)})}} />
       })
     }
   </div>

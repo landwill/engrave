@@ -7,7 +7,7 @@ import { EditorTitlePanel } from './EditorTitlePanel.tsx'
 
 export const EditorPanel = observer(() => {
   const editorBodyRef = useRef<HTMLDivElement>(null)
-  if (documentStore.isNoDocumentSelected) return <WelcomePage />
+  if (documentStore.selectedDocument == null) return <WelcomePage />
 
   return <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
     <EditorTitlePanel editorBodyRef={editorBodyRef} />

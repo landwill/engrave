@@ -23,13 +23,13 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
     }
   }
 
-  if (!documentStore.selectedDocumentUuid) {
+  if (!documentStore.selectedDocument) {
     return <div>E04</div>
   }
 
   return (
     <input
-      key={documentStore.selectedDocumentUuid}
+      key={documentStore.selectedDocument.documentUuid}
       contentEditable
       autoFocus
       onChange={handleChange}
@@ -38,7 +38,7 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
       suppressContentEditableWarning
       style={INPUT_STYLE}
       placeholder='Untitled'
-      value={documentStore.currentDocument.documentTitle}
+      value={documentStore.selectedDocument.documentTitle}
     />
   )
 })

@@ -4,7 +4,7 @@ import { PanelBox } from './PanelBox.tsx'
 
 
 export const DocumentSelectorPanel = () => {
-  return <PanelBox direction='vertical'>
+  return <PanelBox direction='vertical' >
     <DocumentOperationsTopPanel />
     <DocumentSelectorList />
   </PanelBox>

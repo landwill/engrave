@@ -1,8 +1,9 @@
 import { action, makeAutoObservable, runInAction } from 'mobx'
 import { v4 as uuid } from 'uuid'
-import { getDocumentBody, getDocuments, updateDocumentBody, updateDocumentTitle } from '../indexeddx/utils.ts'
+import { deleteDocument, getDocumentBody, getDocuments, updateDocumentBody, updateDocumentTitle } from '../indexeddx/utils.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../utils.ts'
+import { contextMenu } from './ContextMenu.ts'
 
 const NEW_FILE_NAME = ''
 
@@ -81,6 +82,22 @@ export class DocumentStore {
     const documentUuid = uuid()
     this.documentIdentifiers.push({ documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
     this.selectDocument(documentUuid)
+  }
+
+  deleteDocument(documentUuid: string) {
+    const documentIndex = this.documentIdentifiers.findIndex(d => d.documentUuid === documentUuid)
+    this.documentIdentifiers.splice(documentIndex, 1)
+    this.verifySelectedDocument()
+    if (this.idb == null) throw new Error('E07')
+    contextMenu.setClosed()
+    deleteDocument(documentUuid, this.idb)
+      .catch(lazyErrorHandler)
+  }
+
+  verifySelectedDocument() {
+    if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => uuid === this.selectedDocument?.documentUuid)) {
+      this.deselectDocument()
+    }
   }
 }
 

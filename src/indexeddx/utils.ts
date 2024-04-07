@@ -1,8 +1,8 @@
 import { DocumentDetail } from '../interfaces.ts'
 import { INDEXEDDB_DATABASE_NAME, INDEXEDDB_STORE_NAME_FILES } from './consts.ts'
 
-const initializeDatabase = (db: IDBDatabase) => {
-  db.createObjectStore(INDEXEDDB_STORE_NAME_FILES, { keyPath: 'documentUuid' })
+const initializeDatabase = (idb: IDBDatabase) => {
+  idb.createObjectStore(INDEXEDDB_STORE_NAME_FILES, { keyPath: 'documentUuid' })
 }
 
 export const setupIndexedDB = (): Promise<IDBDatabase> => {
@@ -17,9 +17,9 @@ export const setupIndexedDB = (): Promise<IDBDatabase> => {
   })
 }
 
-export const getDocuments = (db: IDBDatabase) => {
+export const getDocuments = (idb: IDBDatabase) => {
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
+    const tx = idb.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
     const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
     const allDocuments = store.getAll()
     allDocuments.onsuccess = () => { resolve(allDocuments.result) }
@@ -27,8 +27,8 @@ export const getDocuments = (db: IDBDatabase) => {
   })
 }
 
-export const updateDocumentTitle = (documentUuid: string, documentTitle: string, db: IDBDatabase) => {
-  const tx = db.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
+export const updateDocumentTitle = (documentUuid: string, documentTitle: string, idb: IDBDatabase) => {
+  const tx = idb.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
   const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
   const request = store.get(documentUuid)
   request.onsuccess = () => {
@@ -62,9 +62,9 @@ export const getDocumentBody = (documentUuid: string, idb: IDBDatabase): Promise
   })
 }
 
-export function updateDocumentBody(documentUuid: string, body: string, db: IDBDatabase) {
+export function updateDocumentBody(documentUuid: string, body: string, idb: IDBDatabase) {
   return new Promise(() => {
-    const transaction = db.transaction([INDEXEDDB_STORE_NAME_FILES], 'readwrite')
+    const transaction = idb.transaction([INDEXEDDB_STORE_NAME_FILES], 'readwrite')
     const store = transaction.objectStore(INDEXEDDB_STORE_NAME_FILES)
     const request = store.get(documentUuid)
     request.onsuccess = () => {
@@ -82,6 +82,15 @@ export function updateDocumentBody(documentUuid: string, body: string, db: IDBDa
     request.onerror = () => {
       console.error(new Error(request.error?.message))
     }
+  })
+}
+
+export function deleteDocument(documentUuid: string, idb: IDBDatabase) {
+  return new Promise((_resolve, reject) => {
+    const transaction = idb.transaction([INDEXEDDB_STORE_NAME_FILES], 'readwrite')
+    const store = transaction.objectStore(INDEXEDDB_STORE_NAME_FILES)
+    const request = store.delete(documentUuid)
+    request.onerror = () => {reject(new Error(request.error?.message))}
   })
 }
 

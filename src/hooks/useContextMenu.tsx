@@ -1,6 +1,6 @@
 import { useLocalObservable } from 'mobx-react-lite'
 import { useEffect } from 'react'
-import { contextMenu, ContextMenuLocation } from '../stores/ContextMenu.ts'
+import { contextMenu, ContextMenuOpenProps } from '../stores/ContextMenu.ts'
 
 export const useContextMenu = () => {
   const store = useLocalObservable(() => contextMenu)
@@ -18,7 +18,7 @@ export const useContextMenu = () => {
 
   return {
     open: store.isOpen,
-    setOpen: (location: ContextMenuLocation) => { store.setOpen(location) },
+    setOpen: (location: ContextMenuOpenProps) => { store.setOpen(location) },
     setClosed: () => { store.setClosed() }
   }
 }

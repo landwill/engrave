@@ -5,6 +5,7 @@ import { ListItem } from './ListItem.tsx'
 
 interface DocumentSelectorItemProps {
   isActive: boolean
+  documentUuid: string
   title: string
   onClick?: MouseEventHandler
 }
@@ -20,13 +21,13 @@ function getTitleAndClassName(title: string, isActive: boolean) {
   return { effectiveTitle, className: classNames.join(' ') }
 }
 
-export const DocumentSelectorItem = observer(({ isActive, title, onClick }: DocumentSelectorItemProps) => {
+export const DocumentSelectorItem = observer(({ isActive, documentUuid, title, onClick }: DocumentSelectorItemProps) => {
   const { effectiveTitle, className } = getTitleAndClassName(title, isActive)
   const { setOpen } = useContextMenu()
 
   return <ListItem additionalClassName={className} onClick={onClick} onContextMenu={e => {
     e.preventDefault()
-    setOpen({ x: e.pageX, y: e.pageY })
+    setOpen({ x: e.pageX, y: e.pageY, documentUuid })
   }}>
     {effectiveTitle}
   </ListItem>

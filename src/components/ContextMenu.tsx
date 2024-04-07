@@ -1,10 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { COMMON_BORDER_RADIUS } from '../consts.ts'
 import { contextMenu } from '../stores/ContextMenu.ts'
+import { documentStore } from '../stores/DocumentStore.ts'
 import { ListItem } from './ListItem.tsx'
 
 export const ContextMenu = observer(() => {
   if (contextMenu.isOpen) {
+    const documentUuid = contextMenu.documentUuid
+    if (documentUuid == null) throw new Error('E03')
+
     return <div style={{
       position: 'fixed',
       top: contextMenu.y ?? 0,
@@ -18,7 +22,7 @@ export const ContextMenu = observer(() => {
       padding: '0.5em'
     }}>
       <ListItem>Rename</ListItem>
-      <ListItem>Delete</ListItem>
+      <ListItem onClick={() => { documentStore.deleteDocument(documentUuid) }}>Delete</ListItem>
     </div>
   }
   return undefined

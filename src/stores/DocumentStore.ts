@@ -87,10 +87,17 @@ export class DocumentStore {
   deleteDocument(documentUuid: string) {
     const documentIndex = this.documentIdentifiers.findIndex(d => d.documentUuid === documentUuid)
     this.documentIdentifiers.splice(documentIndex, 1)
+    this.verifySelectedDocument()
     if (this.idb == null) throw new Error('E07')
     contextMenu.setClosed()
     deleteDocument(documentUuid, this.idb)
       .catch(lazyErrorHandler)
+  }
+
+  verifySelectedDocument() {
+    if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => uuid === this.selectedDocument?.documentUuid)) {
+      this.deselectDocument()
+    }
   }
 }
 

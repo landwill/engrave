@@ -1,5 +1,6 @@
 import { configure } from 'mobx'
 import { CSSProperties, useEffect, useState } from 'react'
+import { ContextMenu } from './components/ContextMenu.tsx'
 import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
 import { setupIndexedDB } from './indexeddx/utils.ts'
@@ -33,6 +34,7 @@ function App() {
   return <div style={DIV_STYLE}>
     <LeftPanel />
     <DocumentSelectorAndEditor />
+    <ContextMenu />
   </div>
 }
 

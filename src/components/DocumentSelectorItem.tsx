@@ -1,4 +1,7 @@
-import { CSSProperties, MouseEventHandler } from 'react'
+import { observer } from 'mobx-react-lite'
+import { MouseEventHandler } from 'react'
+import { useContextMenu } from '../hooks/useContextMenu.tsx'
+import { ListItem } from './ListItem.tsx'
 
 interface DocumentSelectorItemProps {
   isActive: boolean
@@ -6,34 +9,25 @@ interface DocumentSelectorItemProps {
   onClick?: MouseEventHandler
 }
 
-const SPAN_STYLE: CSSProperties = {
-  marginBottom: '0.25em',
-  textOverflow: 'ellipsis',
-  textWrap: 'nowrap',
-  overflow: 'hidden',
-  paddingLeft: '0.5em',
-  paddingRight: '0.5em',
-  borderRadius: '0.5em',
-  flexShrink: 0
-}
-
 function getTitleAndClassName(title: string, isActive: boolean) {
+  const classNames = []
   let effectiveTitle = title
-  let className = 'document-selector-item'
-  if (isActive) className += ' active'
+  if (isActive) classNames.push('active')
   if (title.trim() == '') {
-    className += ' untitled'
+    classNames.push('untitled')
     effectiveTitle = 'Untitled'
   }
-  return { effectiveTitle, className }
+  return { effectiveTitle, className: classNames.join(' ') }
 }
 
-export function DocumentSelectorItem({ isActive, title, onClick }: DocumentSelectorItemProps) {
+export const DocumentSelectorItem = observer(({ isActive, title, onClick }: DocumentSelectorItemProps) => {
   const { effectiveTitle, className } = getTitleAndClassName(title, isActive)
+  const { setOpen } = useContextMenu()
 
-  return <span className={className}
-               style={SPAN_STYLE}
-               onClick={onClick}>
-            {effectiveTitle}
-        </span>
-}
+  return <ListItem additionalClassName={className} onClick={onClick} onContextMenu={e => {
+    e.preventDefault()
+    setOpen({ x: e.pageX, y: e.pageY })
+  }}>
+    {effectiveTitle}
+  </ListItem>
+})

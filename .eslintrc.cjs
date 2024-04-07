@@ -21,7 +21,8 @@ module.exports = {
         'no-const-assign': 'error',
         'no-var': 'error',
         'no-new-object': 'error',
-        'object-shorthand': 'error'
+        'object-shorthand': 'error',
+        'react-hooks/exhaustive-deps': 'error',
     },
     parserOptions: {
         ecmaVersion: 'latest',

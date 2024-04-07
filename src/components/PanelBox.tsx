@@ -17,14 +17,17 @@ const getBorders = (direction: 'horizontal' | 'vertical') => {
 
 export const PanelBox = ({ direction, children, style }: PanelBoxProps) => {
   const { borderRight, borderBottom } = getBorders(direction)
-  return <div className='panelBox' style={{
-    borderRight,
-    borderBottom,
-    backgroundColor: 'var(--panel-background-color)',
-    display: 'flex',
-    flexDirection: direction === 'vertical' ? 'column' : 'row',
-    ...style
-  }}>
+  return <div
+    className='panelBox'
+    onContextMenu={e => { e.preventDefault()}}
+    style={{
+      borderRight,
+      borderBottom,
+      backgroundColor: 'var(--panel-background-color)',
+      display: 'flex',
+      flexDirection: direction === 'vertical' ? 'column' : 'row',
+      ...style
+    }}>
     {children}
   </div>
 }

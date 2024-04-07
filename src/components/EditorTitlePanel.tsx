@@ -1,6 +1,6 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import React, { ChangeEventHandler } from 'react'
+import React, { ChangeEventHandler, CSSProperties } from 'react'
 import { COMMON_BORDER_STYLE } from '../consts.ts'
 import { documentStore } from '../stores/DocumentStore.ts'
 
@@ -8,7 +8,17 @@ interface EditorTitlePanelObserverProps {
   editorBodyRef: React.RefObject<HTMLTextAreaElement>
 }
 
-const INPUT_STYLE = { padding: '1em', border: 'none', borderBottom: COMMON_BORDER_STYLE, outline: 'none', fontSize: '1.25em', fontWeight: 500, backgroundColor: 'var(--background-color)', color: 'var(--color)' }
+const INPUT_STYLE: CSSProperties = {
+  padding: '1em',
+  border: 'none',
+  borderBottom: COMMON_BORDER_STYLE,
+  outline: 'none',
+  fontSize: '1.25em',
+  fontWeight: 500,
+  backgroundColor: 'var(--background-color)',
+  color: 'var(--color)',
+  resize: 'none'
+}
 
 export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObserverProps) => {
   const documentUuid = documentStore.selectedDocument?.documentUuid

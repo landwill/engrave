@@ -1,12 +1,12 @@
 import { observer } from 'mobx-react-lite'
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
 
 interface EditorBodyPanelProps {
   editorBodyRef: React.RefObject<HTMLTextAreaElement>
 }
 
-const TEXTAREA_STYLE = {
+const TEXTAREA_STYLE: CSSProperties = {
   padding: '1em',
   height: '100%',
   outline: 'none',
@@ -14,7 +14,8 @@ const TEXTAREA_STYLE = {
   backgroundColor: 'var(--background-color)',
   color: 'var(--color)',
   fontSize: '1.2em',
-  fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif'
+  fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+  resize: 'none'
 }
 
 export const EditorBodyPanel = observer(({ editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {

@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { deleteDocument, getDocumentBody, getDocuments, updateDocumentBody, updateDocumentTitle } from '../indexeddx/utils.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../utils.ts'
-import { contextMenu } from './ContextMenu.ts'
+import { contextMenuStore } from './ContextMenuStore.ts'
 
 const NEW_FILE_NAME = ''
 
@@ -89,7 +89,7 @@ export class DocumentStore {
     this.documentIdentifiers.splice(documentIndex, 1)
     this.verifySelectedDocument()
     if (this.idb == null) throw new Error('E07')
-    contextMenu.setClosed()
+    contextMenuStore.setClosed()
     deleteDocument(documentUuid, this.idb)
       .catch(lazyErrorHandler)
   }

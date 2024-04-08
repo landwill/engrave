@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { MouseEventHandler } from 'react'
 import { useContextMenu } from '../hooks/useContextMenu.tsx'
 import { ListItem } from './ListItem.tsx'
@@ -21,7 +20,7 @@ function getTitleAndClassName(title: string, isActive: boolean) {
   return { effectiveTitle, className: classNames.join(' ') }
 }
 
-export const DocumentSelectorItem = observer(({ isActive, documentUuid, title, onClick }: DocumentSelectorItemProps) => {
+export const DocumentSelectorItem = ({ isActive, documentUuid, title, onClick }: DocumentSelectorItemProps) => {
   const { effectiveTitle, className } = getTitleAndClassName(title, isActive)
   const { setOpen } = useContextMenu()
 
@@ -31,4 +30,4 @@ export const DocumentSelectorItem = observer(({ isActive, documentUuid, title, o
   }}>
     {effectiveTitle}
   </ListItem>
-})
+}

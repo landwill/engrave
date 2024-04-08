@@ -1,18 +1,18 @@
 import { observer } from 'mobx-react-lite'
 import { COMMON_BORDER_RADIUS } from '../consts.ts'
-import { contextMenu } from '../stores/ContextMenu.ts'
+import { contextMenuStore } from '../stores/ContextMenuStore.ts'
 import { documentStore } from '../stores/DocumentStore.ts'
 import { ListItem } from './ListItem.tsx'
 
 export const ContextMenu = observer(() => {
-  if (contextMenu.isOpen) {
-    const documentUuid = contextMenu.documentUuid
+  if (contextMenuStore.isOpen) {
+    const documentUuid = contextMenuStore.documentUuid
     if (documentUuid == null) throw new Error('E03')
 
     return <div style={{
       position: 'fixed',
-      top: contextMenu.y ?? 0,
-      left: contextMenu.x ?? 0,
+      top: contextMenuStore.y ?? 0,
+      left: contextMenuStore.x ?? 0,
       backgroundColor: 'var(--panel-background-color)',
       borderRadius: COMMON_BORDER_RADIUS,
       border: '1px solid var(--border-color)',

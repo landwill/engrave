@@ -7,7 +7,7 @@ export interface ContextMenuOpenProps {
   documentUuid: string
 }
 
-class ContextMenu {
+class ContextMenuStore {
   isOpen = false
   x: number | null = null
   y: number | null = null
@@ -37,4 +37,4 @@ class ContextMenu {
 }
 
 
-export const contextMenu = new ContextMenu()
+export const contextMenuStore = new ContextMenuStore()

@@ -7,22 +7,13 @@ interface PanelBoxProps {
   style?: CSSProperties
 }
 
-const getBorders = (direction: 'horizontal' | 'vertical') => {
-  if (direction === 'horizontal') {
-    return { borderRight: undefined, borderBottom: COMMON_BORDER_STYLE }
-  } else {
-    return { borderRight: COMMON_BORDER_STYLE, borderBottom: undefined }
-  }
-}
-
 export const PanelBox = ({ direction, children, style }: PanelBoxProps) => {
-  const { borderRight, borderBottom } = getBorders(direction)
+  const borderRight = direction === 'horizontal' ? undefined : COMMON_BORDER_STYLE
   return <div
     className='panelBox'
     onContextMenu={e => { e.preventDefault()}}
     style={{
       borderRight,
-      borderBottom,
       backgroundColor: 'var(--panel-background-color)',
       display: 'flex',
       flexDirection: direction === 'vertical' ? 'column' : 'row',

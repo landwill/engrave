@@ -2,15 +2,10 @@ import { DocumentDetail } from '../interfaces.ts'
 import { INDEXEDDB_DATABASE_NAME, INDEXEDDB_STORE_NAME_FILES } from './consts.ts'
 
 export class IndexedDB {
-  _idb: IDBDatabase | undefined
-
-  get idb(): IDBDatabase {
-    if (this._idb === undefined) throw new Error("IndexedDB was not opened.")
-    return this._idb
-  }
+  idb: IDBDatabase
 
   constructor(idb: IDBDatabase) {
-    this._idb = idb
+    this.idb = idb
   }
 
   static async open(): Promise<IndexedDB> {

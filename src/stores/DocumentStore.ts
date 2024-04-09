@@ -1,4 +1,4 @@
-import { action, makeAutoObservable, runInAction } from 'mobx'
+import { action, flow, flowResult, makeAutoObservable, runInAction } from 'mobx'
 import { v4 as uuid } from 'uuid'
 import { IndexedDB } from '../indexeddx/indexeddb.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
@@ -37,23 +37,23 @@ export class DocumentStore {
   }
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      loadDocuments: flow
+    })
   }
 
   setup(idb: IndexedDB) {
     this._idb = idb
-    this.loadDocuments().catch(lazyErrorHandler)
+    flowResult(this.loadDocuments()).catch(lazyErrorHandler)
   }
 
-  async loadDocuments() {
-    const documents: DocumentDetail[] = await this.idb.getDocuments() as DocumentDetail[]
-    runInAction(() => {
-      this.documentIdentifiers = documents.map(document => ({
-        documentUuid: document.documentUuid,
-        documentTitle: document.documentTitle,
-        lastModified: document.lastModified
-      } as DocumentIdentifier))
-    })
+  *loadDocuments(): Generator<Promise<DocumentDetail[]>, void, DocumentDetail[]> {
+    const documents: DocumentDetail[] = yield this.idb.getDocuments()
+    this.documentIdentifiers = documents.map(document => ({
+      documentUuid: document.documentUuid,
+      documentTitle: document.documentTitle,
+      lastModified: document.lastModified
+    } as DocumentIdentifier))
   }
 
   renameDocument(documentUuid: string, documentTitle: string) {
@@ -91,7 +91,7 @@ export class DocumentStore {
     this.documentIdentifiers.splice(documentIndex, 1)
     this.verifySelectedDocument()
     contextMenuStore.setClosed()
-    this.idb.deleteDocument(documentUuid, )
+    this.idb.deleteDocument(documentUuid)
       .catch(lazyErrorHandler)
   }
 

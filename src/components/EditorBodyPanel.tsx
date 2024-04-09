@@ -1,3 +1,4 @@
+import { action } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { CSSProperties } from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
@@ -27,9 +28,9 @@ export const EditorBodyPanel = observer(({ editorBodyRef }: EditorBodyPanelProps
                    style={TEXTAREA_STYLE}
                    key={documentUuid}
                    tabIndex={2}
-                   onChange={e => {
+                   onChange={action(e => {
                      documentStore.updateDocumentBody(documentUuid, e.target.value)
-                   }}
+                   })}
                    value={document.body}
   />
 })

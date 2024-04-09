@@ -26,19 +26,19 @@ export class IndexedDB {
     return new Promise((resolve, reject) => {
       const tx = this.idb.transaction(INDEXEDDB_STORE_NAME_FILES, 'readonly')
       const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
-      const request = store.get(documentUuid)
+      const request = store.get(documentUuid) as IDBRequest<DocumentDetail | undefined>
       request.onsuccess = () => {
         // Nullable in the case of new, unnamed & unmodified documents, which are present only in the DocumentStore but not IDB
-        const result: DocumentDetail | null = request.result as (DocumentDetail | null)
+        const result: DocumentDetail | undefined = request.result
         resolve(result?.body ?? '')
       }
       request.onerror = () => { reject(new Error(request.error?.message))}
     })
   }
 
-  getDocuments = () => {
+  getDocuments = (): Promise<DocumentDetail[]> => {
     return new Promise((resolve, reject) => {
-      const tx = this.idb.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
+      const tx = this.idb.transaction(INDEXEDDB_STORE_NAME_FILES, 'readonly')
       const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
       const allDocuments = store.getAll()
       allDocuments.onsuccess = () => { resolve(allDocuments.result) }
@@ -49,17 +49,12 @@ export class IndexedDB {
   updateDocumentTitle = (documentUuid: string, documentTitle: string) => {
     const tx = this.idb.transaction(INDEXEDDB_STORE_NAME_FILES, 'readwrite')
     const store = tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
-    const request = store.get(documentUuid)
+    const request = store.get(documentUuid) as IDBRequest<DocumentDetail | undefined>
     request.onsuccess = () => {
-      const document = request.result as DocumentDetail | null
-      let putRequest
-      if (document) {
-        document.documentTitle = documentTitle
-        document.lastModified = Date.now()
-        putRequest = store.put(document)
-      } else {
-        putRequest = store.put({ documentUuid, documentTitle, lastModified: Date.now() } as DocumentDetail)
-      }
+      const document: DocumentDetail = request.result ?? { documentUuid, documentTitle: '', lastModified: 0 }
+      document.documentTitle = documentTitle
+      document.lastModified = Date.now()
+      const putRequest = store.put(document)
       putRequest.onerror = () => { console.error(new Error(request.error?.message))}
     }
     request.onerror = () => {
@@ -71,9 +66,9 @@ export class IndexedDB {
     return new Promise(() => {
       const transaction = this.idb.transaction([INDEXEDDB_STORE_NAME_FILES], 'readwrite')
       const store = transaction.objectStore(INDEXEDDB_STORE_NAME_FILES)
-      const request = store.get(documentUuid)
+      const request = store.get(documentUuid) as IDBRequest<DocumentDetail | undefined>
       request.onsuccess = () => {
-        const document = request.result as DocumentDetail | null
+        const document = request.result
         if (document) {
           document.body = body
           document.lastModified = Date.now()

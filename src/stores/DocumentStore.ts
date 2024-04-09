@@ -1,6 +1,6 @@
 import { action, makeAutoObservable, runInAction } from 'mobx'
 import { v4 as uuid } from 'uuid'
-import { deleteDocument, getDocumentBody, getDocuments, updateDocumentBody, updateDocumentTitle } from '../indexeddx/utils.ts'
+import { IndexedDB } from '../indexeddx/indexeddb.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../utils.ts'
 import { contextMenuStore } from './ContextMenuStore.ts'
@@ -10,14 +10,18 @@ const NEW_FILE_NAME = ''
 export class DocumentStore {
   documentIdentifiers: DocumentIdentifier[] = []
   selectedDocument: DocumentDetail | null = null
-  idb: IDBDatabase | null = null
+  _idb: IndexedDB | null = null
+
+  get idb() {
+    if (this._idb == null) throw new Error('Tried accessing idb before setting it.')
+    return this._idb
+  }
 
   selectDocument(documentUuid: string) {
     const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
     if (document == null) throw new Error('No document found for the given uuid.')
     this.selectedDocument = document
-    if (this.idb == null) throw new Error('Couldn\'t retrieve document, as the database connection was null.')
-    getDocumentBody(documentUuid, this.idb)
+    this.idb.getDocumentBody(documentUuid)
       .then(
         action('retrieveDocumentBody', body => {
           if (this.selectedDocument == null) throw new Error('E06')
@@ -36,13 +40,13 @@ export class DocumentStore {
     makeAutoObservable(this)
   }
 
-  setup(idb: IDBDatabase) {
-    this.idb = idb
-    this.loadDocuments(idb).catch(lazyErrorHandler)
+  setup(idb: IndexedDB) {
+    this._idb = idb
+    this.loadDocuments().catch(lazyErrorHandler)
   }
 
-  async loadDocuments(db: IDBDatabase) {
-    const documents: DocumentDetail[] = await getDocuments(db) as DocumentDetail[]
+  async loadDocuments() {
+    const documents: DocumentDetail[] = await this.idb.getDocuments() as DocumentDetail[]
     runInAction(() => {
       this.documentIdentifiers = documents.map(document => ({
         documentUuid: document.documentUuid,
@@ -53,11 +57,10 @@ export class DocumentStore {
   }
 
   renameDocument(documentUuid: string, documentTitle: string) {
-    if (this.idb == null) throw new Error('DocumentStore was not setup() properly.')
     const documentIdentifier = this.documentIdentifiers.find(d => d.documentUuid == documentUuid)
     if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
     documentIdentifier.documentTitle = documentTitle
-    updateDocumentTitle(documentUuid, documentTitle, this.idb)
+    this.idb.updateDocumentTitle(documentUuid, documentTitle)
   }
 
   updateDocumentBody(documentUuid: string, newBody: string) {
@@ -72,8 +75,7 @@ export class DocumentStore {
       }
     })
 
-    if (!this.idb) throw new Error('IDB is not initialized')
-    updateDocumentBody(documentUuid, newBody, this.idb)
+    this.idb.updateDocumentBody(documentUuid, newBody)
       .catch(lazyErrorHandler)
   }
 
@@ -88,9 +90,8 @@ export class DocumentStore {
     const documentIndex = this.documentIdentifiers.findIndex(d => d.documentUuid === documentUuid)
     this.documentIdentifiers.splice(documentIndex, 1)
     this.verifySelectedDocument()
-    if (this.idb == null) throw new Error('E07')
     contextMenuStore.setClosed()
-    deleteDocument(documentUuid, this.idb)
+    this.idb.deleteDocument(documentUuid, )
       .catch(lazyErrorHandler)
   }
 

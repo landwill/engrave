@@ -3,7 +3,7 @@ import { CSSProperties, useEffect, useState } from 'react'
 import { ContextMenu } from './components/ContextMenu.tsx'
 import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
-import { setupIndexedDB } from './indexeddx/utils.ts'
+import { IndexedDB } from './indexeddx/indexeddb.ts'
 import { documentStore } from './stores/DocumentStore.ts'
 import { lazyDarkModeRetrieve, lazyErrorHandler } from './utils.ts'
 
@@ -18,10 +18,10 @@ configure({
 })
 
 function App() {
-  const [db, setDb] = useState<IDBDatabase | null>(null)
+  const [db, setDb] = useState<IndexedDB | null>(null)
 
   useEffect(() => {
-    setupIndexedDB()
+    IndexedDB.open()
       .then(setDb)
       .catch(lazyErrorHandler)
   }, [])

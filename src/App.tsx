@@ -18,18 +18,20 @@ configure({
 })
 
 function App() {
-  const [db, setDb] = useState<IndexedDB | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     IndexedDB.open()
-      .then(setDb)
+      .then(db => {
+        setIsLoading(false)
+        documentStore.setup(db)
+      })
       .catch(lazyErrorHandler)
   }, [])
 
   lazyDarkModeRetrieve()
 
-  if (db == null) return <div>Loading...</div>
-  documentStore.setup(db)
+  if (isLoading) return <div>Loading...</div>
 
   return <div style={DIV_STYLE}>
     <LeftPanel />

@@ -64,7 +64,7 @@ body {
     --scrollbar-color: rgba(33, 53, 71, 0.3);
     --background-color: #ffffff;
 
-    --border-color: #bbb;
+    --border-color: #ddd;
     --panel-background-color: #eee;
     --panel-background-color-hover: #ddd;
 }
@@ -74,7 +74,7 @@ body {
     --scrollbar-color: rgba(255, 255, 255, 0.43);
     --background-color: #242424;
 
-    --border-color: #ccc;
+    --border-color: #555;
     --panel-background-color: #333;
     --panel-background-color-hover: #555;
 }

@@ -1,4 +1,5 @@
 import { DownloadIcon, FileIcon, GitCommitIcon, HelpCircleIcon, SearchIcon, SunMoonIcon, UploadIcon } from 'lucide-react'
+import React from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
 import { toggleDarkMode } from '../utils.ts'
 import { IconPanel } from './IconPanel.tsx'
@@ -32,6 +33,6 @@ const LEFT_PANEL_ICONS: PanelIcon[] = [
   }
 ]
 
-export function LeftPanel() {
+export const LeftPanel = React.memo(function LeftPanel() {
   return <IconPanel icons={LEFT_PANEL_ICONS} direction='vertical' />
-}
+})

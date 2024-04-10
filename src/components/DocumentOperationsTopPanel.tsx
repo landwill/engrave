@@ -16,6 +16,8 @@ const icons: PanelIcon[] = [
   }
 ]
 
+const DIV_PROPS = { marginBottom: '0.5em' }
+
 export const DocumentOperationsTopPanel = () => {
-  return <IconPanel icons={icons} direction='horizontal' centered divProps={{ marginBottom: '0.5em' }} />
+  return <IconPanel icons={icons} direction='horizontal' centered divProps={DIV_PROPS} />
 }

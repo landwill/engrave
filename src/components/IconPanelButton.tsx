@@ -1,11 +1,11 @@
 import { LucideIcon } from 'lucide-react'
-import React, { useRef, useState } from 'react'
+import React, { MouseEventHandler, useRef, useState } from 'react'
 import { Tooltip } from './Tooltip.tsx'
 
 export interface PanelIcon {
   Icon: LucideIcon
-  action?: () => void
   buttonName: string
+  action?: MouseEventHandler
   additionalProps?: React.CSSProperties
 }
 
@@ -17,7 +17,12 @@ const getMargins = (direction: 'horizontal' | 'vertical') => {
   }
 }
 
-export function IconPanelButton({ icon, direction }: { icon: PanelIcon, direction: 'horizontal' | 'vertical' }) {
+interface IconPanelButtonProps {
+  icon: PanelIcon
+  direction: 'horizontal' | 'vertical'
+}
+
+export function IconPanelButton({ icon, direction }: IconPanelButtonProps) {
   const [tooltip, setTooltip] = useState<{ isOpen: boolean, x: number, y: number }>({ isOpen: false, x: 0, y: 0 })
   const opacity = icon.action == null ? 0.4 : 1
   const pointerEvents = icon.action == null ? 'none' : undefined
@@ -52,7 +57,7 @@ export function IconPanelButton({ icon, direction }: { icon: PanelIcon, directio
       onMouseLeave={closeTooltip}
       onClick={icon.action}
     >
-      <icon.Icon />
+      <icon.Icon size={20}/>
     </div>
     {tooltip.isOpen && <Tooltip tooltip={tooltip} text={icon.buttonName} />
     }

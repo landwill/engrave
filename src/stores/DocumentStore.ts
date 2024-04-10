@@ -17,25 +17,6 @@ export class DocumentStore {
     return this._idb
   }
 
-  selectDocument(documentUuid: string) {
-    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
-    if (document == null) throw new Error('No document found for the given uuid.')
-    this.selectedDocument = document
-    this.idb.getDocumentBody(documentUuid)
-      .then(
-        action('retrieveDocumentBody', body => {
-          if (this.selectedDocument == null) throw new Error('E06')
-          if (this.selectedDocument.documentUuid !== document.documentUuid) throw new Error('E02')
-          this.selectedDocument.body = body
-        })
-      )
-      .catch(lazyErrorHandler)
-  }
-
-  deselectDocument() {
-    this.selectedDocument = null
-  }
-
   constructor() {
     makeAutoObservable(this, {
       loadDocuments: flow
@@ -47,7 +28,7 @@ export class DocumentStore {
     flowResult(this.loadDocuments()).catch(lazyErrorHandler)
   }
 
-  *loadDocuments(): Generator<Promise<DocumentDetail[]>, void, DocumentDetail[]> {
+  * loadDocuments(): Generator<Promise<DocumentDetail[]>, void, DocumentDetail[]> {
     const documents: DocumentDetail[] = yield this.idb.getDocuments()
     this.documentIdentifiers = documents.map(document => ({
       documentUuid: document.documentUuid,
@@ -56,11 +37,31 @@ export class DocumentStore {
     } as DocumentIdentifier))
   }
 
+  selectDocument(documentUuid: string) {
+    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
+    if (document == null) throw new Error('No document found for the given uuid.')
+    this.selectedDocument = document
+    this.idb.getDocumentBody(documentUuid)
+      .then(
+        action('retrieveDocumentBody', body => {
+          if (document.documentUuid === this.selectedDocument?.documentUuid) {
+            this.selectedDocument.body = body
+          }
+        })
+      )
+      .catch(lazyErrorHandler)
+  }
+
+  deselectDocument() {
+    this.selectedDocument = null
+  }
+
   renameDocument(documentUuid: string, documentTitle: string) {
     const documentIdentifier = this.documentIdentifiers.find(d => d.documentUuid == documentUuid)
     if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
     documentIdentifier.documentTitle = documentTitle
     this.idb.updateDocumentTitle(documentUuid, documentTitle)
+      .catch(lazyErrorHandler)
   }
 
   updateDocumentBody(documentUuid: string, newBody: string) {

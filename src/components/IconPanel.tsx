@@ -12,7 +12,7 @@ interface IconPanelProps {
 export function IconPanel({ icons, direction, centered = false, divProps }: IconPanelProps) {
   return <PanelBox direction={direction}>
     <div style={{
-      margin: '1em',
+      margin: '0.5em',
       flexGrow: 1,
       display: 'flex',
       flexDirection: direction === 'vertical' ? 'column' : 'row',

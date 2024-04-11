@@ -9,24 +9,15 @@ export interface PanelIcon {
   additionalProps?: React.CSSProperties
 }
 
-const getMargins = (direction: 'horizontal' | 'vertical') => {
-  if (direction === 'horizontal') {
-    return { marginBottom: undefined, marginRight: '1em' }
-  } else {
-    return { marginBottom: '1em', marginRight: undefined }
-  }
-}
-
 interface IconPanelButtonProps {
   icon: PanelIcon
   direction: 'horizontal' | 'vertical'
 }
 
-export function IconPanelButton({ icon, direction }: IconPanelButtonProps) {
+export const IconPanelButton = ({ icon }: IconPanelButtonProps) => {
   const [tooltip, setTooltip] = useState<{ isOpen: boolean, x: number, y: number }>({ isOpen: false, x: 0, y: 0 })
   const opacity = icon.action == null ? 0.4 : 1
   const pointerEvents = icon.action == null ? 'none' : undefined
-  const { marginBottom, marginRight } = getMargins(direction)
   const tooltipTimeoutRef = useRef<number | null>(null)
 
   const openTooltip = ({ x, y }: { x: number, y: number }) => {
@@ -46,8 +37,6 @@ export function IconPanelButton({ icon, direction }: IconPanelButtonProps) {
       style={{
         opacity,
         pointerEvents,
-        marginBottom,
-        marginRight,
         cursor: 'pointer',
         ...icon.additionalProps
       }}
@@ -57,7 +46,7 @@ export function IconPanelButton({ icon, direction }: IconPanelButtonProps) {
       onMouseLeave={closeTooltip}
       onClick={icon.action}
     >
-      <icon.Icon size={20}/>
+      <icon.Icon className='icon' style={{ padding: '0.5em' }} size={20}/>
     </div>
     {tooltip.isOpen && <Tooltip tooltip={tooltip} text={icon.buttonName} />
     }

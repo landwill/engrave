@@ -28,6 +28,7 @@ export const EditorBodyPanel = observer(({ editorBodyRef }: EditorBodyPanelProps
                    style={TEXTAREA_STYLE}
                    key={documentUuid}
                    tabIndex={2}
+                   disabled={document.body == null}
                    onChange={action(e => {
                      documentStore.updateDocumentBody(documentUuid, e.target.value)
                    })}

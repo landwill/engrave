@@ -1,4 +1,4 @@
-import { IndexedDB } from './indexeddx/indexeddb.ts'
+import { IndexedDB } from '../indexeddx/indexeddb.ts'
 
 let idb: IndexedDB
 void (async () => {

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
-import { WelcomePage } from '../WelcomePage.tsx'
+import { WelcomePage } from './WelcomePage.tsx'
 import { EditorBodyPanel } from './EditorBodyPanel.tsx'
 import { EditorTitlePanel } from './EditorTitlePanel.tsx'
 

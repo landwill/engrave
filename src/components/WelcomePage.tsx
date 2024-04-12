@@ -1,6 +1,6 @@
 import engraveLogo from '/engrave.svg'
-import { CenteringDiv } from './components/CenteringDiv.tsx'
-import { documentStore } from './stores/DocumentStore.ts'
+import { CenteringDiv } from './CenteringDiv.tsx'
+import { documentStore } from '../stores/DocumentStore.ts'
 
 export function WelcomePage() {
   return <CenteringDiv>

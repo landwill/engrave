@@ -10,6 +10,7 @@ export const CenteringDiv = ({ children }: CenteringDivProps) => {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    userSelect: 'none'
   }}>{children}</div>
 }

@@ -81,5 +81,4 @@ export class IndexedDB {
       request.onerror = () => {reject(new Error(request.error?.message))}
     })
   }
-
 }

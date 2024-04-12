@@ -5,7 +5,7 @@ import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEdito
 import { LeftPanel } from './components/LeftPanel.tsx'
 import { IndexedDB } from './indexeddx/indexeddb.ts'
 import { documentStore } from './stores/DocumentStore.ts'
-import { lazyDarkModeRetrieve, lazyErrorHandler } from './utils.ts'
+import { lazyDarkModeRetrieve, lazyErrorHandler } from './misc/utils.ts'
 
 const DIV_STYLE: CSSProperties = { display: 'flex', flexDirection: 'row', height: '100%' }
 

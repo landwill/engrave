@@ -1,7 +1,7 @@
 import { DownloadIcon, FileIcon, GitCommitIcon, HelpCircleIcon, SearchIcon, SunMoonIcon, UploadIcon } from 'lucide-react'
 import React from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
-import { toggleDarkMode } from '../utils.ts'
+import { toggleDarkMode } from '../misc/utils.ts'
 import { IconPanel } from './IconPanel.tsx'
 import { PanelIcon } from './IconPanelButton.tsx'
 

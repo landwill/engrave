@@ -1,4 +1,4 @@
-import { DARK_MODE_LOCALSTORAGE_KEY } from './consts.ts'
+import { DARK_MODE_LOCALSTORAGE_KEY } from '../consts.ts'
 
 export enum Theme {
   LIGHT,

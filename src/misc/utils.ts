@@ -5,6 +5,8 @@ export enum Theme {
   DARK
 }
 
+const DEFAULT_THEME = Theme.DARK
+
 const getOldAndNewClassNames = (newMode: Theme) => {
   return newMode === Theme.LIGHT ? { newClassName: 'light-mode', oldClassName: 'dark-mode' } : { newClassName: 'dark-mode', oldClassName: 'light-mode' }
 }
@@ -22,10 +24,10 @@ export const setRootTheme = (theme: Theme) => {
 
 const getCurrentLightDarkMode = (): Theme => {
   const localStorageDarkMode = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
-  if (localStorageDarkMode != null) {
-    return localStorageDarkMode === 'true' ? Theme.DARK : Theme.LIGHT
+  if (localStorageDarkMode == null) {
+    return DEFAULT_THEME
   }
-  return Theme.LIGHT
+  return localStorageDarkMode === 'true' ? Theme.DARK : Theme.LIGHT
 }
 
 export const toggleDarkMode = () => {
@@ -33,10 +35,22 @@ export const toggleDarkMode = () => {
   setRootTheme(currentMode === Theme.DARK ? Theme.LIGHT : Theme.DARK)
 }
 
+function getThemeFromDarkModePreference(darkModePreference: string | null) {
+  switch (darkModePreference) {
+    case 'false':
+      return Theme.LIGHT
+    case 'true':
+      return Theme.DARK
+    default:
+      return DEFAULT_THEME
+  }
+}
+
 export const lazyDarkModeRetrieve = () => {
   try {
-    const darkMode = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
-    if (darkMode === 'true') setRootTheme(Theme.DARK)
+    const darkModePreference = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
+    const theme = getThemeFromDarkModePreference(darkModePreference)
+    setRootTheme(theme)
   } catch (error) {
     console.warn('Failed to fetch your light/dark mode preferences.')
   }

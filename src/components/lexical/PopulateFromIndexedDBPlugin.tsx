@@ -12,6 +12,7 @@ export const PopulateFromIndexedDBPlugin = ({ documentUuid: documentUuidProp }: 
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
+    editor.setEditable(false)
     worker.onmessage = ({ data }) => {
       const { documentUuid, body } = data as IDBWorkerMessage
       if (documentUuid !== documentUuidProp) throw new Error('Unexpected documentUuid.')
@@ -22,7 +23,10 @@ export const PopulateFromIndexedDBPlugin = ({ documentUuid: documentUuidProp }: 
         if (parsedEditorState.isEmpty()) {
           clearEditor(editor)
         } else {
-          editor.update(() => {editor.setEditorState(parsedEditorState)})
+          editor.update(() => {
+            editor.setEditorState(parsedEditorState)
+            editor.setEditable(true)
+          })
         }
       }
     }

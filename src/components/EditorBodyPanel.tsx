@@ -2,6 +2,7 @@ import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalCompos
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { type EditorState, type LexicalEditor } from 'lexical'
@@ -27,7 +28,8 @@ export const EditorBodyPanel = ({ documentUuid, editorBodyRef }: EditorBodyPanel
   const initialConfig: InitialConfigType = {
     namespace: 'EngraveEditor',
     onError: (error: unknown) => {console.log(error)},
-    theme
+    theme,
+    editable: false
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -38,9 +40,10 @@ export const EditorBodyPanel = ({ documentUuid, editorBodyRef }: EditorBodyPanel
   return <LexicalComposer initialConfig={initialConfig}>
     <RichTextPlugin contentEditable={<ContentEditable tabIndex={2} style={{ height: '100%', paddingLeft: '1em', paddingRight: '1em', outline: 'none' }} />}
                     placeholder={<div />}
-                    ErrorBoundary={LexicalErrorBoundary} />
-    <OnChangePlugin onChange={onChange} />
+                    ErrorBoundary={LexicalErrorBoundary}/>
+    <OnChangePlugin onChange={onChange} ignoreSelectionChange/>
     <PopulateFromIndexedDBPlugin documentUuid={documentUuid} />
     <EditorRefPlugin editorRef={editorBodyRef}/>
+    <HistoryPlugin />
   </LexicalComposer>
 }

@@ -4,7 +4,6 @@ import { v4 as uuid } from 'uuid'
 import { IndexedDB } from '../indexeddx/indexeddb.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../misc/utils.ts'
-import { worker } from '../misc/worker.ts'
 import { contextMenuStore } from './ContextMenuStore.ts'
 
 const NEW_FILE_NAME = ''
@@ -23,14 +22,6 @@ export class DocumentStore {
     makeAutoObservable(this, {
       loadDocuments: flow
     })
-    // worker.onmessage = ({ data }) => {
-    //   const { documentUuid: responseDocumentUuid, body } = data as DocumentDetail
-    //   runInAction(() => {
-    //     if (this.selectedDocument != null && this.selectedDocument.documentUuid === responseDocumentUuid) {
-    //       this.selectedDocument.body = body
-    //     }
-    //   })
-    // }
   }
 
   setup(idb: IndexedDB) {
@@ -51,7 +42,6 @@ export class DocumentStore {
     const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
     if (document == null) throw new Error('No document found for the given uuid.')
     this.selectedDocument = document
-    worker.postMessage(documentUuid)
   }
 
   deselectDocument() {

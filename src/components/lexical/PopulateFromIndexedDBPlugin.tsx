@@ -1,4 +1,5 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { CLEAR_HISTORY_COMMAND } from 'lexical'
 import { useEffect } from 'react'
 import { IDBWorkerMessage } from '../../interfaces.ts'
 import { clearEditor } from '../../lexical/utils.tsx'
@@ -25,6 +26,7 @@ export const PopulateFromIndexedDBPlugin = ({ documentUuid: documentUuidProp }: 
         } else {
           editor.update(() => {
             editor.setEditorState(parsedEditorState)
+            editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
             editor.setEditable(true)
           })
         }

@@ -58,6 +58,10 @@ body {
     font-style: italic;
 }
 
+.textStrikethrough {
+    text-decoration: line-through;
+}
+
 .active, .list-item:hover {
     background-color: var(--panel-background-color-hover);
 }

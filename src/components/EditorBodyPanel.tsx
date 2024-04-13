@@ -5,7 +5,7 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { type EditorState, type LexicalEditor } from 'lexical'
+import { type EditorState, EditorThemeClasses, type LexicalEditor } from 'lexical'
 import { runInAction } from 'mobx'
 import React, { MutableRefObject } from 'react'
 import ToolbarPlugin from '../lexical/ToolbarPlugin.tsx'
@@ -17,11 +17,12 @@ interface EditorBodyPanelProps {
   editorBodyRef: MutableRefObject<LexicalEditor | null>
 }
 
-const theme = {
+const theme: EditorThemeClasses = {
   text: {
     bold: 'textBold',
     italic: 'textItalic',
-    underline: 'textUnderline'
+    underline: 'textUnderline',
+    strikethrough: 'textStrikethrough'
   }
 }
 

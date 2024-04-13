@@ -1,5 +1,10 @@
+import { SerializedEditorState, SerializedLexicalNode } from 'lexical'
 import { DocumentDetail } from '../interfaces.ts'
 import { INDEXEDDB_DATABASE_NAME, INDEXEDDB_STORE_NAME_FILES } from './consts.ts'
+
+const hasChildren = (node: SerializedLexicalNode): node is { children: unknown[] } & SerializedLexicalNode => {
+  return 'children' in node && Array.isArray(node.children)
+}
 
 export class IndexedDB {
   idb: IDBDatabase
@@ -35,7 +40,7 @@ export class IndexedDB {
     })
   }
 
-  getDocumentBody = async (documentUuid: string): Promise<string> => {
+  getDocumentBody = async (documentUuid: string): Promise<SerializedEditorState | ''> => {
     const document = await this.getDocument(documentUuid)
     return document?.body ?? ''
   }
@@ -61,8 +66,16 @@ export class IndexedDB {
     })
   }
 
-  updateDocumentBody = async (documentUuid: string, body: string) => {
-    const document: DocumentDetail = await this.getDocument(documentUuid) ?? { documentUuid, documentTitle: '', lastModified: 0 }
+  updateDocumentBody = async (documentUuid: string, body: SerializedEditorState) => {
+    let document: DocumentDetail | undefined = await this.getDocument(documentUuid)
+    if (document == null) {
+      if (body.root.children.length == 1
+        && hasChildren(body.root.children[0])
+        && body.root.children[0].children.length === 0) {
+        return
+      }
+      document = { documentUuid, documentTitle: '', lastModified: 0 }
+    }
     document.body = body
     document.lastModified = Date.now()
 

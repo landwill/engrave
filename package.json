@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lexical/react": "^0.14.3",
+    "lexical": "^0.14.3",
     "lucide-react": "^0.363.0",
     "mobx": "^6.12.3",
     "mobx-react-lite": "^4.0.7",

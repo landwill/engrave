@@ -1,37 +1,52 @@
-import { action } from 'mobx'
-import { observer } from 'mobx-react-lite'
-import React, { CSSProperties } from 'react'
+import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin'
+import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { type EditorState, EditorThemeClasses, type LexicalEditor } from 'lexical'
+import { runInAction } from 'mobx'
+import React, { MutableRefObject } from 'react'
+import ToolbarPlugin from '../lexical/ToolbarPlugin.tsx'
 import { documentStore } from '../stores/DocumentStore.ts'
+import { PopulateFromIndexedDBPlugin } from './lexical/PopulateFromIndexedDBPlugin.tsx'
 
 interface EditorBodyPanelProps {
-  editorBodyRef: React.RefObject<HTMLTextAreaElement>
+  documentUuid: string
+  editorBodyRef: MutableRefObject<LexicalEditor | null>
 }
 
-const TEXTAREA_STYLE: CSSProperties = {
-  padding: '1em',
-  height: '100%',
-  outline: 'none',
-  border: 'none',
-  backgroundColor: 'var(--background-color)',
-  color: 'var(--color)',
-  fontSize: '1.2em',
-  fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
-  resize: 'none'
+const theme: EditorThemeClasses = {
+  text: {
+    bold: 'textBold',
+    italic: 'textItalic',
+    underline: 'textUnderline',
+    strikethrough: 'textStrikethrough'
+  }
 }
 
-export const EditorBodyPanel = observer(({ editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
-  const document = documentStore.selectedDocument
-  if (document == null) throw new Error('Body editor rendered for a null document')
-  const documentUuid = document.documentUuid
+export const EditorBodyPanel = ({ documentUuid, editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
+  const initialConfig: InitialConfigType = {
+    namespace: 'EngraveEditor',
+    onError: (error: unknown) => {console.log(error)},
+    theme,
+    editable: false
+  }
 
-  return <textarea ref={editorBodyRef}
-                   style={TEXTAREA_STYLE}
-                   key={documentUuid}
-                   tabIndex={2}
-                   disabled={document.body == null}
-                   onChange={action(e => {
-                     documentStore.updateDocumentBody(documentUuid, e.target.value)
-                   })}
-                   value={document.body}
-  />
-})
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onChange = (editorState: EditorState, _editor: LexicalEditor, _tags: Set<string>): void => {
+    runInAction(() => {documentStore.updateDocumentBody(documentUuid, editorState.toJSON())})
+  }
+
+  return <LexicalComposer initialConfig={initialConfig} key={documentUuid}>
+    <ToolbarPlugin />
+    <RichTextPlugin contentEditable={<ContentEditable tabIndex={2} style={{ height: '100%', paddingLeft: '1em', paddingRight: '1em', outline: 'none' }} />}
+                    placeholder={<div />}
+                    ErrorBoundary={LexicalErrorBoundary}/>
+    <OnChangePlugin onChange={onChange} ignoreSelectionChange/>
+    <PopulateFromIndexedDBPlugin documentUuid={documentUuid} />
+    <EditorRefPlugin editorRef={editorBodyRef}/>
+    <HistoryPlugin />
+  </LexicalComposer>
+}

@@ -1,17 +1,18 @@
 import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { type EditorState, type LexicalEditor } from 'lexical'
 import { runInAction } from 'mobx'
-import React from 'react'
+import React, { MutableRefObject } from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
-import { PopulateFromIndexedDB } from './lexical/PopulateFromIndexedDB.tsx'
+import { PopulateFromIndexedDBPlugin } from './lexical/PopulateFromIndexedDBPlugin.tsx'
 
 interface EditorBodyPanelProps {
   documentUuid: string
-  // editorBodyRef: React.RefObject<HTMLTextAreaElement>
+  editorBodyRef: MutableRefObject<LexicalEditor | null>
 }
 
 const theme = {
@@ -22,7 +23,7 @@ const theme = {
   }
 }
 
-export const EditorBodyPanel = ({ documentUuid }: EditorBodyPanelProps): React.JSX.Element => {
+export const EditorBodyPanel = ({ documentUuid, editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
   const initialConfig: InitialConfigType = {
     namespace: 'EngraveEditor',
     onError: (error: unknown) => {console.log(error)},
@@ -39,6 +40,7 @@ export const EditorBodyPanel = ({ documentUuid }: EditorBodyPanelProps): React.J
                     placeholder={<div />}
                     ErrorBoundary={LexicalErrorBoundary} />
     <OnChangePlugin onChange={onChange} />
-    <PopulateFromIndexedDB documentUuid={documentUuid} />
+    <PopulateFromIndexedDBPlugin documentUuid={documentUuid} />
+    <EditorRefPlugin editorRef={editorBodyRef}/>
   </LexicalComposer>
 }

@@ -8,7 +8,7 @@ interface PopulateFromIndexedDBProps {
   documentUuid: string
 }
 
-export const PopulateFromIndexedDB = ({ documentUuid: documentUuidProp }: PopulateFromIndexedDBProps) => {
+export const PopulateFromIndexedDBPlugin = ({ documentUuid: documentUuidProp }: PopulateFromIndexedDBProps) => {
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {

@@ -4,8 +4,8 @@ import { ContextMenu } from './components/ContextMenu.tsx'
 import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
 import { LeftPanel } from './components/LeftPanel.tsx'
 import { IndexedDB } from './indexeddx/indexeddb.ts'
-import { documentStore } from './stores/DocumentStore.ts'
 import { lazyDarkModeRetrieve, lazyErrorHandler } from './misc/utils.ts'
+import { documentStore } from './stores/DocumentStore.ts'
 
 const DIV_STYLE: CSSProperties = { display: 'flex', flexDirection: 'row', height: '100%' }
 
@@ -17,16 +17,27 @@ configure({
   disableErrorBoundaries: true
 })
 
+const handleKeyDown = (e: KeyboardEvent) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault()
+  }
+}
+
 function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
     IndexedDB.open()
       .then(db => {
         setIsLoading(false)
         documentStore.setup(db)
       })
       .catch(lazyErrorHandler)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [])
 
   lazyDarkModeRetrieve()

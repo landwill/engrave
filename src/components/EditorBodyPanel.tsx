@@ -1,37 +1,44 @@
-import { action } from 'mobx'
-import { observer } from 'mobx-react-lite'
-import React, { CSSProperties } from 'react'
+import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { type EditorState, type LexicalEditor } from 'lexical'
+import { runInAction } from 'mobx'
+import React from 'react'
 import { documentStore } from '../stores/DocumentStore.ts'
+import { PopulateFromIndexedDB } from './lexical/PopulateFromIndexedDB.tsx'
 
 interface EditorBodyPanelProps {
-  editorBodyRef: React.RefObject<HTMLTextAreaElement>
+  documentUuid: string
+  // editorBodyRef: React.RefObject<HTMLTextAreaElement>
 }
 
-const TEXTAREA_STYLE: CSSProperties = {
-  padding: '1em',
-  height: '100%',
-  outline: 'none',
-  border: 'none',
-  backgroundColor: 'var(--background-color)',
-  color: 'var(--color)',
-  fontSize: '1.2em',
-  fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
-  resize: 'none'
+const theme = {
+  text: {
+    bold: 'textBold',
+    italic: 'textItalic',
+    underline: 'textUnderline'
+  }
 }
 
-export const EditorBodyPanel = observer(({ editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
-  const document = documentStore.selectedDocument
-  if (document == null) throw new Error('Body editor rendered for a null document')
-  const documentUuid = document.documentUuid
+export const EditorBodyPanel = ({ documentUuid }: EditorBodyPanelProps): React.JSX.Element => {
+  const initialConfig: InitialConfigType = {
+    namespace: 'EngraveEditor',
+    onError: (error: unknown) => {console.log(error)},
+    theme
+  }
 
-  return <textarea ref={editorBodyRef}
-                   style={TEXTAREA_STYLE}
-                   key={documentUuid}
-                   tabIndex={2}
-                   disabled={document.body == null}
-                   onChange={action(e => {
-                     documentStore.updateDocumentBody(documentUuid, e.target.value)
-                   })}
-                   value={document.body}
-  />
-})
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onChange = (editorState: EditorState, _editor: LexicalEditor, _tags: Set<string>): void => {
+    runInAction(() => {documentStore.updateDocumentBody(documentUuid, editorState.toJSON())})
+  }
+
+  return <LexicalComposer initialConfig={initialConfig}>
+    <RichTextPlugin contentEditable={<ContentEditable tabIndex={2} style={{ height: '100%', paddingLeft: '1em', paddingRight: '1em', outline: 'none' }} />}
+                    placeholder={<div />}
+                    ErrorBoundary={LexicalErrorBoundary} />
+    <OnChangePlugin onChange={onChange} />
+    <PopulateFromIndexedDB documentUuid={documentUuid} />
+  </LexicalComposer>
+}

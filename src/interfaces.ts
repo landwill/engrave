@@ -1,3 +1,5 @@
+import { SerializedEditorState } from 'lexical'
+
 export interface DocumentIdentifier {
   documentUuid: string
   documentTitle: string
@@ -5,5 +7,10 @@ export interface DocumentIdentifier {
 }
 
 export interface DocumentDetail extends DocumentIdentifier {
-  body?: string
+  body?: SerializedEditorState
+}
+
+export interface IDBWorkerMessage {
+  documentUuid: string
+  body?: SerializedEditorState | ''
 }

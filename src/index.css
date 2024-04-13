@@ -50,6 +50,13 @@ body {
     background-color: var(--scrollbar-color);
 }
 
+.textBold {
+    font-weight: bold;
+}
+
+.textItalic {
+    font-style: italic;
+}
 
 .active, .list-item:hover {
     background-color: var(--panel-background-color-hover);

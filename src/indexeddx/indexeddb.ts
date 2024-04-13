@@ -1,3 +1,4 @@
+import { SerializedEditorState } from 'lexical'
 import { DocumentDetail } from '../interfaces.ts'
 import { INDEXEDDB_DATABASE_NAME, INDEXEDDB_STORE_NAME_FILES } from './consts.ts'
 
@@ -35,7 +36,7 @@ export class IndexedDB {
     })
   }
 
-  getDocumentBody = async (documentUuid: string): Promise<string> => {
+  getDocumentBody = async (documentUuid: string): Promise<SerializedEditorState | ''> => {
     const document = await this.getDocument(documentUuid)
     return document?.body ?? ''
   }
@@ -61,7 +62,7 @@ export class IndexedDB {
     })
   }
 
-  updateDocumentBody = async (documentUuid: string, body: string) => {
+  updateDocumentBody = async (documentUuid: string, body: SerializedEditorState) => {
     const document: DocumentDetail = await this.getDocument(documentUuid) ?? { documentUuid, documentTitle: '', lastModified: 0 }
     document.body = body
     document.lastModified = Date.now()

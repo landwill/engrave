@@ -11,6 +11,10 @@
     color-scheme: light dark;
     color: var(--color);
     background-color: var(--background-color);
+    --dark-background-color: #242424;
+    --light-background-color: #ffffff;
+    --light-panel-background-color: #eee;
+    --dark-panel-background-color: #333;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -103,21 +107,41 @@ body {
 .light-mode {
     --color: #213547;
     --scrollbar-color: rgba(33, 53, 71, 0.3);
-    --background-color: #ffffff;
+    --background-color: var(--light-background-color);
 
     --border-color: #ddd;
-    --panel-background-color: #eee;
+    --panel-background-color: var(--light-panel-background-color);
     --panel-background-color-hover: #ddd;
+
+    --tooltip-background-color: #666;
+    --tooltip-font-color: #eee;
 }
 
 .dark-mode {
     --color: rgba(255, 255, 255, 0.87);
     --scrollbar-color: rgba(255, 255, 255, 0.43);
-    --background-color: #242424;
+    --background-color: var(--dark-background-color);
 
     --border-color: #555;
-    --panel-background-color: #333;
+    --panel-background-color: var(--dark-panel-background-color);
     --panel-background-color-hover: #555;
+
+    --tooltip-background-color: #777;
+    --tooltip-font-color: #eee;
+}
+
+.fade-in {
+    animation: fade-in-opacity 300ms;
+}
+
+@keyframes fade-in-opacity {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .toolbar {

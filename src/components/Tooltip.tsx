@@ -1,10 +1,9 @@
 interface TooltipProps {
-  tooltip: { isOpen: boolean; x: number; y: number }
-  text: string
+  tooltip: { isOpen: boolean; x: number; y: number, text: string }
 }
 
-export function Tooltip({ tooltip, text }: TooltipProps) {
-  return <div style={{
+export function Tooltip({ tooltip }: TooltipProps) {
+  return <div className='fade-in' style={{
     position: 'fixed',
     left: tooltip.x,
     top: tooltip.y,
@@ -14,13 +13,12 @@ export function Tooltip({ tooltip, text }: TooltipProps) {
     paddingBottom: '0.25em',
     paddingLeft: '0.5em',
     paddingRight: '0.5em',
-    border: '1px solid white',
     borderRadius: '0.5em',
-    fontSize: '0.9em',
-    backgroundColor: 'var(--panel-background-color)',
-    color: 'var(--color)',
-    boxShadow: '0px 0px 3px 0.4px var(--border-color)'
+    fontSize: '0.8em',
+    backgroundColor: 'var(--tooltip-background-color)',
+    color: 'var(--tooltip-font-color)',
+    transform: 'translateY(-50%)'
   }}>
-    {text}
+    {tooltip.text}
   </div>
 }

@@ -87,6 +87,16 @@ export class IndexedDB {
     })
   }
 
+  $TEST_createBrokenFile = async (documentUuid: string) => {
+    return new Promise<void>((resolve, reject) => {
+      const store = this.getStore('readwrite')
+      // @ts-expect-error This method is intentionally mischievous for chaos/debugging purposes.
+      const request = store.put({ documentUuid, body: 'Hello, world!', documentTitle: 'Test file', lastModified: Date.now() } satisfies DocumentDetail)
+      request.onsuccess = () => {resolve()}
+      request.onerror = () => {reject(new Error(request.error?.message))}
+    })
+  }
+
   deleteDocument = (documentUuid: string) => {
     return new Promise((_resolve, reject) => {
       const store = this.getStore('readwrite')

@@ -1,5 +1,6 @@
-import { MouseEventHandler } from 'react'
+import { MouseEventHandler, useMemo } from 'react'
 import { useContextMenu } from '../hooks/useContextMenu.tsx'
+import { documentStore } from '../stores/DocumentStore.ts'
 import { ListItem } from './ListItem.tsx'
 
 interface DocumentSelectorItemProps {
@@ -22,11 +23,16 @@ function getTitleAndClassName(title: string, isActive: boolean) {
 
 export const DocumentSelectorItem = ({ isActive, documentUuid, title, onClick }: DocumentSelectorItemProps) => {
   const { effectiveTitle, className } = getTitleAndClassName(title, isActive)
-  const { setOpen } = useContextMenu()
+  const { openContextMenu } = useContextMenu()
+
+  const contextMenuItems = useMemo(() => <>
+    <ListItem>Rename</ListItem>
+    <ListItem onClick={() => { documentStore.deleteDocument(documentUuid) }}>Delete</ListItem>
+  </>, [documentUuid])
 
   return <ListItem additionalClassName={className} onClick={onClick} onContextMenu={e => {
     e.preventDefault()
-    setOpen({ x: e.pageX, y: e.pageY, documentUuid })
+    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems })
   }}>
     {effectiveTitle}
   </ListItem>

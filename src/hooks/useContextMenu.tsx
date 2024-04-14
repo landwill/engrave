@@ -15,6 +15,6 @@ export const useContextMenu = () => {
   }, [])
 
   return {
-    setOpen: (location: ContextMenuOpenProps) => { contextMenuStore.setOpen(location) }
+    openContextMenu: (contextMenu: ContextMenuOpenProps) => { contextMenuStore.openContextMenu(contextMenu) }
   }
 }

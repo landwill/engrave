@@ -24,7 +24,10 @@ export function IconPanel({ icons, direction, centered = false, divProps }: Icon
       justifyContent: centered ? 'center' : undefined,
       ...divProps
     }}>
-      {icons.map(icon => <IconPanelButton key={icon.buttonName} icon={icon} direction={direction} setTooltip={setTooltip} />)}
+      {
+        icons.filter(i => i.visible == null || i.visible)
+          .map(icon => <IconPanelButton key={icon.buttonName} icon={icon} direction={direction} setTooltip={setTooltip} />)
+      }
     </div>
     {
       tooltip.isOpen && <Tooltip tooltip={tooltip} />

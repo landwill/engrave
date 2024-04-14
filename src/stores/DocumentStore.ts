@@ -63,10 +63,11 @@ export class DocumentStore {
       .catch(lazyErrorHandler)
   }
 
-  createAndSelectNewDocument() {
+  createAndSelectNewDocument(): string {
     const documentUuid = uuid()
     this.documentIdentifiers.push({ documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
     this.selectDocument(documentUuid)
+    return documentUuid
   }
 
   deleteDocument(documentUuid: string) {
@@ -82,6 +83,11 @@ export class DocumentStore {
     if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => uuid === this.selectedDocument?.documentUuid)) {
       this.deselectDocument()
     }
+  }
+
+  $TEST_createBrokenFile(documentUuid: string) {
+    this.idb.$TEST_createBrokenFile(documentUuid)
+      .catch(lazyErrorHandler)
   }
 }
 

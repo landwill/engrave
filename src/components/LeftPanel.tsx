@@ -7,8 +7,13 @@ import { IconPanel } from './IconPanel.tsx'
 import { PanelIcon } from './IconPanelButton.tsx'
 import { ListItem } from './ListItem.tsx'
 
+const createV1Document = () => {
+  const documentUuid = documentStore.createAndSelectNewDocument()
+  documentStore.$TEST_createBrokenFile(documentUuid)
+}
+
 const contextMenuItems = <>
-  <ListItem>Create test/broken document</ListItem>
+  <ListItem onClick={createV1Document}>Create test/broken document</ListItem>
 </>
 
 export const LeftPanel = React.memo(function LeftPanel() {

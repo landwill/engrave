@@ -7,6 +7,7 @@ export interface PanelIcon {
   buttonName: string
   action?: MouseEventHandler
   additionalProps?: React.CSSProperties
+  visible?: boolean
 }
 
 interface IconPanelButtonProps {
@@ -44,11 +45,13 @@ export const IconPanelButton = ({ icon }: IconPanelButtonProps) => {
         tooltipTimeoutRef.current = setTimeout(() => {openTooltip({ x: e.pageX + 15, y: e.pageY - 10 })}, 500)
       }}
       onMouseLeave={closeTooltip}
-      onClick={icon.action}
+      onClick={event => {
+        if (icon.action != null) icon.action(event)
+        closeTooltip()
+      }}
     >
-      <icon.Icon className='icon' style={{ padding: '0.5em' }} size={20}/>
+      <icon.Icon className='icon' style={{ padding: '0.5em' }} size={20} />
     </div>
-    {tooltip.isOpen && <Tooltip tooltip={tooltip} text={icon.buttonName} />
-    }
+    {tooltip.isOpen && <Tooltip tooltip={tooltip} text={icon.buttonName} />}
   </>
 }

@@ -130,6 +130,20 @@ body {
     --tooltip-font-color: #eee;
 }
 
+.fade-in {
+    animation: fade-in-opacity 300ms;
+}
+
+@keyframes fade-in-opacity {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 .toolbar {
     display: flex;
     margin-bottom: 1px;

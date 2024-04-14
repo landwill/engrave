@@ -3,7 +3,7 @@ interface TooltipProps {
 }
 
 export function Tooltip({ tooltip }: TooltipProps) {
-  return <div style={{
+  return <div className='fade-in' style={{
     position: 'fixed',
     left: tooltip.x,
     top: tooltip.y,

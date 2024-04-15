@@ -20,6 +20,9 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    --blue: #0080ff;
+    --purple: #a15cff;
 }
 
 .logo {
@@ -66,8 +69,13 @@ body {
     text-decoration: line-through;
 }
 
-.active, .list-item:hover {
+.active, .list-item:hover, .toolbar-item:hover:not([disabled]) {
     background-color: var(--panel-background-color-hover);
+    color: white;
+
+    svg {
+        stroke: white;
+    }
 }
 
 .untitled {
@@ -75,7 +83,7 @@ body {
 }
 
 .link {
-    color: #AA6EFD;
+    color: var(--purple);
     cursor: pointer;
 }
 
@@ -84,7 +92,7 @@ body {
 }
 
 .icon:hover {
-    color: #AA6EFD;
+    color: var(--purple);
 }
 
 .pulse {
@@ -111,7 +119,7 @@ body {
 
     --border-color: #ddd;
     --panel-background-color: var(--light-panel-background-color);
-    --panel-background-color-hover: #ddd;
+    --panel-background-color-hover: var(--purple);
 
     --tooltip-background-color: #666;
     --tooltip-font-color: #eee;
@@ -124,7 +132,7 @@ body {
 
     --border-color: #555;
     --panel-background-color: var(--dark-panel-background-color);
-    --panel-background-color-hover: #555;
+    --panel-background-color-hover: var(--purple);
 
     --tooltip-background-color: #777;
     --tooltip-font-color: #eee;
@@ -191,12 +199,8 @@ body {
     background-color: var(--panel-background-color-hover);
 }
 
-.toolbar button.toolbar-item.active  {
+.toolbar button.toolbar-item.active {
     opacity: 1;
-}
-
-.toolbar .toolbar-item:hover:not([disabled]) {
-    background-color: var(--panel-background-color-hover);
 }
 
 .toolbar .divider {

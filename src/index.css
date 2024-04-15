@@ -218,3 +218,9 @@ body {
     line-height: 16px;
     background-size: contain;
 }
+
+/* Lexical themes */
+.paragraph {
+    margin-top: 5px;
+    margin-bottom: 0;
+}

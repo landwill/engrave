@@ -23,7 +23,8 @@ const theme: EditorThemeClasses = {
     italic: 'textItalic',
     underline: 'textUnderline',
     strikethrough: 'textStrikethrough'
-  }
+  },
+  paragraph: 'paragraph'
 }
 
 export const EditorBodyPanel = ({ documentUuid, editorBodyRef }: EditorBodyPanelProps): React.JSX.Element => {
@@ -43,10 +44,10 @@ export const EditorBodyPanel = ({ documentUuid, editorBodyRef }: EditorBodyPanel
     <ToolbarPlugin />
     <RichTextPlugin contentEditable={<ContentEditable tabIndex={2} style={{ height: '100%', paddingLeft: '1em', paddingRight: '1em', outline: 'none' }} />}
                     placeholder={<div />}
-                    ErrorBoundary={LexicalErrorBoundary}/>
-    <OnChangePlugin onChange={onChange} ignoreSelectionChange/>
+                    ErrorBoundary={LexicalErrorBoundary} />
+    <OnChangePlugin onChange={onChange} ignoreSelectionChange />
     <PopulateFromIndexedDBPlugin documentUuid={documentUuid} />
-    <EditorRefPlugin editorRef={editorBodyRef}/>
+    <EditorRefPlugin editorRef={editorBodyRef} />
     <HistoryPlugin />
   </LexicalComposer>
 }

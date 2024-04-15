@@ -1,7 +1,7 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { CSSProperties } from 'react'
-import { documentStore } from '../stores/DocumentStore.ts'
+import { documentStore } from '../../stores/DocumentStore.ts'
 import { DocumentSelectorItem } from './DocumentSelectorItem.tsx'
 
 const DIV_STYLE: CSSProperties = {

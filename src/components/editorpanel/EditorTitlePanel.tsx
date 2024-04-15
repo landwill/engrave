@@ -2,8 +2,8 @@ import type { LexicalEditor } from 'lexical'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { ChangeEventHandler, CSSProperties } from 'react'
-import { COMMON_BORDER_STYLE } from '../consts.ts'
-import { documentStore } from '../stores/DocumentStore.ts'
+import { COMMON_BORDER_STYLE } from '../../consts.ts'
+import { documentStore } from '../../stores/DocumentStore.ts'
 
 interface EditorTitlePanelObserverProps {
   editorBodyRef: React.MutableRefObject<LexicalEditor | null>

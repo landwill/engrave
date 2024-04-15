@@ -8,9 +8,9 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { type EditorState, EditorThemeClasses, type LexicalEditor } from 'lexical'
 import { runInAction } from 'mobx'
 import React, { MutableRefObject } from 'react'
-import ToolbarPlugin from '../lexical/ToolbarPlugin.tsx'
-import { documentStore } from '../stores/DocumentStore.ts'
-import { PopulateFromIndexedDBPlugin } from './lexical/PopulateFromIndexedDBPlugin.tsx'
+import ToolbarPlugin from '../../lexical/ToolbarPlugin.tsx'
+import { documentStore } from '../../stores/DocumentStore.ts'
+import { PopulateFromIndexedDBPlugin } from '../lexical/PopulateFromIndexedDBPlugin.tsx'
 
 interface EditorBodyPanelProps {
   documentUuid: string

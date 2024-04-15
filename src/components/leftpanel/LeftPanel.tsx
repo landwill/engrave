@@ -1,11 +1,11 @@
 import { BugIcon, DownloadIcon, FileIcon, GitCommitIcon, HelpCircleIcon, SearchIcon, SunMoonIcon, UploadIcon } from 'lucide-react'
 import React, { useMemo } from 'react'
-import { useContextMenu } from '../hooks/useContextMenu.tsx'
-import { toggleDarkMode } from '../misc/utils.ts'
-import { documentStore } from '../stores/DocumentStore.ts'
-import { IconPanel } from './IconPanel.tsx'
-import { PanelIcon } from './IconPanelButton.tsx'
-import { ListItem } from './ListItem.tsx'
+import { useContextMenu } from '../../hooks/useContextMenu.tsx'
+import { toggleDarkMode } from '../../misc/utils.ts'
+import { documentStore } from '../../stores/DocumentStore.ts'
+import { IconPanel } from '../IconPanel.tsx'
+import { PanelIcon } from '../IconPanelButton.tsx'
+import { ListItem } from '../ListItem.tsx'
 
 const createV1Document = () => {
   const documentUuid = documentStore.createAndSelectNewDocument()

@@ -1,7 +1,7 @@
 import { FilePlusIcon, FolderPlusIcon } from 'lucide-react'
-import { documentStore } from '../stores/DocumentStore.ts'
-import { IconPanel } from './IconPanel.tsx'
-import { PanelIcon } from './IconPanelButton.tsx'
+import { documentStore } from '../../stores/DocumentStore.ts'
+import { IconPanel } from '../IconPanel.tsx'
+import { PanelIcon } from '../IconPanelButton.tsx'
 
 const icons: PanelIcon[] = [
   {

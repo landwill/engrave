@@ -1,7 +1,7 @@
 import { MouseEventHandler, useMemo } from 'react'
-import { useContextMenu } from '../hooks/useContextMenu.tsx'
-import { documentStore } from '../stores/DocumentStore.ts'
-import { ListItem } from './ListItem.tsx'
+import { useContextMenu } from '../../hooks/useContextMenu.tsx'
+import { documentStore } from '../../stores/DocumentStore.ts'
+import { ListItem } from '../ListItem.tsx'
 
 interface DocumentSelectorItemProps {
   isActive: boolean

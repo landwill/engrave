@@ -16,7 +16,7 @@ const DIV_STYLE: CSSProperties = {
 }
 
 export const DocumentSelectorList = observer(() => {
-  const selectedDocumentUuid = documentStore.selectedDocument?.documentUuid
+  const selectedDocumentUuid = documentStore.selectedDocumentUuid
   const documentIdentifiers = documentStore.documentIdentifiers
 
   return <div style={DIV_STYLE}>

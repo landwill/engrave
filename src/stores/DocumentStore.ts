@@ -10,7 +10,7 @@ const NEW_FILE_NAME = ''
 
 export class DocumentStore {
   documentIdentifiers: DocumentIdentifier[] = []
-  selectedDocument: DocumentDetail | null = null
+  selectedDocumentUuid: string | null = null
   _idb: IndexedDB | null = null
 
   get idb() {
@@ -41,11 +41,11 @@ export class DocumentStore {
   selectDocument(documentUuid: string) {
     const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
     if (document == null) throw new Error('No document found for the given uuid.')
-    this.selectedDocument = document
+    this.selectedDocumentUuid = documentUuid
   }
 
   deselectDocument() {
-    this.selectedDocument = null
+    this.selectedDocumentUuid = null
   }
 
   renameDocument(documentUuid: string, documentTitle: string) {
@@ -80,7 +80,7 @@ export class DocumentStore {
   }
 
   verifySelectedDocument() {
-    if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => uuid === this.selectedDocument?.documentUuid)) {
+    if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => uuid === this.selectedDocumentUuid)) {
       this.deselectDocument()
     }
   }

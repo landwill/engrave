@@ -33,7 +33,7 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
       (newTitle): void => {
         if (newTitle == null) return
         // todo debounce
-        documentStore.renameDocument(selectedDocumentUuid, newTitle)
+        documentStore.renameDocumentInIDB(selectedDocumentUuid, newTitle)
       }
     )
     return () => {dispose()}

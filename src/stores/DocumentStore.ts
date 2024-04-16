@@ -48,10 +48,9 @@ export class DocumentStore {
     this.selectedDocumentUuid = null
   }
 
-  renameDocument(documentUuid: string, documentTitle: string) {
+  renameDocumentInIDB(documentUuid: string, documentTitle: string) {
     const documentIdentifier = this.documentIdentifiers.find(d => d.documentUuid == documentUuid)
     if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
-    documentIdentifier.documentTitle = documentTitle
     this.idb.updateDocumentTitle(documentUuid, documentTitle)
       .catch(lazyErrorHandler)
   }

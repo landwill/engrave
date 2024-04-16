@@ -1,7 +1,7 @@
 import type { LexicalEditor } from 'lexical'
-import { runInAction } from 'mobx'
+import { reaction, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import React, { ChangeEventHandler, CSSProperties } from 'react'
+import React, { ChangeEventHandler, CSSProperties, useEffect } from 'react'
 import { COMMON_BORDER_STYLE } from '../../consts.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 
@@ -22,13 +22,29 @@ const INPUT_STYLE: CSSProperties = {
 }
 
 export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObserverProps) => {
-  const documentUuid = documentStore.selectedDocument?.documentUuid
-  if (documentUuid == null) throw new Error('Title Editor was rendered with no selected documentUuid.')
+  const selectedDocumentUuid = documentStore.selectedDocumentUuid
+  if (selectedDocumentUuid == null) throw new Error('Title Editor was rendered with no selected documentUuid.')
+
+  const selectedDocument = documentStore.documentIdentifiers.find(d => d.documentUuid === selectedDocumentUuid)
+
+  useEffect(() => {
+    const dispose = reaction(
+      () => selectedDocument?.documentTitle,
+      (newTitle): void => {
+        if (newTitle == null) return
+        // todo debounce
+        documentStore.renameDocumentInIDB(selectedDocumentUuid, newTitle)
+      }
+    )
+    return () => {dispose()}
+  }, [selectedDocument, selectedDocumentUuid])
+
+  if (!selectedDocument) {
+    throw new Error('The title editor failed to identify the respective file, for the selected file ID.')
+  }
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    runInAction(() => {
-      documentStore.renameDocument(documentUuid, event.target.value)
-    })
+    runInAction(() => {selectedDocument.documentTitle = event.target.value})
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -38,20 +54,16 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
     }
   }
 
-  if (!documentStore.selectedDocument) {
-    return <div>E04</div>
-  }
-
   return (
     <input
-      key={documentStore.selectedDocument.documentUuid}
+      key={selectedDocumentUuid}
       autoFocus
       onChange={handleChange}
       tabIndex={1}
       onKeyDown={handleKeyDown}
       style={INPUT_STYLE}
       placeholder='Untitled'
-      value={documentStore.selectedDocument.documentTitle}
+      value={selectedDocument.documentTitle}
     />
   )
 })

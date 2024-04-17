@@ -1,11 +1,12 @@
-import { DocumentOperationsTopPanel } from './DocumentOperationsTopPanel.tsx'
-import { DocumentSelectorList } from './DocumentSelectorList.tsx'
 import { PanelBox } from '../PanelBox.tsx'
+import { DocumentOperationsTopPanel } from './DocumentOperationsTopPanel.tsx'
+import { FileSelectorList } from './FileSelectorList.tsx'
 
 
 export const DocumentSelectorPanel = () => {
   return <PanelBox direction='vertical' >
     <DocumentOperationsTopPanel />
-    <DocumentSelectorList />
+    <FileSelectorList />
+    {/*<FileSelectorPragmatic />*/}
   </PanelBox>
 }

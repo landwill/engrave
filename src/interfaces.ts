@@ -21,3 +21,18 @@ export interface TooltipDetails {
   y: number
   text: string
 }
+
+export type FileTreeItem = FileFolderItem | FileItem;
+
+interface BaseFileItem {
+  uuid: string;
+}
+
+interface FileFolderItem extends BaseFileItem {
+  isFolder: true;
+  children: FileTreeItem[];
+}
+
+interface FileItem extends BaseFileItem {
+  isFolder: false;
+}

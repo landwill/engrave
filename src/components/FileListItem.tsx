@@ -14,21 +14,34 @@ const SPAN_STYLE: CSSProperties = {
 }
 
 interface ListItemProps {
-  children: React.ReactNode
   innerRef?: React.RefObject<HTMLSpanElement>
   onContextMenu?: MouseEventHandler
   onClick?: MouseEventHandler
-  additionalClassName?: string
+  isActive: boolean
+  title: string
 }
 
-export const FileListItem = ({ children, innerRef, onContextMenu, onClick, additionalClassName }: ListItemProps) => {
-  let className = 'list-item'
-  if (additionalClassName) className += ' ' + additionalClassName
+function getTitleAndClassName(title: string, isActive: boolean) {
+  const classNames = ['list-item']
+  let effectiveTitle = title
+  if (isActive) classNames.push('active')
+  if (title.trim() == '') {
+    classNames.push('untitled')
+    effectiveTitle = 'Untitled'
+  }
+  return { effectiveTitle, className: classNames.join(' ') }
+}
+
+export const FileListItem = ({ innerRef, onContextMenu, onClick, isActive, title }: ListItemProps) => {
   const style = { ...SPAN_STYLE }
   if (onClick == null) {
     style.pointerEvents = 'none'
     style.opacity = 0.5
   }
 
-  return <span ref={innerRef} className={className} style={style} onClick={onClick} onContextMenu={onContextMenu}>{children}</span>
+  const { effectiveTitle, className } = getTitleAndClassName(title, isActive)
+
+  return <span ref={innerRef} className={className} style={style} onClick={onClick} onContextMenu={onContextMenu}>
+    {effectiveTitle}
+  </span>
 }

@@ -12,21 +12,9 @@ interface DocumentSelectorItemProps {
   onClick?: MouseEventHandler
 }
 
-function getTitleAndClassName(title: string, isActive: boolean) {
-  const classNames = []
-  let effectiveTitle = title
-  if (isActive) classNames.push('active')
-  if (title.trim() == '') {
-    classNames.push('untitled')
-    effectiveTitle = 'Untitled'
-  }
-  return { effectiveTitle, className: classNames.join(' ') }
-}
-
 export const TreeItemFile = ({ isActive, documentUuid, title, onClick }: DocumentSelectorItemProps) => {
   const ref = useRef<HTMLElement | null>(null)
 
-  const { effectiveTitle, className } = getTitleAndClassName(title, isActive)
   const { openContextMenu } = useContextMenu()
 
   useEffect(() => {
@@ -44,10 +32,8 @@ export const TreeItemFile = ({ isActive, documentUuid, title, onClick }: Documen
     <ListItem onClick={() => { documentStore.deleteDocument(documentUuid) }}>Delete</ListItem>
   </>, [documentUuid])
 
-  return <FileListItem innerRef={ref} additionalClassName={className} onClick={onClick} onContextMenu={e => {
+  return <FileListItem title={title} isActive={isActive} innerRef={ref} onClick={onClick} onContextMenu={e => {
     e.preventDefault()
     openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems })
-  }}>
-    {effectiveTitle}
-  </FileListItem>
+  }}/>
 }

@@ -25,14 +25,14 @@ export interface TooltipDetails {
 export type FileTreeItem = FileFolderItem | FileItem;
 
 interface BaseFileItem {
-  uuid: string;
+  uuid: string
 }
 
 interface FileFolderItem extends BaseFileItem {
-  isFolder: true;
-  children: FileTreeItem[];
+  isFolder: true
+  children: FileTreeItem[]
 }
 
 interface FileItem extends BaseFileItem {
-  isFolder: false;
+  isFolder: false
 }

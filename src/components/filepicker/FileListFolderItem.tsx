@@ -9,7 +9,7 @@ export const FileListFolderItem = observer(({ onContextMenu, onClick, uuid, titl
   const isOpen = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen ?? false
 
   return <div style={{ display: 'flex', flexDirection: 'row', lineHeight: 'normal', alignItems: 'center' }}>
-    {useMemo(() => <ChevronRight className={isOpen ? 'expanded' : 'collapsed'} size={16} />, [isOpen])}
-    <ListItem onClick={onClick} onContextMenu={onContextMenu}>{title}</ListItem>
+    <ChevronRight className={isOpen ? 'expanded' : 'collapsed'} style={{ flexShrink: 0 }} size={16} />
+    {useMemo(() => <ListItem onClick={onClick} onContextMenu={onContextMenu}>{title}</ListItem>, [onClick, onContextMenu, title])}
   </div>
 })

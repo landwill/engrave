@@ -35,7 +35,7 @@ const FileTreeFolderComponent = observer(({ uuid, children }: Omit<FileTreeFolde
   </>
 })
 
-const FileTreeFileComponent = observer(({ uuid }: Omit<FileTreeFile, 'isFolder'>) => {
+export const FileTreeFileComponent = observer(({ uuid }: Omit<FileTreeFile, 'isFolder'>) => {
   const { openContextMenu } = useContextMenu()
   const fileName = documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
   const onClick = action(() => {documentStore.selectDocument(uuid)})

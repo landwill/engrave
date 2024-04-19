@@ -11,7 +11,6 @@ const SPAN_STYLE: CSSProperties = {
   paddingLeft: '0.5em',
   paddingRight: '0.5em',
   borderRadius: COMMON_BORDER_RADIUS,
-  flexShrink: 0,
   cursor: 'default'
 }
 

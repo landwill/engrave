@@ -1,5 +1,7 @@
+import { observer } from 'mobx-react-lite'
 import React, { CSSProperties, MouseEventHandler } from 'react'
-import { COMMON_BORDER_RADIUS } from '../consts.ts'
+import { COMMON_BORDER_RADIUS } from '../../consts.ts'
+import { documentStore } from '../../stores/DocumentStore.ts'
 
 const SPAN_STYLE: CSSProperties = {
   marginBottom: '0.25em',
@@ -17,7 +19,7 @@ interface ListItemProps {
   innerRef?: React.RefObject<HTMLSpanElement>
   onContextMenu?: MouseEventHandler
   onClick?: MouseEventHandler
-  isActive: boolean
+  uuid: string
   title: string
 }
 
@@ -32,7 +34,9 @@ function getTitleAndClassName(title: string, isActive: boolean) {
   return { effectiveTitle, className: classNames.join(' ') }
 }
 
-export const FileListItem = ({ innerRef, onContextMenu, onClick, isActive, title }: ListItemProps) => {
+export const FileListItem = observer(({ innerRef, onContextMenu, onClick, uuid, title }: ListItemProps) => {
+  const isActive = documentStore.selectedDocumentUuid === uuid
+
   const style = { ...SPAN_STYLE }
   if (onClick == null) {
     style.pointerEvents = 'none'
@@ -44,4 +48,4 @@ export const FileListItem = ({ innerRef, onContextMenu, onClick, isActive, title
   return <span ref={innerRef} className={className} style={style} onClick={onClick} onContextMenu={onContextMenu}>
     {effectiveTitle}
   </span>
-}
+})

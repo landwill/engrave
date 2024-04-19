@@ -22,17 +22,17 @@ export interface TooltipDetails {
   text: string
 }
 
-export type FileTreeItem = FileFolderItem | FileItem;
+export type FileTreeItem = FileTreeFolder | FileTreeFile;
 
-interface BaseFileItem {
+interface FileTreeBaseItem {
   uuid: string
 }
 
-interface FileFolderItem extends BaseFileItem {
+export interface FileTreeFolder extends FileTreeBaseItem {
   isFolder: true
   children: FileTreeItem[]
 }
 
-interface FileItem extends BaseFileItem {
+export interface FileTreeFile extends FileTreeBaseItem {
   isFolder: false
 }

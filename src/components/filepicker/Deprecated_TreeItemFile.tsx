@@ -2,7 +2,7 @@ import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { MouseEventHandler, useEffect, useMemo, useRef } from 'react'
 import { useContextMenu } from '../../hooks/useContextMenu.tsx'
 import { documentStore } from '../../stores/DocumentStore.ts'
-import { FileListItem } from '../FileListItem.tsx'
+import { FileListItem } from './FileListItem.tsx'
 import { ListItem } from '../ListItem.tsx'
 
 interface DocumentSelectorItemProps {
@@ -12,7 +12,7 @@ interface DocumentSelectorItemProps {
   onClick?: MouseEventHandler
 }
 
-export const TreeItemFile = ({ isActive, documentUuid, title, onClick }: DocumentSelectorItemProps) => {
+export const Deprecated_TreeItemFile = ({ isActive, documentUuid, title, onClick }: DocumentSelectorItemProps) => {
   const ref = useRef<HTMLElement | null>(null)
 
   const { openContextMenu } = useContextMenu()

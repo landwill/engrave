@@ -1,10 +1,10 @@
 import { action } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { CSSProperties } from 'react'
-import { FileTreeItem } from '../../interfaces.ts'
+import { FileTreeFile, FileTreeFolder, FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
-import { fileTreeStore } from '../../stores/FileTreeStore.tsx'
-import { FileListItem } from '../FileListItem.tsx'
+import { fileTreeStore } from '../../stores/FileTreeStore.ts'
+import { FileListItem } from './FileListItem.tsx'
 
 const DIV_STYLE: CSSProperties = {
   display: 'flex',
@@ -17,43 +17,40 @@ const DIV_STYLE: CSSProperties = {
   overflowY: 'auto'
 }
 
-const FileTreeItemComponent = observer(({ uuid, isFolder, children, level = 0 }: {
-  uuid: string,
-  isFolder: boolean,
-  children: FileTreeItem[],
-  level?: number
-}) => {
-  const fileName = isFolder ? fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
-  const onClick = isFolder ? action(() => {fileTreeStore.collapseFolder(uuid)}) : action(() => {documentStore.selectDocument(uuid)})
-  const isActive = documentStore.selectedDocumentUuid === uuid
-  const isOpen = isFolder ? fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen : undefined
+const FileTreeFolderComponent = observer(({ uuid, children }: Omit<FileTreeFolder, 'isFolder'>) => {
+  const fileName = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.name ?? 'Folder name not found'
+  const onClick = action(() => {fileTreeStore.collapseFolder(uuid)})
+  const isOpen = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen
 
   return <>
-    <FileListItem isActive={isActive} title={fileName} onClick={onClick} />
-    {(isFolder && isOpen) && children.map(child => {
+    <FileListItem uuid={uuid} title={fileName} onClick={onClick} />
+    {isOpen && children.map(child => {
       return <div key={child.uuid} style={{ paddingLeft: '0.25em', marginLeft: '0.75em', borderLeft: '1px solid var(--border-color)' }}>
-        <FileTreeItemComponent
-          uuid={child.uuid}
-          isFolder={child.isFolder}
-          level={level + 1}>
-          {'children' in child ? child.children : []}
-        </FileTreeItemComponent>
+        <FileTreeBaseItemComponent item={child} />
       </div>
     })}
   </>
 })
 
+const FileTreeFileComponent = observer(({ uuid }: Omit<FileTreeFile, 'isFolder'>) => {
+  const fileName = documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
+  const onClick = action(() => {documentStore.selectDocument(uuid)})
+
+  return <>
+    <FileListItem uuid={uuid} title={fileName} onClick={onClick} />
+  </>
+})
+
+const FileTreeBaseItemComponent = observer(({ item }: { item: FileTreeItem }) => {
+  return item.isFolder
+    ? <FileTreeFolderComponent uuid={item.uuid}>{item.children}</FileTreeFolderComponent>
+    : <FileTreeFileComponent uuid={item.uuid} />
+})
+
 export const FileSelectorList = observer(() => {
   return <div style={DIV_STYLE}>
     {
-      fileTreeStore.fileTreeData.map(item => {
-        return <FileTreeItemComponent
-          key={item.uuid}
-          uuid={item.uuid}
-          isFolder={item.isFolder}>
-          {'children' in item ? item.children : []}
-        </FileTreeItemComponent>
-      })
+      fileTreeStore.fileTreeData.map(item => <FileTreeBaseItemComponent key={item.uuid} item={item} />)
     }
   </div>
 })

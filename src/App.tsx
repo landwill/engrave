@@ -1,7 +1,7 @@
 import { configure } from 'mobx'
 import { CSSProperties, useEffect, useState } from 'react'
 import { ContextMenu } from './components/ContextMenu.tsx'
-import { DocumentSelectorAndEditor } from './components/DocumentSelectorAndEditor.tsx'
+import { FilePickerAndEditor } from './components/filepicker/FilePickerAndEditor.tsx'
 import { LeftPanel } from './components/leftpanel/LeftPanel.tsx'
 import { IndexedDB } from './indexeddx/indexeddb.ts'
 import { lazyDarkModeRetrieve, lazyErrorHandler } from './misc/utils.ts'
@@ -46,7 +46,7 @@ function App() {
 
   return <div style={DIV_STYLE}>
     <LeftPanel />
-    <DocumentSelectorAndEditor />
+    <FilePickerAndEditor />
     <ContextMenu />
   </div>
 }

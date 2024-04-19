@@ -19,16 +19,16 @@ const DIV_STYLE: CSSProperties = {
   overflowY: 'auto'
 }
 
+const contextMenuItems = <>
+  <ListItem>Rename</ListItem>
+  <ListItem>Delete</ListItem>
+</>
+
 const FileTreeFolderComponent = observer(({ uuid, children }: Omit<FileTreeFolder, 'isFolder'>) => {
   const { openContextMenu } = useContextMenu()
   const fileName = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.name ?? 'Folder name not found'
   const onClick = action(() => {fileTreeStore.collapseFolder(uuid)})
   const isOpen = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen
-
-  const contextMenuItems = useMemo(() => <>
-    <ListItem>Rename</ListItem>
-    <ListItem>Delete</ListItem>
-  </>, [uuid])
 
   const onContextMenu: MouseEventHandler = (e) => {
     e.preventDefault()

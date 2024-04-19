@@ -138,20 +138,6 @@ body {
     --tooltip-font-color: #eee;
 }
 
-.fade-in {
-    animation: fade-in-opacity 300ms;
-}
-
-@keyframes fade-in-opacity {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
 .toolbar {
     display: flex;
     margin-bottom: 1px;
@@ -224,13 +210,14 @@ body {
     margin-top: 5px;
     margin-bottom: 0;
 }
+/* End Lexical themes */
 
 .expanded {
-    transition: transform 300ms;
+    transition: transform 200ms;
     transform: rotate(90deg);
 }
 
 .collapsed {
-    transition: transform 300ms;
+    transition: transform 200ms;
     transform: rotate(0deg);
 }

@@ -30,7 +30,7 @@ export function IconPanel({ icons, direction, centered = false, divProps }: Icon
       }
     </div>
     {
-      tooltip.isOpen && <Tooltip tooltip={tooltip} />
+      <Tooltip tooltip={tooltip} />
     }
   </PanelBox>
 }

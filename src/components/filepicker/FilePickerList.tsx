@@ -19,8 +19,7 @@ const DIV_STYLE: CSSProperties = {
 const flattenFileTreeUuids = (fileTree: FileTreeItem[]) => {
   const uuids: string[] = []
   ;(function traverse(items: FileTreeItem[]) {
-    for (const index in items) {
-      const item = items[index]
+    for (const item of items) {
       uuids.push(item.uuid)
       if ('children' in item) traverse(item.children)
     }

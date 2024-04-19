@@ -11,7 +11,8 @@ const SPAN_STYLE: CSSProperties = {
   paddingLeft: '0.5em',
   paddingRight: '0.5em',
   borderRadius: COMMON_BORDER_RADIUS,
-  cursor: 'default'
+  cursor: 'default',
+  flexGrow: 1
 }
 
 interface ListItemProps {

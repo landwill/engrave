@@ -28,7 +28,7 @@ const FileTreeFolderComponent = observer(({ uuid, children }: Omit<FileTreeFolde
   return <>
     <FileListFolderItem uuid={uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} />
     {isOpen && children.map(child => {
-      return <div key={child.uuid} style={{ paddingLeft: '0.25em', marginLeft: '0.75em', borderLeft: '1px solid var(--border-color)' }}>
+      return <div key={child.uuid} style={{ paddingLeft: '0.25em', marginLeft: '0.45em', borderLeft: '1px solid var(--border-color)' }}>
         <FileTreeBaseItemComponent item={child} />
       </div>
     })}

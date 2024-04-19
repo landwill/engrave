@@ -7,6 +7,7 @@ interface FolderDetail {
   isOpen: boolean
 }
 
+// noinspection SpellCheckingInspection
 export class FileTreeStore {
   fileTreeData: FileTreeItem[] = [
     {
@@ -53,6 +54,7 @@ export class FileTreeStore {
       ]
     }
   ]
+
   foldersDetails: FolderDetail[] = [
     {
       uuid: 'voop',

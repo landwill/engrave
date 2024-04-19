@@ -6,7 +6,8 @@ import { FileTreeFile, FileTreeFolder, FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { ListItem } from '../ListItem.tsx'
-import { FileListItem } from './FileListItem.tsx'
+import { FileListFileItem } from './FileListFileItem.tsx'
+import { FileListFolderItem } from './FileListFolderItem.tsx'
 
 const folderContextMenuItems = <>
   <ListItem>Rename</ListItem>
@@ -25,7 +26,7 @@ const FileTreeFolderComponent = observer(({ uuid, children }: Omit<FileTreeFolde
   }
 
   return <>
-    <FileListItem uuid={uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} />
+    <FileListFolderItem uuid={uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} />
     {isOpen && children.map(child => {
       return <div key={child.uuid} style={{ paddingLeft: '0.25em', marginLeft: '0.75em', borderLeft: '1px solid var(--border-color)' }}>
         <FileTreeBaseItemComponent item={child} />
@@ -50,7 +51,7 @@ const FileTreeFileComponent = observer(({ uuid }: Omit<FileTreeFile, 'isFolder'>
   }
 
   return <>
-    <FileListItem uuid={uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} />
+    <FileListFileItem uuid={uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} />
   </>
 })
 

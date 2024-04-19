@@ -1,4 +1,5 @@
 import { SerializedEditorState } from 'lexical'
+import { MouseEventHandler } from 'react'
 
 export interface DocumentIdentifier {
   documentUuid: string
@@ -35,4 +36,11 @@ export interface FileTreeFolder extends FileTreeBaseItem {
 
 export interface FileTreeFile extends FileTreeBaseItem {
   isFolder: false
+}
+
+export interface ListItemProps {
+  uuid: string
+  title: string
+  onContextMenu?: MouseEventHandler
+  onClick?: MouseEventHandler
 }

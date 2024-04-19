@@ -1,10 +1,10 @@
-import { DocumentSelectorPanel } from './DocumentSelectorPanel.tsx'
+import { FilePickerPanel } from './FilePickerPanel.tsx'
 import { EditorPanel } from '../editorpanel/EditorPanel.tsx'
 
 
 export function FilePickerAndEditor() {
   return <>
-    <DocumentSelectorPanel />
+    <FilePickerPanel />
     <EditorPanel />
   </>
 }

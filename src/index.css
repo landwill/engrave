@@ -23,7 +23,8 @@
 
     --blue: #0080ff;
     --purple: #a15cff;
-    --light-pink: #D0B0FC;
+    --dnd-hover-border: #8437ef;
+    --light-pink: #d0b0fc;
 }
 
 .logo {
@@ -124,6 +125,8 @@ body {
 
     --tooltip-background-color: #666;
     --tooltip-font-color: #eee;
+
+    --dnd-hover-background: #e6d9f7;
 }
 
 .dark-mode {
@@ -137,6 +140,8 @@ body {
 
     --tooltip-background-color: #777;
     --tooltip-font-color: #eee;
+
+    --dnd-hover-background: #3a2d4c;
 }
 
 .toolbar {

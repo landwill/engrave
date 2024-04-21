@@ -40,7 +40,7 @@ export class DocumentStore {
 
   selectDocument(documentUuid: string) {
     const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
-    if (document == null) throw new Error('No document found for the given uuid.')
+    if (document == null) throw new Error('No document found for the given uuid: ' + documentUuid)
     this.selectedDocumentUuid = documentUuid
   }
 

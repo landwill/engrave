@@ -44,3 +44,12 @@ export interface ListItemProps {
   onContextMenu?: MouseEventHandler
   onClick?: MouseEventHandler
 }
+
+export interface DraggableSource {
+  uuid: string
+  isFolder: boolean
+}
+
+export interface DropTargetLocation {
+  uuid: string
+}

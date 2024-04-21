@@ -23,6 +23,7 @@
 
     --blue: #0080ff;
     --purple: #a15cff;
+    --light-pink: #D0B0FC;
 }
 
 .logo {
@@ -88,7 +89,7 @@ body {
 }
 
 .link:hover {
-    color: #D0B0FC;
+    color: var(--light-pink);
 }
 
 .icon:hover {

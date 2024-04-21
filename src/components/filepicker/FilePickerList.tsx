@@ -1,5 +1,7 @@
+import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
+import { action } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { CSSProperties } from 'react'
+import { CSSProperties, useEffect } from 'react'
 import { FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
@@ -27,8 +29,41 @@ const flattenFileTreeUuids = (fileTree: FileTreeItem[]) => {
   return uuids
 }
 
+function searchTree(items: FileTreeItem[], targetUuid: string): FileTreeItem | null {
+  for (const item of items) {
+    if (item.uuid === targetUuid) {
+      return item
+    }
+    if (item.isFolder && item.children) {
+      const found = searchTree(item.children, targetUuid)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+const moveElementToFolder = (fileTree: FileTreeItem[], sourceUuid: string, targetUuid: string) => {
+  const targetBranch = searchTree(fileTree, targetUuid)
+  if (targetBranch == null) console.error('wtf')
+  else console.log(sourceUuid,
+    '->',
+    targetBranch.uuid)
+}
+
 export const FilePickerList = observer(() => {
   const fileTreeUuids = flattenFileTreeUuids(fileTreeStore.fileTreeData)
+
+  useEffect(() => {
+    return monitorForElements({
+      onDrop: action(({ source, location }) => {
+        const sourceUuid: string | undefined = source.data.source?.uuid
+        if (sourceUuid == null) return
+        const destination = location.current.dropTargets[0]
+        if (!destination) return
+        moveElementToFolder(fileTreeStore.fileTreeData, sourceUuid, destination.data.location)
+      })
+    })
+  }, [])
 
   return <div style={DIV_STYLE}>
     {

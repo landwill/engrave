@@ -5,7 +5,7 @@ import { toggleDarkMode } from '../../misc/utils.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { IconPanel } from '../IconPanel.tsx'
 import { PanelIcon } from '../IconPanelButton.tsx'
-import { ListItem } from '../ListItem.tsx'
+import { ListItemSpan } from '../ListItemSpan.tsx'
 
 const createV1Document = () => {
   const documentUuid = documentStore.createAndSelectNewDocument()
@@ -13,7 +13,7 @@ const createV1Document = () => {
 }
 
 const contextMenuItems = <>
-  <ListItem onClick={createV1Document}>Create test/broken document</ListItem>
+  <ListItemSpan onClick={createV1Document}>Create test/broken document</ListItemSpan>
 </>
 
 export const LeftPanel = React.memo(function LeftPanel() {

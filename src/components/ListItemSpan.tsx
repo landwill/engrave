@@ -3,13 +3,13 @@ import React, { CSSProperties, MouseEventHandler } from 'react'
 import { COMMON_BORDER_RADIUS } from '../consts.ts'
 
 const SPAN_STYLE: CSSProperties = {
-  marginBottom: '0.15em',
-  marginTop: '0.15em',
+  paddingBottom: '0.15em',
+  paddingTop: '0.15em',
   textOverflow: 'ellipsis',
   textWrap: 'nowrap',
   overflow: 'hidden',
-  paddingLeft: '0.5em',
-  paddingRight: '0.5em',
+  paddingLeft: '6px',
+  paddingRight: '6px',
   borderRadius: COMMON_BORDER_RADIUS,
   cursor: 'default',
   flexGrow: 1
@@ -21,14 +21,16 @@ interface ListItemProps {
   onClick?: MouseEventHandler
   additionalClassName?: string
   marginY?: Property.Margin
+  coloredHover?: boolean
+  actionItem?: boolean
 }
 
-export const ListItem = ({ children, onContextMenu, onClick, additionalClassName, marginY }: ListItemProps) => {
-  let className = 'list-item'
+export const ListItemSpan = ({ children, onContextMenu, onClick, additionalClassName, marginY, coloredHover = true, actionItem = true }: ListItemProps) => {
+  let className = coloredHover ? 'list-item' : ''
   if (additionalClassName) className += ' ' + additionalClassName
 
   const style: CSSProperties = { ...SPAN_STYLE }
-  if (onClick == null) {
+  if (actionItem && onClick == null) {
     style.pointerEvents = 'none'
     style.opacity = 0.5
   }

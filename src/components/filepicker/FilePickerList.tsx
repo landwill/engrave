@@ -1,4 +1,5 @@
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
+import { DropTargetRecord } from '@atlaskit/pragmatic-drag-and-drop/types'
 import { action } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { CSSProperties, useEffect } from 'react'
@@ -33,7 +34,7 @@ function searchTreeForFolder(items: FileTreeItem[], targetFolderUuid: string): F
       if (!item.isFolder) throw new Error('Unexpected; searchTreeForFolder landed on a non-folder.')
       return item
     }
-    if (item.isFolder && item.children) {
+    if (item.isFolder) {
       const found = searchTreeForFolder(item.children, targetFolderUuid)
       if (found) return found
     }
@@ -47,7 +48,7 @@ function searchTreeForContainingList(items: FileTreeItem[], itemUuid: string): {
     if (item.uuid === itemUuid) {
       return { item, parent: items, index: i }
     }
-    if (item.isFolder && item.children) {
+    if (item.isFolder) {
       const found = searchTreeForContainingList(item.children, itemUuid)
       if (found) return found
     }
@@ -90,8 +91,11 @@ export const FilePickerList = observer(() => {
         const sourceData = source.data.source as DraggableSource | null | undefined // unsure if null or defined, so declaring both
         if (sourceData == null) return
         const { uuid, isFolder: sourceIsFolder } = sourceData
-        const destination = location.current.dropTargets[0]
-        if (!destination) return
+        const destination: DropTargetRecord | undefined = location.current.dropTargets[0]
+
+        // suppressed because despite Pragmatic's type-hinting, null/undefined is possible
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (destination == null) return
         const destinationLocation = destination.data.location as DropTargetLocation
         moveElementToFolder(fileTreeStore.fileTreeData, uuid, destinationLocation.uuid, sourceIsFolder)
       })

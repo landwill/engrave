@@ -10,17 +10,17 @@ import { useContextMenu } from '../../hooks/useContextMenu.tsx'
 import { DraggableSource, DropTargetLocation, FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
-import { ListItem } from '../ListItem.tsx'
-import { FileListFileItem } from './FileListFileItem.tsx'
+import { ListItemSpan } from '../ListItemSpan.tsx'
 import { FileListFolderItem } from './FileListFolderItem.tsx'
 
 interface FileTreeComponentProps {
   item: FileTreeItem
+  level?: number
 }
 
 const ContextMenuFolderItems = () => <>
-  <ListItem>Rename</ListItem>
-  <ListItem>Delete</ListItem>
+  <ListItemSpan>Rename</ListItemSpan>
+  <ListItemSpan>Delete</ListItemSpan>
 </>
 
 function customDraggable(
@@ -65,14 +65,15 @@ function customDroppable(element: HTMLDivElement, uuid: string, setIsDraggedOver
 
 
 const ContextMenuFileItems = ({ uuid }: { uuid: string }) => <>
-  <ListItem>Rename</ListItem>
-  <ListItem onClick={() => { documentStore.deleteDocument(uuid) }}>Delete</ListItem>
+  <ListItemSpan>Rename</ListItemSpan>
+  <ListItemSpan onClick={() => { documentStore.deleteDocument(uuid) }}>Delete</ListItemSpan>
 </>
 
-export const FileTreeComponent = observer(({ item }: FileTreeComponentProps) => {
+export const FileTreeComponent = observer(({ item, level = 0 }: FileTreeComponentProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState<boolean>(false)
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
+  const { uuid, isFolder } = item
   const isOpen = item.isFolder && fileTreeStore.foldersDetails.find(f => f.uuid === item.uuid)?.isOpen
 
   const fileName = item.isFolder ? fileTreeStore.foldersDetails.find(f => f.uuid === item.uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === item.uuid)?.documentTitle ?? 'Filename not found'
@@ -81,10 +82,10 @@ export const FileTreeComponent = observer(({ item }: FileTreeComponentProps) => 
     const element = ref.current
     if (element == null) throw new Error('null ref.current in draggable')
     return combine(
-      customDraggable(element, item.uuid, setDragging, fileName, item.isFolder),
-      customDroppable(element, item.uuid, setIsDraggedOver, item.isFolder)
+      customDraggable(element, uuid, setDragging, fileName, isFolder),
+      customDroppable(element, uuid, setIsDraggedOver, true)
     )
-  }, [fileName, item.isFolder, item.uuid])
+  }, [fileName, isFolder, uuid])
 
   const { openContextMenu } = useContextMenu()
   const onClick = action(() => {item.isFolder ? fileTreeStore.collapseFolder(item.uuid) : documentStore.selectDocument(item.uuid)})
@@ -94,24 +95,21 @@ export const FileTreeComponent = observer(({ item }: FileTreeComponentProps) => 
     openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: item.isFolder ? <ContextMenuFolderItems /> : <ContextMenuFileItems uuid={item.uuid} /> })
   }
 
-  return <div style={{
-    border: isDraggedOver ? '1px solid var(--dnd-hover-border)' : '1px solid transparent',
-    backgroundColor: isDraggedOver ? 'var(--dnd-hover-background)' : undefined
-  }}
-  ref={ref}>
-    {
-      item.isFolder
-      ? <FileListFolderItem uuid={item.uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} isDragging={dragging} />
-      : <FileListFileItem uuid={item.uuid}
+  return <>
+    <div ref={ref} style={{
+      border: isDraggedOver ? '1px solid var(--dnd-hover-border)' : '1px solid transparent',
+      backgroundColor: isDraggedOver ? 'var(--dnd-hover-background)' : undefined
+    }}>
+      <FileListFolderItem uuid={item.uuid}
                           title={fileName}
                           onClick={onClick}
                           onContextMenu={onContextMenu}
-                          isDragging={dragging} />
-    }
+                          isDragging={dragging}
+                          isFolder={item.isFolder}
+                          level={level} />
+    </div>
     {isOpen && item.children.map(child => {
-      return <div key={child.uuid} style={{ paddingLeft: '0.25em', marginLeft: '0.45em', borderLeft: '1px solid var(--border-color)' }}>
-        <FileTreeComponent item={child} />
-      </div>
+      return <FileTreeComponent key={child.uuid} item={child} level={level + 1} />
     })}
-  </div>
+  </>
 })

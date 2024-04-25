@@ -3,10 +3,11 @@ import { DropTargetRecord } from '@atlaskit/pragmatic-drag-and-drop/types'
 import { action } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { CSSProperties, useEffect } from 'react'
-import { DraggableSource, DropTargetLocation, FileTreeFolder, FileTreeItem } from '../../interfaces.ts'
+import { DraggableSource, DropTargetLocation, FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { FileTreeComponent } from './FileTreeComponents.tsx'
+import { moveElementToFolder } from './utils.ts'
 
 const DIV_STYLE: CSSProperties = {
   display: 'flex',
@@ -26,67 +27,6 @@ const flattenFileTreeUuids = (fileTree: FileTreeItem[]) => {
     }
   })(fileTree)
   return uuids
-}
-
-function searchTreeForFolder(items: FileTreeItem[], targetFolderUuid: string): FileTreeFolder | null {
-  for (const item of items) {
-    if (item.uuid === targetFolderUuid) {
-      if (!item.isFolder) throw new Error('Unexpected; searchTreeForFolder landed on a non-folder.')
-      return item
-    }
-    if (item.isFolder) {
-      const found = searchTreeForFolder(item.children, targetFolderUuid)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-function searchTreeForContainingList(items: FileTreeItem[], itemUuid: string): { item: FileTreeItem, parent: FileTreeItem[], index: number } | null {
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]
-    if (item.uuid === itemUuid) {
-      return { item, parent: items, index: i }
-    }
-    if (item.isFolder) {
-      const found = searchTreeForContainingList(item.children, itemUuid)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-const moveElementToFolder = (fileTree: FileTreeItem[], sourceUuid: string, targetFolderUuid: string | undefined, isFolder: boolean) => {
-  if (sourceUuid === targetFolderUuid) return
-  let targetChildren
-  if (targetFolderUuid === undefined) {
-    targetChildren = fileTree
-  } else {
-    const targetBranch = searchTreeForFolder(fileTree, targetFolderUuid)
-    if (targetBranch == null) {
-      console.error('Target branch not found when moving element to folder.')
-      return
-    }
-    targetChildren = targetBranch.children
-  }
-
-  const result = searchTreeForContainingList(fileTree, sourceUuid)
-
-  if (result != null) {
-    // item found in fileTree; move its corresponding info (isFolder, children, etc.) from the source
-    const { item, parent, index } = result
-    targetChildren.push(item)
-    parent.splice(index, 1)
-  } else {
-    // item not found in fileTree; it's presumably stored outside the fileTree, and is being newly added
-    let newFileTreeEntry
-    if (isFolder) {
-      newFileTreeEntry = { uuid: sourceUuid, isFolder, children: [] }
-    } else {
-      newFileTreeEntry = { uuid: sourceUuid, isFolder }
-    }
-    targetChildren.push(newFileTreeEntry)
-  }
 }
 
 export const FilePickerList = observer(() => {

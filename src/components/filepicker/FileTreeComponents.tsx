@@ -16,6 +16,7 @@ import { FileListFolderItem } from './FileListFolderItem.tsx'
 interface FileTreeComponentProps {
   item: FileTreeItem
   level?: number
+  parentUuid?: string
 }
 
 const ContextMenuFolderItems = () => <>
@@ -49,7 +50,7 @@ function customDraggable(
   })
 }
 
-function customDroppable(element: HTMLDivElement, uuid: string, setIsDraggedOver: React.Dispatch<React.SetStateAction<boolean>>, isFolder: boolean) {
+function customDroppable(element: HTMLDivElement, uuid: string | undefined, setIsDraggedOver: React.Dispatch<React.SetStateAction<boolean>>, isFolder: boolean) {
   return dropTargetForElements({
     element,
     onDragEnter: () => {setIsDraggedOver(true)},
@@ -69,7 +70,7 @@ const ContextMenuFileItems = ({ uuid }: { uuid: string }) => <>
   <ListItemSpan onClick={() => { documentStore.deleteDocument(uuid) }}>Delete</ListItemSpan>
 </>
 
-export const FileTreeComponent = observer(({ item, level = 0 }: FileTreeComponentProps) => {
+export const FileTreeComponent = observer(({ item, parentUuid, level = 0 }: FileTreeComponentProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState<boolean>(false)
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
@@ -83,9 +84,9 @@ export const FileTreeComponent = observer(({ item, level = 0 }: FileTreeComponen
     if (element == null) throw new Error('null ref.current in draggable')
     return combine(
       customDraggable(element, uuid, setDragging, fileName, isFolder),
-      customDroppable(element, uuid, setIsDraggedOver, true)
+      customDroppable(element, isFolder ? uuid : parentUuid, setIsDraggedOver, true)
     )
-  }, [fileName, isFolder, uuid])
+  }, [fileName, isFolder, parentUuid, uuid])
 
   const { openContextMenu } = useContextMenu()
   const onClick = action(() => {item.isFolder ? fileTreeStore.collapseFolder(item.uuid) : documentStore.selectDocument(item.uuid)})
@@ -109,7 +110,7 @@ export const FileTreeComponent = observer(({ item, level = 0 }: FileTreeComponen
                           level={level} />
     </div>
     {isOpen && item.children.map(child => {
-      return <FileTreeComponent key={child.uuid} item={child} level={level + 1} />
+      return <FileTreeComponent key={child.uuid} item={child} level={level + 1} parentUuid={uuid} />
     })}
   </>
 })

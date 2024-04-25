@@ -56,29 +56,36 @@ function searchTreeForContainingList(items: FileTreeItem[], itemUuid: string): {
   return null
 }
 
-const moveElementToFolder = (fileTree: FileTreeItem[], sourceUuid: string, targetFolderUuid: string, isFolder: boolean) => {
+const moveElementToFolder = (fileTree: FileTreeItem[], sourceUuid: string, targetFolderUuid: string | undefined, isFolder: boolean) => {
   if (sourceUuid === targetFolderUuid) return
-  const targetBranch = searchTreeForFolder(fileTree, targetFolderUuid)
-  if (targetBranch == null) {
-    console.error('Target branch not found when moving element to folder.')
-    return
+  let targetChildren
+  if (targetFolderUuid === undefined) {
+    targetChildren = fileTree
+  } else {
+    const targetBranch = searchTreeForFolder(fileTree, targetFolderUuid)
+    if (targetBranch == null) {
+      console.error('Target branch not found when moving element to folder.')
+      return
+    }
+    targetChildren = targetBranch.children
   }
+
   const result = searchTreeForContainingList(fileTree, sourceUuid)
 
   if (result != null) {
     // item found in fileTree; move its corresponding info (isFolder, children, etc.) from the source
     const { item, parent, index } = result
-    targetBranch.children.push(item)
+    targetChildren.push(item)
     parent.splice(index, 1)
   } else {
     // item not found in fileTree; it's presumably stored outside the fileTree, and is being newly added
     let newFileTreeEntry
     if (isFolder) {
-      newFileTreeEntry = { uuid: sourceUuid, isFolder, children: []}
+      newFileTreeEntry = { uuid: sourceUuid, isFolder, children: [] }
     } else {
       newFileTreeEntry = { uuid: sourceUuid, isFolder }
     }
-    targetBranch.children.push(newFileTreeEntry)
+    targetChildren.push(newFileTreeEntry)
   }
 }
 

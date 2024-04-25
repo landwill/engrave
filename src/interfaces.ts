@@ -51,5 +51,5 @@ export interface DraggableSource {
 }
 
 export interface DropTargetLocation {
-  uuid: string
+  uuid: string | undefined
 }

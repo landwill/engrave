@@ -5,7 +5,7 @@ import { CSSProperties, useEffect } from 'react'
 import { DraggableSource, DropTargetLocation, FileTreeFolder, FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
-import { FileTreeBaseItemComponent, FileTreeFileComponent } from './FileTreeComponents.tsx'
+import { FileTreeComponent } from './FileTreeComponents.tsx'
 
 const DIV_STYLE: CSSProperties = {
   display: 'flex',
@@ -100,12 +100,12 @@ export const FilePickerList = observer(() => {
 
   return <div style={DIV_STYLE}>
     {
-      fileTreeStore.fileTreeData.map(item => <FileTreeBaseItemComponent key={item.uuid} item={item} />)
+      fileTreeStore.fileTreeData.map(item => <FileTreeComponent key={item.uuid} item={item} />)
     }
     {
       documentStore.documentIdentifiers
         .filter(f => !fileTreeUuids.includes(f.documentUuid))
-        .map(f => <FileTreeFileComponent key={f.documentUuid} uuid={f.documentUuid} />)
+        .map(f => <FileTreeComponent key={f.documentUuid} item={{ uuid: f.documentUuid, isFolder: false } satisfies FileTreeItem} />)
     }
   </div>
 })

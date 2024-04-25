@@ -4,17 +4,21 @@ import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/el
 import { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/types'
 import { action } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import React, { MouseEventHandler, useEffect, useMemo, useRef, useState } from 'react'
+import React, { MouseEventHandler, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { useContextMenu } from '../../hooks/useContextMenu.tsx'
-import { DraggableSource, DropTargetLocation, FileTreeFile, FileTreeFolder, FileTreeItem } from '../../interfaces.ts'
+import { DraggableSource, DropTargetLocation, FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { ListItem } from '../ListItem.tsx'
 import { FileListFileItem } from './FileListFileItem.tsx'
 import { FileListFolderItem } from './FileListFolderItem.tsx'
 
-const folderContextMenuItems = <>
+interface FileTreeComponentProps {
+  item: FileTreeItem
+}
+
+const ContextMenuFolderItems = () => <>
   <ListItem>Rename</ListItem>
   <ListItem>Delete</ListItem>
 </>
@@ -59,83 +63,55 @@ function customDroppable(element: HTMLDivElement, uuid: string, setIsDraggedOver
   })
 }
 
-const FileTreeFolderComponent = observer(({ uuid, children }: Omit<FileTreeFolder, 'isFolder'>) => {
+
+const ContextMenuFileItems = ({ uuid }: { uuid: string }) => <>
+  <ListItem>Rename</ListItem>
+  <ListItem onClick={() => { documentStore.deleteDocument(uuid) }}>Delete</ListItem>
+</>
+
+export const FileTreeComponent = observer(({ item }: FileTreeComponentProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState<boolean>(false)
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
+  const isOpen = item.isFolder && fileTreeStore.foldersDetails.find(f => f.uuid === item.uuid)?.isOpen
 
-  const fileName = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.name ?? 'Folder name not found'
-
-  useEffect(() => {
-    const element = ref.current
-    if (element == null) throw new Error('null ref.current in draggable folder')
-    return combine(
-      customDraggable(element, uuid, setDragging, fileName, true),
-      customDroppable(element, uuid, setIsDraggedOver, true)
-    )
-  }, [fileName, uuid])
-
-  const { openContextMenu } = useContextMenu()
-  const onClick = action(() => {fileTreeStore.collapseFolder(uuid)})
-  const isOpen = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen
-
-  const onContextMenu: MouseEventHandler = (e) => {
-    e.preventDefault()
-    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: folderContextMenuItems })
-  }
-
-  return <div // todo extract following line; common with FileTreeFileComponent
-    style={{
-      border: isDraggedOver ? '1px solid var(--dnd-hover-border)' : '1px solid transparent',
-      backgroundColor: isDraggedOver ? 'var(--dnd-hover-background)' : undefined
-    }}
-    ref={ref}>
-    <FileListFolderItem uuid={uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} isDragging={dragging} />
-    {isOpen && children.map(child => {
-      return <div key={child.uuid} style={{ paddingLeft: '0.25em', marginLeft: '0.45em', borderLeft: '1px solid var(--border-color)' }}>
-        <FileTreeBaseItemComponent item={child} />
-      </div>
-    })}
-  </div>
-})
-
-export const FileTreeFileComponent = observer(({ uuid }: Omit<FileTreeFile, 'isFolder'>) => {
-  const ref = useRef<HTMLDivElement>(null)
-  const [dragging, setDragging] = useState<boolean>(false)
-  const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
-
-  const fileName = documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
+  const fileName = item.isFolder ? fileTreeStore.foldersDetails.find(f => f.uuid === item.uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === item.uuid)?.documentTitle ?? 'Filename not found'
 
   useEffect(() => {
     const element = ref.current
     if (element == null) throw new Error('null ref.current in draggable')
-    // todo: extract as much of this as possible, as it's common between folders and files. (Unlike droptarget which is folder-exclusive)
-    return combine(customDraggable(element, uuid, setDragging, fileName, false), customDroppable(element, uuid, setIsDraggedOver, false))
-  }, [fileName, uuid])
+    return combine(
+      customDraggable(element, item.uuid, setDragging, fileName, item.isFolder),
+      customDroppable(element, item.uuid, setIsDraggedOver, item.isFolder)
+    )
+  }, [fileName, item.isFolder, item.uuid])
 
   const { openContextMenu } = useContextMenu()
-  const onClick = action(() => {documentStore.selectDocument(uuid)})
-
-  const contextMenuItems = useMemo(() => <>
-    <ListItem>Rename</ListItem>
-    <ListItem onClick={() => { documentStore.deleteDocument(uuid) }}>Delete</ListItem>
-  </>, [uuid])
+  const onClick = action(() => {item.isFolder ? fileTreeStore.collapseFolder(item.uuid) : documentStore.selectDocument(item.uuid)})
 
   const onContextMenu: MouseEventHandler = (e) => {
     e.preventDefault()
-    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems })
+    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: item.isFolder ? <ContextMenuFolderItems /> : <ContextMenuFileItems uuid={item.uuid} /> })
   }
 
   return <div style={{
     border: isDraggedOver ? '1px solid var(--dnd-hover-border)' : '1px solid transparent',
     backgroundColor: isDraggedOver ? 'var(--dnd-hover-background)' : undefined
-  }}>
-    <FileListFileItem uuid={uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} innerRef={ref} isDragging={dragging} />
+  }}
+  ref={ref}>
+    {
+      item.isFolder
+      ? <FileListFolderItem uuid={item.uuid} title={fileName} onClick={onClick} onContextMenu={onContextMenu} isDragging={dragging} />
+      : <FileListFileItem uuid={item.uuid}
+                          title={fileName}
+                          onClick={onClick}
+                          onContextMenu={onContextMenu}
+                          isDragging={dragging} />
+    }
+    {isOpen && item.children.map(child => {
+      return <div key={child.uuid} style={{ paddingLeft: '0.25em', marginLeft: '0.45em', borderLeft: '1px solid var(--border-color)' }}>
+        <FileTreeComponent item={child} />
+      </div>
+    })}
   </div>
-})
-
-export const FileTreeBaseItemComponent = observer(({ item }: { item: FileTreeItem }) => {
-  return item.isFolder
-    ? <FileTreeFolderComponent uuid={item.uuid}>{item.children}</FileTreeFolderComponent>
-    : <FileTreeFileComponent uuid={item.uuid} />
 })

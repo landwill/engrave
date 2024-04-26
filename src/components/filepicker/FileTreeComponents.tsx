@@ -96,11 +96,21 @@ export const FileTreeComponent = observer(({ item, parentUuid, level = 0 }: File
     openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems /> : <ContextMenuFileItems uuid={uuid} /> })
   }
 
+  const style = isDraggedOver
+    ? {
+      outline: '1px solid var(--dnd-hover-border)',
+      borderLeft: '1px solid var(--dnd-hover-border)',
+      borderRight: '1px solid var(--dnd-hover-border)',
+      backgroundColor: 'var(--dnd-hover-background)'
+    }
+    : {
+      outline: '1px solid transparent',
+      borderLeft: '1px solid transparent',
+      borderRight: '1px solid transparent'
+    }
+
   return <>
-    <div ref={ref} style={{
-      border: isDraggedOver ? '1px solid var(--dnd-hover-border)' : '1px solid transparent',
-      backgroundColor: isDraggedOver ? 'var(--dnd-hover-background)' : undefined
-    }}>
+    <div ref={ref} style={style}>
       <FileListFolderItem uuid={item.uuid}
                           title={fileName}
                           onClick={onClick}

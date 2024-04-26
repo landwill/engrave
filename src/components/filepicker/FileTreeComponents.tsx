@@ -93,7 +93,7 @@ export const FileTreeComponent = observer(({ item, parentUuid, level = 0 }: File
 
   const onContextMenu: MouseEventHandler = (e) => {
     e.preventDefault()
-    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems /> : <ContextMenuFileItems uuid={item.uuid} /> })
+    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems /> : <ContextMenuFileItems uuid={uuid} /> })
   }
 
   return <>

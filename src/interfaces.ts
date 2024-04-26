@@ -53,3 +53,9 @@ export interface DraggableSource {
 export interface DropTargetLocation {
   uuid: string | undefined
 }
+
+export interface FileTreeItemSearchResult {
+  item: FileTreeItem
+  parent: FileTreeItem[]
+  index: number
+}

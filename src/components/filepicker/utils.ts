@@ -1,4 +1,4 @@
-import { FileTreeFolder, FileTreeItem } from '../../interfaces.ts'
+import { FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
 
 function searchTreeForFolder(items: FileTreeItem[], targetFolderUuid: string): FileTreeFolder | null {
   for (const item of items) {
@@ -14,7 +14,7 @@ function searchTreeForFolder(items: FileTreeItem[], targetFolderUuid: string): F
   return null
 }
 
-function searchTreeForContainingList(items: FileTreeItem[], itemUuid: string): { item: FileTreeItem, parent: FileTreeItem[], index: number } | null {
+export function searchTreeForContainingList(items: FileTreeItem[], itemUuid: string): FileTreeItemSearchResult | null {
   for (let i = 0; i < items.length; i++) {
     const item = items[i]
     if (item.uuid === itemUuid) {
@@ -38,24 +38,16 @@ function addForeignElementToFileTree(targetBranch: FileTreeFolder, sourceUuid: s
   targetBranch.children.push(newFileTreeEntry)
 }
 
-const performMove = (targetList: FileTreeItem[], source: {
-  item: FileTreeItem;
-  parent: FileTreeItem[];
-  index: number
-}) => {
+const performMove = (targetList: FileTreeItem[], source: FileTreeItemSearchResult) => {
   if (targetList === source.parent) return
 
   targetList.push(source.item)
   source.parent.splice(source.index, 1)
 }
 
-function moveElementFromOneFolderToAnother(sourceContainingList: {
-  item: FileTreeItem;
-  parent: FileTreeItem[];
-  index: number
-}, targetBranch: FileTreeFolder, targetUuid: string) {
+function moveElementFromOneFolderToAnother(fileTreeItemSearchResult: FileTreeItemSearchResult, targetBranch: FileTreeFolder, targetUuid: string) {
   // item found in fileTree; move its corresponding info (isFolder, children, etc.) from the source
-  const { item } = sourceContainingList
+  const { item } = fileTreeItemSearchResult
 
   // Quit early if we're dragging a folder into one of its child (even nested) folders
   if (
@@ -66,7 +58,7 @@ function moveElementFromOneFolderToAnother(sourceContainingList: {
     return
   }
 
-  performMove(targetBranch.children, sourceContainingList)
+  performMove(targetBranch.children, fileTreeItemSearchResult)
 }
 
 function moveFolderToTopLevel(fileTree: FileTreeItem[], sourceUuid: string) {
@@ -78,29 +70,41 @@ function moveFolderToTopLevel(fileTree: FileTreeItem[], sourceUuid: string) {
   performMove(fileTree, sourceContainingList)
 }
 
-export const moveElementToFolder = (fileTree: FileTreeItem[], sourceUuid: string, targetUuid: string | undefined, sourceIsFolder: boolean) => {
-  if (sourceUuid === targetUuid) return
+function removeElementFromFileTree(fileTree: FileTreeItem[], sourceUuid: string) {
+  const fileTreeItemSearchResult = searchTreeForContainingList(fileTree, sourceUuid)
+  if (fileTreeItemSearchResult == null) {
+    // Didn't find the sourceUuid in the file tree.
+    // Thus, it's already absent, and doesn't need removing. Our job here is done.
+    return
+  }
+
+  const { parent, index } = fileTreeItemSearchResult
+  parent.splice(index, 1)
+}
+
+export const moveElementToFolder = (fileTree: FileTreeItem[], itemToMoveUuid: string, targetUuid: string | undefined, sourceIsFolder: boolean) => {
+  if (itemToMoveUuid === targetUuid) return
 
   if (targetUuid === undefined) {
     if (sourceIsFolder) {
-      moveFolderToTopLevel(fileTree, sourceUuid)
+      moveFolderToTopLevel(fileTree, itemToMoveUuid)
       return
     } else {
-      // removeElementFromFileTree(sourceUuid) // todo implement
+      removeElementFromFileTree(fileTree, itemToMoveUuid)
       return
     }
   }
 
   const targetBranch = searchTreeForFolder(fileTree, targetUuid)
   if (targetBranch == null) {
-    console.error('Target branch not found when moving element to folder. Unknown scenario. Source: {}. Target: {}.', sourceUuid, targetUuid)
+    console.error('Target branch not found when moving element to folder. Unknown scenario. Source: {}. Target: {}.', itemToMoveUuid, targetUuid)
     return
   }
 
-  const sourceContainingList = searchTreeForContainingList(fileTree, sourceUuid)
+  const sourceContainingList = searchTreeForContainingList(fileTree, itemToMoveUuid)
 
   if (sourceContainingList == null) {
-    addForeignElementToFileTree(targetBranch, sourceUuid, sourceIsFolder)
+    addForeignElementToFileTree(targetBranch, itemToMoveUuid, sourceIsFolder)
     return
   } else {
     moveElementFromOneFolderToAnother(sourceContainingList, targetBranch, targetUuid)

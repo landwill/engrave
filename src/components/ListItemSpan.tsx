@@ -26,7 +26,7 @@ interface ListItemProps {
 }
 
 export const ListItemSpan = ({ children, onContextMenu, onClick, additionalClassName, marginY, coloredHover = true, actionItem = true }: ListItemProps) => {
-  let classNames = coloredHover ? ['list-item'] : []
+  const classNames = coloredHover ? ['list-item'] : []
   if (additionalClassName) classNames.push(additionalClassName)
   const className = classNames.join(' ')
 

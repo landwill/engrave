@@ -1,3 +1,5 @@
+// noinspection SpellCheckingInspection
+
 import { describe, expect, it } from 'vitest'
 import { FileTreeItem } from '../../interfaces.ts'
 
@@ -36,7 +38,7 @@ describe('moveElementToFolder', () => {
 
   it('should support moving elements to the top level (i.e. removing from fileTreeData)', () => {
     const fileUuidToMove = "53c0031f-f80b-4940-9a23-6c7f28f6d9ed"
-    const initialFileData = JSON.parse("[{\"uuid\":\"voop\",\"isFolder\":true,\"children\":[{\"uuid\":\"" + fileUuidToMove + "\",\"isFolder\":false},{\"uuid\":\"veep\",\"isFolder\":true,\"children\":[{\"uuid\":\"84da3a17-e8d8-408d-aadc-ca1ef29185f1\",\"isFolder\":false}]}]}]")
+    const initialFileData: FileTreeItem[] = JSON.parse("[{\"uuid\":\"someUuid\",\"isFolder\":true,\"children\":[{\"uuid\":\"" + fileUuidToMove + "\",\"isFolder\":false},{\"uuid\":\"veep\",\"isFolder\":true,\"children\":[{\"uuid\":\"84da3a17-e8d8-408d-aadc-ca1ef29185f1\",\"isFolder\":false}]}]}]") as FileTreeItem[]
     // before
     expect(searchTreeForContainingList(initialFileData, fileUuidToMove)).not.toBeNull()
 
@@ -48,7 +50,7 @@ describe('moveElementToFolder', () => {
   })
 
   it('should do nothing if moving an absent file to the top-level', () => {
-    const initialFileData = JSON.parse("[{\"uuid\":\"voop\",\"isFolder\":true,\"children\":[{\"uuid\":\"53c0031f-f80b-4940-9a23-6c7f28f6d9ed\",\"isFolder\":false},{\"uuid\":\"veep\",\"isFolder\":true,\"children\":[{\"uuid\":\"84da3a17-e8d8-408d-aadc-ca1ef29185f1\",\"isFolder\":false}]}]}]")
+    const initialFileData: FileTreeItem[] = JSON.parse("[{\"uuid\":\"voop\",\"isFolder\":true,\"children\":[{\"uuid\":\"53c0031f-f80b-4940-9a23-6c7f28f6d9ed\",\"isFolder\":false},{\"uuid\":\"veep\",\"isFolder\":true,\"children\":[{\"uuid\":\"84da3a17-e8d8-408d-aadc-ca1ef29185f1\",\"isFolder\":false}]}]}]") as FileTreeItem[]
     // before
     const initialStructure = JSON.stringify(mockFileList)
 

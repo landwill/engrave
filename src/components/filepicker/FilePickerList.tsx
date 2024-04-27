@@ -15,7 +15,8 @@ const DIV_STYLE: CSSProperties = {
   paddingTop: '1em',
   width: '200px',
   userSelect: 'none',
-  overflowY: 'auto'
+  overflowY: 'auto',
+  height: '100%'
 }
 
 const flattenFileTreeUuids = (fileTree: FileTreeItem[]) => {
@@ -49,7 +50,7 @@ export const FilePickerList = observer(() => {
     })
   }, [])
 
-  return <div style={DIV_STYLE}>
+  return <div style={DIV_STYLE} id='file-picker-list'>
     {
       fileTreeStore.fileTreeData.map(item => <FileTreeComponent key={item.uuid} item={item} />)
     }

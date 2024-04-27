@@ -5,14 +5,8 @@ import { COMMON_BORDER_RADIUS } from '../../consts.ts'
 import { ListItemProps } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
+import { CHEVRON_WIDTH, FolderIndentLine } from '../icons/FolderIndentLine.tsx'
 import { ListItemSpan } from '../ListItemSpan.tsx'
-
-const CHEVRON_WIDTH = 16
-
-const FolderIndentLine = () => <svg style={{ flexShrink: 0, lineHeight: 0 }} className="lucide lucide-chevron-right" strokeLinejoin="round" strokeLinecap="round" strokeWidth="1"
-                                    stroke="currentColor" fill="none" height="30px" width={CHEVRON_WIDTH} xmlns="http://www.w3.org/2000/svg">
-  <line style={{ color: 'var(--color)' }} x1="7.5" y1="0" x2="7.5" y2="100%" strokeWidth="1" opacity='0.3'></line>
-</svg>
 
 export const FileListFolderItem = observer(
   ({
@@ -60,8 +54,8 @@ export const FileListFolderItem = observer(
       {useMemo(() => {
           return <ListItemSpan additionalClassName={spanClassName} actionItem={false}
                                onContextMenu={onContextMenu}
-                               coloredHover={false}>{title == '' ? 'Untitled' : title}</ListItemSpan>
+                               coloredHover={false}>{title || 'Untitled'}</ListItemSpan>
         },
-        [onContextMenu, title])}
+        [onContextMenu, spanClassName, title])}
     </div>
   })

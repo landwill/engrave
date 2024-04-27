@@ -18,9 +18,9 @@ export interface IDBWorkerMessage {
 
 export interface TooltipDetails {
   isOpen: boolean
+  text: string
   x: number
   y: number
-  text: string
 }
 
 export type FileTreeItem = FileTreeFolder | FileTreeFile;
@@ -54,4 +54,11 @@ export interface FileTreeItemSearchResult {
   item: FileTreeItem
   parent: Map<string, FileTreeItem>
   key: string
+}
+
+export interface TooltipDispatch {
+  isOpen: boolean
+  text?: string
+  x?: number
+  y?: number
 }

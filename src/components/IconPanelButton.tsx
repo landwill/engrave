@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react'
 import React, { MouseEventHandler, useRef } from 'react'
 import { TOOLTIP_OFFSET_X } from '../consts.ts'
-import { TooltipDetails } from '../interfaces.ts'
+import { TooltipDispatch } from '../interfaces.ts'
 
 export interface PanelIcon {
   Icon: LucideIcon
@@ -14,7 +14,7 @@ export interface PanelIcon {
 interface IconPanelButtonProps {
   icon: PanelIcon
   direction: 'horizontal' | 'vertical'
-  setTooltip: React.Dispatch<React.SetStateAction<TooltipDetails>>
+  setTooltip: React.Dispatch<TooltipDispatch>
 }
 
 export const IconPanelButton = ({ icon, setTooltip }: IconPanelButtonProps) => {
@@ -27,7 +27,7 @@ export const IconPanelButton = ({ icon, setTooltip }: IconPanelButtonProps) => {
   }
 
   const closeTooltip = () => {
-    setTooltip({ isOpen: false, x: 0, y: 0, text: '' })
+    setTooltip({ isOpen: false })
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current)
       tooltipTimeoutRef.current = null

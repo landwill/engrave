@@ -1,5 +1,5 @@
-import { CSSProperties, useState } from 'react'
-import { TooltipDetails } from '../interfaces.ts'
+import { CSSProperties, Reducer, useReducer } from 'react'
+import { TooltipDetails, TooltipDispatch } from '../interfaces.ts'
 import { IconPanelButton, PanelIcon } from './IconPanelButton.tsx'
 import { PanelBox } from './PanelBox.tsx'
 import { Tooltip } from './Tooltip.tsx'
@@ -12,7 +12,9 @@ interface IconPanelProps {
 }
 
 export function IconPanel({ icons, direction, centered = false, divProps }: IconPanelProps) {
-  const [tooltip, setTooltip] = useState<TooltipDetails>({ isOpen: false, x: 0, y: 0, text: '' })
+  const [tooltip, setTooltip] = useReducer<Reducer<TooltipDetails, TooltipDispatch>>((state, action) => {
+    return { ...state, ...action }
+  }, { isOpen: false, x: 0, y: 0, text: '' })
   return <PanelBox direction={direction}>
     <div style={{
       margin: '0.5em',

@@ -45,14 +45,22 @@ export const FilePickerList = observer(() => {
       dropTargetForElements({ element, getData: () => ({ location: { uuid: undefined } as DropTargetLocation }) }))
   }, [])
 
+  const displayedOrder: string[] = []
+
   return <div style={DIV_STYLE} id='file-picker-list' ref={ref}>
     {
-      Array.from(fileTreeStore.fileTreeData.entries()).map(([uuid, item]) => <FileTreeComponent key={uuid} item={item} uuid={uuid} />)
+      Array.from(fileTreeStore.fileTreeData.entries()).map(([uuid, item]) => {
+        displayedOrder.push(uuid)
+        return <FileTreeComponent key={uuid} item={item} uuid={uuid} />
+      })
     }
     {
       documentStore.documentIdentifiers
         .filter(f => !fileTreeUuids.includes(f.documentUuid))
-        .map(f => <FileTreeComponent key={f.documentUuid} item={{ isFolder: false } satisfies FileTreeItem} uuid={f.documentUuid} />)
+        .map(f => {
+          displayedOrder.push(f.documentUuid)
+          return <FileTreeComponent key={f.documentUuid} item={{ isFolder: false } satisfies FileTreeItem} uuid={f.documentUuid} />
+        })
     }
   </div>
 })

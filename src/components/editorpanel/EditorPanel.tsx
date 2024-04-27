@@ -15,13 +15,14 @@ const Fallback = () => <CenteringDiv>
 
 export const EditorPanel = observer(() => {
   const editorBodyRef = useRef<LexicalEditor | null>(null)
-  if (documentStore.selectedDocumentUuid == null) return <WelcomePage />
+  if (documentStore.selectedDocumentUuids.size !== 1) return <WelcomePage />
+  const [documentUuid] = documentStore.selectedDocumentUuids
 
   return <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
     <ErrorBoundary fallback={<Fallback />}>
       <EditorTitlePanel editorBodyRef={editorBodyRef} />
       <EditorBodyPanel
-        documentUuid={documentStore.selectedDocumentUuid}
+        documentUuid={documentUuid}
         editorBodyRef={editorBodyRef}
       />
     </ErrorBoundary>

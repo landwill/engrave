@@ -22,9 +22,9 @@ const INPUT_STYLE: CSSProperties = {
 }
 
 export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObserverProps) => {
-  const selectedDocumentUuid = documentStore.selectedDocumentUuid
-  if (selectedDocumentUuid == null) throw new Error('Title Editor was rendered with no selected documentUuid.')
-
+  const selectedDocumentUuids = documentStore.selectedDocumentUuids
+  if (selectedDocumentUuids.size !== 1) throw new Error('Title Editor was rendered with multiple or zero selected documents.')
+  const [selectedDocumentUuid] = selectedDocumentUuids
   const selectedDocument = documentStore.documentIdentifiers.find(d => d.documentUuid === selectedDocumentUuid)
 
   useEffect(() => {

@@ -1,11 +1,10 @@
 import { ChevronRight, FileIcon, FolderIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
-import { COMMON_BORDER_RADIUS } from '../../consts.ts'
+import { CHEVRON_WIDTH, COMMON_BORDER_RADIUS } from '../../consts.ts'
 import { ListItemProps } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
-import { CHEVRON_WIDTH } from '../icons/FolderIndentLine.tsx'
 import { ListItemSpan } from '../ListItemSpan.tsx'
 
 export const FileListFolderItem = observer(
@@ -21,7 +20,7 @@ export const FileListFolderItem = observer(
     }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number, isDraggedOver: boolean }>
   ) => {
     const isOpen = fileTreeStore.folderDetails.get(uuid)?.isOpen ?? false
-    const isActive = documentStore.selectedDocumentUuid === uuid
+    const isActive = documentStore.selectedDocumentUuids.has(uuid)
 
     const classNames = ['list-item']
     if (isActive) classNames.push('active')
@@ -53,9 +52,7 @@ export const FileListFolderItem = observer(
       {
         isFolder && <ChevronRight className={chevronClassName} style={{ flexShrink: 0 }} size={CHEVRON_WIDTH} />
       }
-      {
-        <FolderOrFileIcon size={16} style={{ flexShrink: 0, color: 'var(--color)' }} />
-      }
+      <FolderOrFileIcon size={16} style={{ flexShrink: 0, color: 'var(--color)' }} />
       {useMemo(() => {
           return <ListItemSpan additionalClassName={spanClassName} actionItem={false}
                                onContextMenu={onContextMenu}

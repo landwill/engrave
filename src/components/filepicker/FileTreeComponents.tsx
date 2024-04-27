@@ -75,9 +75,9 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
   const [dragging, setDragging] = useState<boolean>(false)
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
   const { isFolder } = item
-  const isOpen = item.isFolder && fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen
+  const isOpen = item.isFolder && fileTreeStore.foldersDetails.get(uuid)?.isOpen
 
-  const fileName = item.isFolder ? fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
+  const fileName = item.isFolder ? fileTreeStore.foldersDetails.get(uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
 
   useEffect(() => {
     const element = ref.current

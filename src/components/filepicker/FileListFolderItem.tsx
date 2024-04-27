@@ -19,7 +19,7 @@ export const FileListFolderItem = observer(
       level = 0
     }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number }>
   ) => {
-    const isOpen = fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen ?? false
+    const isOpen = fileTreeStore.foldersDetails.get(uuid)?.isOpen ?? false
     const isActive = documentStore.selectedDocumentUuid === uuid
 
     const classNames = ['list-item']

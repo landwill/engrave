@@ -1,10 +1,10 @@
 import { FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
 
-function searchTreeForFolder(items: Map<string, FileTreeItem>, targetFolderUuid: string): FileTreeFolder | null {
+export function searchTreeForFolder(items: Map<string, FileTreeItem>, targetFolderUuid: string): { folder: FileTreeFolder, parent: Map<string, FileTreeItem> } | null {
   for (const [key, item] of items) {
     if (key === targetFolderUuid) {
       if (!item.isFolder) throw new Error(`Unexpected; searchTreeForFolder landed on a non-folder (${targetFolderUuid})`)
-      return item
+      return { folder: item, parent: items }
     }
     if (item.isFolder) {
       const found = searchTreeForFolder(item.children, targetFolderUuid)
@@ -51,7 +51,7 @@ function moveElementFromOneFolderToAnother(fileTreeItemSearchResult: FileTreeIte
     item.isFolder // this risk only exists for folders
     && searchTreeForContainingList(item.children, targetUuid) // i.e. the target was found in the
   ) {
-    console.debug('Cannot move folders into their own subfolders (even if nested).')
+    console.info('Cannot move folders into their own subfolders (even if nested).')
     return
   }
 
@@ -93,12 +93,13 @@ export const moveElementToFolder = (fileTree: Map<string, FileTreeItem>, itemToM
     }
   }
 
-  const targetBranch = searchTreeForFolder(fileTree, targetUuid)
-  if (targetBranch == null) {
+  const searchResult = searchTreeForFolder(fileTree, targetUuid)
+  if (searchResult == null) {
     console.error('Target branch not found when moving element to folder. Unknown scenario. Source: {}. Target: {}.', itemToMoveUuid, targetUuid)
     return
   }
 
+  const { folder: targetBranch } = searchResult
   const sourceContainingList = searchTreeForContainingList(fileTree, itemToMoveUuid)
 
   if (sourceContainingList == null) {
@@ -108,4 +109,17 @@ export const moveElementToFolder = (fileTree: Map<string, FileTreeItem>, itemToM
     moveElementFromOneFolderToAnother(sourceContainingList, targetBranch, targetUuid)
     return
   }
+}
+
+export const flattenFileTreeUuids = (fileTree: Map<string, FileTreeItem>, type: 'file' | 'folder' | 'all') => {
+  const uuids: string[] = []
+  ;(function traverse(items: Map<string, FileTreeItem>) {
+    for (const [uuid, item] of items) {
+      if (type === 'all' || (item.isFolder && type === 'folder') || (!item.isFolder && type === 'file')) {
+        uuids.push(uuid)
+      }
+      if ('children' in item) traverse(item.children)
+    }
+  })(fileTree)
+  return uuids
 }

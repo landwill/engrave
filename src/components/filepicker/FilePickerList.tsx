@@ -8,7 +8,7 @@ import { DraggableSource, DropTargetLocation, FileTreeItem } from '../../interfa
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { FileTreeComponent } from './FileTreeComponents.tsx'
-import { moveElementToFolder } from './utils.ts'
+import { flattenFileTreeUuids, moveElementToFolder } from './utils.ts'
 
 const DIV_STYLE: CSSProperties = {
   display: 'flex',
@@ -20,19 +20,8 @@ const DIV_STYLE: CSSProperties = {
   height: '100%'
 }
 
-const flattenFileTreeUuids = (fileTree: Map<string, FileTreeItem>) => {
-  const uuids: string[] = []
-  ;(function traverse(items: Map<string, FileTreeItem>) {
-    for (const [uuid, item] of items) {
-      uuids.push(uuid)
-      if ('children' in item) traverse(item.children)
-    }
-  })(fileTree)
-  return uuids
-}
-
 export const FilePickerList = observer(() => {
-  const fileTreeUuids = flattenFileTreeUuids(fileTreeStore.fileTreeData)
+  const fileTreeUuids = flattenFileTreeUuids(fileTreeStore.fileTreeData, 'all')
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -53,7 +42,7 @@ export const FilePickerList = observer(() => {
           moveElementToFolder(fileTreeStore.fileTreeData, uuid, destinationLocation.uuid, sourceIsFolder)
         })
       }),
-      dropTargetForElements({ element, getData: () => ({ location: { uuid: undefined } as DropTargetLocation })}))
+      dropTargetForElements({ element, getData: () => ({ location: { uuid: undefined } as DropTargetLocation }) }))
   }, [])
 
   return <div style={DIV_STYLE} id='file-picker-list' ref={ref}>

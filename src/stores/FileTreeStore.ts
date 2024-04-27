@@ -1,5 +1,6 @@
 import { action, makeObservable, observable } from 'mobx'
 import { v4 as uuid } from 'uuid'
+import { flattenFileTreeUuids, searchTreeForFolder } from '../components/filepicker/utils.ts'
 import { FileTreeItem } from '../interfaces.ts'
 
 interface FolderDetail {
@@ -7,52 +8,53 @@ interface FolderDetail {
   isOpen: boolean
 }
 
-// noinspection SpellCheckingInspection
 export class FileTreeStore {
-  fileTreeData = new Map<string, FileTreeItem>([
-    ['voop', {
-      isFolder: true,
-      children: new Map([
-        ['53c0031f-f80b-4940-9a23-6c7f28f6d9ed', {
-          isFolder: false
-        }],
-        ['veep', {
-          isFolder: true, children: new Map([
-            ['84da3a17-e8d8-408d-aadc-ca1ef29185f1', { isFolder: false }]])
-        }]])
-    }]
-  ])
-
-  foldersDetails = new Map<string, FolderDetail>([
-    ['voop', {
-      name: 'Folder 1',
-      isOpen: true
-    }],
-    ['veep', {
-      name: 'Folder 2',
-      isOpen: false
-    }]
-  ])
+  fileTreeData = new Map<string, FileTreeItem>()
+  folderDetails = new Map<string, FolderDetail>()
 
   constructor() {
     makeObservable(this, {
       fileTreeData: observable,
-      foldersDetails: observable,
+      folderDetails: observable,
       collapseFolder: action,
-      createFolder: action
+      createFolder: action,
+      deleteFolderAndChildFolders: action
     })
   }
 
   collapseFolder(uuid: string) {
-    const folderDetail = this.foldersDetails.get(uuid)
+    const folderDetail = this.folderDetails.get(uuid)
     if (folderDetail == null) throw new Error('No folder found with the given uuid: ' + uuid)
     folderDetail.isOpen = !folderDetail.isOpen
   }
 
   createFolder(name: string) {
     const folderUuid = uuid()
-    this.foldersDetails.set(folderUuid, { name, isOpen: true })
+    this.folderDetails.set(folderUuid, { name, isOpen: true })
     this.fileTreeData.set(folderUuid, { isFolder: true, children: new Map() })
+  }
+
+  /**
+   * Deletes a folder and any nested folders, but does not remove the files contained within.
+   * The children file UUIDs are returned for you to handle separately.
+   */
+  deleteFolderAndChildFolders(uuid: string) {
+    const searchResult = searchTreeForFolder(this.fileTreeData, uuid)
+    if (!searchResult) throw new Error(`Failed to identify the folder to delete (${uuid}).`)
+    const { folder, parent } = searchResult
+    const fileUuids = flattenFileTreeUuids(folder.children, 'file')
+    const folderUuids = flattenFileTreeUuids(folder.children, 'folder')
+
+    // delete folder
+    parent.delete(uuid) // naturally also drops this folder's child folders
+    // ...but the above doesn't remove the foldersDetails entries. See below
+
+    // delete folder details for the target folder and all its children
+    for (const deleteUuid of [uuid, ...folderUuids]) {
+      this.folderDetails.delete(deleteUuid)
+    }
+
+    return fileUuids
   }
 }
 

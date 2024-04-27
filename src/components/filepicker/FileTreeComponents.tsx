@@ -20,9 +20,17 @@ interface FileTreeComponentProps {
   parentUuid?: string
 }
 
-const ContextMenuFolderItems = () => <>
+const deleteFolder = (uuid: string) => {
+  const deleteConfirmed = confirm('Are you sure you want to delete folder and all the files which it contains?\nThis cannot be undone!')
+  if (deleteConfirmed) {
+    const orphanedChildren: string[] = fileTreeStore.deleteFolderAndChildFolders(uuid)
+    documentStore.deleteDocuments(orphanedChildren)
+  }
+}
+
+const ContextMenuFolderItems = ({ uuid }: { uuid: string }) => <>
   <ListItemSpan>Rename</ListItemSpan>
-  <ListItemSpan>Delete</ListItemSpan>
+  <ListItemSpan onClick={() => {deleteFolder(uuid)}}>Delete</ListItemSpan>
 </>
 
 function customDraggable(
@@ -75,9 +83,9 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
   const [dragging, setDragging] = useState<boolean>(false)
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
   const { isFolder } = item
-  const isOpen = item.isFolder && fileTreeStore.foldersDetails.get(uuid)?.isOpen
+  const isOpen = item.isFolder && fileTreeStore.folderDetails.get(uuid)?.isOpen
 
-  const fileName = item.isFolder ? fileTreeStore.foldersDetails.get(uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
+  const fileName = item.isFolder ? fileTreeStore.folderDetails.get(uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
 
   useEffect(() => {
     const element = ref.current
@@ -93,7 +101,7 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
 
   const onContextMenu: MouseEventHandler = (e) => {
     e.preventDefault()
-    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems /> : <ContextMenuFileItems uuid={uuid} /> })
+    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems uuid={uuid} /> : <ContextMenuFileItems uuid={uuid} /> })
   }
 
   const style = isDraggedOver

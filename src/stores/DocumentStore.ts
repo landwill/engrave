@@ -78,6 +78,10 @@ export class DocumentStore {
       .catch(lazyErrorHandler)
   }
 
+  deleteDocuments(orphanedChildren: string[]) {
+    for (const uuid of orphanedChildren) this.deleteDocument(uuid)
+  }
+
   verifySelectedDocument() {
     if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => uuid === this.selectedDocumentUuid)) {
       this.deselectDocument()

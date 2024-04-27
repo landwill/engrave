@@ -1,4 +1,5 @@
 import { action, makeObservable, observable } from 'mobx'
+import { v4 as uuid } from 'uuid'
 import { FileTreeItem } from '../interfaces.ts'
 
 interface FolderDetail {
@@ -37,7 +38,8 @@ export class FileTreeStore {
     makeObservable(this, {
       fileTreeData: observable,
       foldersDetails: observable,
-      collapseFolder: action
+      collapseFolder: action,
+      createFolder: action
     })
   }
 
@@ -48,7 +50,9 @@ export class FileTreeStore {
   }
 
   createFolder(name: string) {
-    console.log('Created folder', name)
+    const folderUuid = uuid()
+    this.foldersDetails.set(folderUuid, { name, isOpen: true })
+    this.fileTreeData.set(folderUuid, { isFolder: true, children: new Map() })
   }
 }
 

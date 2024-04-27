@@ -106,15 +106,11 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
 
   const style = isDraggedOver
     ? {
-      outline: '1px solid var(--dnd-hover-border)',
-      borderLeft: '1px solid var(--dnd-hover-border)',
-      borderRight: '1px solid var(--dnd-hover-border)',
+      border: '1px solid var(--dnd-hover-border)',
       backgroundColor: 'var(--dnd-hover-background)'
     }
     : {
-      outline: '1px solid transparent',
-      borderLeft: '1px solid transparent',
-      borderRight: '1px solid transparent'
+      border: '1px solid transparent'
     }
 
   return <>
@@ -125,6 +121,7 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
                           onContextMenu={onContextMenu}
                           isDragging={dragging}
                           isFolder={item.isFolder}
+                          isDraggedOver={isDraggedOver}
                           level={level} />
     </div>
     {isOpen && Array.from(item.children.entries()).map(([childUuid, child]) => {

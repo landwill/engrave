@@ -1,11 +1,11 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, FileIcon, FolderIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { COMMON_BORDER_RADIUS } from '../../consts.ts'
 import { ListItemProps } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
-import { CHEVRON_WIDTH, FolderIndentLine } from '../icons/FolderIndentLine.tsx'
+import { CHEVRON_WIDTH } from '../icons/FolderIndentLine.tsx'
 import { ListItemSpan } from '../ListItemSpan.tsx'
 
 export const FileListFolderItem = observer(
@@ -15,9 +15,10 @@ export const FileListFolderItem = observer(
       uuid,
       title,
       isDragging,
+      isDraggedOver,
       isFolder,
       level = 0
-    }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number }>
+    }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number, isDraggedOver: boolean }>
   ) => {
     const isOpen = fileTreeStore.folderDetails.get(uuid)?.isOpen ?? false
     const isActive = documentStore.selectedDocumentUuid === uuid
@@ -35,21 +36,25 @@ export const FileListFolderItem = observer(
     }
     const chevronClassName = chevronClassNames.join(' ')
 
+    const FolderOrFileIcon = isFolder ? FolderIcon : FileIcon
+
     return <div style={{
       display: 'flex',
       flexDirection: 'row',
       lineHeight: 'normal',
       alignItems: 'center',
       marginLeft: '8px',
+      paddingLeft: `${String(level * 16)}px`,
       marginRight: '6px',
       borderRadius: COMMON_BORDER_RADIUS,
-      opacity: isDragging ? 0.5 : undefined
+      opacity: isDragging ? 0.5 : undefined,
+      outline: isDraggedOver ? '1px solid transparent' : undefined
     }} className={className} onClick={onClick}>
       {
-        Array.from({ length: level }, (_, i) => <FolderIndentLine key={i} />)
+        isFolder && <ChevronRight className={chevronClassName} style={{ flexShrink: 0 }} size={CHEVRON_WIDTH} />
       }
       {
-        isFolder && <ChevronRight className={chevronClassName} style={{ flexShrink: 0 }} size={CHEVRON_WIDTH} />
+        <FolderOrFileIcon size={16} style={{ flexShrink: 0, color: 'var(--color)' }} />
       }
       {useMemo(() => {
           return <ListItemSpan additionalClassName={spanClassName} actionItem={false}

@@ -25,16 +25,12 @@ export interface TooltipDetails {
 
 export type FileTreeItem = FileTreeFolder | FileTreeFile;
 
-interface FileTreeBaseItem {
-  uuid: string
-}
-
-export interface FileTreeFolder extends FileTreeBaseItem {
+export interface FileTreeFolder {
   isFolder: true
-  children: FileTreeItem[]
+  children: Map<string, FileTreeItem>
 }
 
-export interface FileTreeFile extends FileTreeBaseItem {
+export interface FileTreeFile {
   isFolder: false
 }
 
@@ -56,6 +52,6 @@ export interface DropTargetLocation {
 
 export interface FileTreeItemSearchResult {
   item: FileTreeItem
-  parent: FileTreeItem[]
-  index: number
+  parent: Map<string, FileTreeItem>
+  key: string
 }

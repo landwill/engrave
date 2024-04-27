@@ -15,6 +15,7 @@ import { FileListFolderItem } from './FileListFolderItem.tsx'
 
 interface FileTreeComponentProps {
   item: FileTreeItem
+  uuid: string
   level?: number
   parentUuid?: string
 }
@@ -64,20 +65,19 @@ function customDroppable(element: HTMLDivElement, uuid: string | undefined, setI
   })
 }
 
-
 const ContextMenuFileItems = ({ uuid }: { uuid: string }) => <>
   <ListItemSpan>Rename</ListItemSpan>
   <ListItemSpan onClick={() => { documentStore.deleteDocument(uuid) }}>Delete</ListItemSpan>
 </>
 
-export const FileTreeComponent = observer(({ item, parentUuid, level = 0 }: FileTreeComponentProps) => {
+export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }: FileTreeComponentProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState<boolean>(false)
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
-  const { uuid, isFolder } = item
-  const isOpen = item.isFolder && fileTreeStore.foldersDetails.find(f => f.uuid === item.uuid)?.isOpen
+  const { isFolder } = item
+  const isOpen = item.isFolder && fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.isOpen
 
-  const fileName = item.isFolder ? fileTreeStore.foldersDetails.find(f => f.uuid === item.uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === item.uuid)?.documentTitle ?? 'Filename not found'
+  const fileName = item.isFolder ? fileTreeStore.foldersDetails.find(f => f.uuid === uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
 
   useEffect(() => {
     const element = ref.current
@@ -89,7 +89,7 @@ export const FileTreeComponent = observer(({ item, parentUuid, level = 0 }: File
   }, [fileName, isFolder, parentUuid, uuid])
 
   const { openContextMenu } = useContextMenu()
-  const onClick = action(() => {item.isFolder ? fileTreeStore.collapseFolder(item.uuid) : documentStore.selectDocument(item.uuid)})
+  const onClick = action(() => {item.isFolder ? fileTreeStore.collapseFolder(uuid) : documentStore.selectDocument(uuid)})
 
   const onContextMenu: MouseEventHandler = (e) => {
     e.preventDefault()
@@ -111,7 +111,7 @@ export const FileTreeComponent = observer(({ item, parentUuid, level = 0 }: File
 
   return <>
     <div ref={ref} style={style}>
-      <FileListFolderItem uuid={item.uuid}
+      <FileListFolderItem uuid={uuid}
                           title={fileName}
                           onClick={onClick}
                           onContextMenu={onContextMenu}
@@ -119,8 +119,8 @@ export const FileTreeComponent = observer(({ item, parentUuid, level = 0 }: File
                           isFolder={item.isFolder}
                           level={level} />
     </div>
-    {isOpen && item.children.map(child => {
-      return <FileTreeComponent key={child.uuid} item={child} level={level + 1} parentUuid={uuid} />
+    {isOpen && Array.from(item.children.entries()).map(([childUuid, child]) => {
+      return <FileTreeComponent key={childUuid} uuid={childUuid} item={child} level={level + 1} parentUuid={uuid} />
     })}
   </>
 })

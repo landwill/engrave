@@ -1,9 +1,9 @@
 import { FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
 
-function searchTreeForFolder(items: FileTreeItem[], targetFolderUuid: string): FileTreeFolder | null {
-  for (const item of items) {
-    if (item.uuid === targetFolderUuid) {
-      if (!item.isFolder) throw new Error('Unexpected; searchTreeForFolder landed on a non-folder.')
+function searchTreeForFolder(items: Map<string, FileTreeItem>, targetFolderUuid: string): FileTreeFolder | null {
+  for (const [key, item] of items) {
+    if (key === targetFolderUuid) {
+      if (!item.isFolder) throw new Error(`Unexpected; searchTreeForFolder landed on a non-folder (${targetFolderUuid})`)
       return item
     }
     if (item.isFolder) {
@@ -14,12 +14,9 @@ function searchTreeForFolder(items: FileTreeItem[], targetFolderUuid: string): F
   return null
 }
 
-export function searchTreeForContainingList(items: FileTreeItem[], itemUuid: string): FileTreeItemSearchResult | null {
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]
-    if (item.uuid === itemUuid) {
-      return { item, parent: items, index: i }
-    }
+export function searchTreeForContainingList(items: Map<string, FileTreeItem>, itemUuid: string): FileTreeItemSearchResult | null {
+  for (const [key, item] of items) {
+    if (key === itemUuid) return { item, parent: items, key }
     if (item.isFolder) {
       const found = searchTreeForContainingList(item.children, itemUuid)
       if (found) return found
@@ -31,18 +28,18 @@ export function searchTreeForContainingList(items: FileTreeItem[], itemUuid: str
 function addForeignElementToFileTree(targetBranch: FileTreeFolder, sourceUuid: string, sourceIsFolder: boolean) {
   let newFileTreeEntry: FileTreeItem
   if (sourceIsFolder) {
-    newFileTreeEntry = { uuid: sourceUuid, isFolder: true, children: [] }
+    newFileTreeEntry = { isFolder: true, children: new Map() }
   } else {
-    newFileTreeEntry = { uuid: sourceUuid, isFolder: false }
+    newFileTreeEntry = { isFolder: false }
   }
-  targetBranch.children.push(newFileTreeEntry)
+  targetBranch.children.set(sourceUuid, newFileTreeEntry)
 }
 
-const performMove = (targetList: FileTreeItem[], source: FileTreeItemSearchResult) => {
-  if (targetList === source.parent) return
+const performMove = (targetChildren: Map<string, FileTreeItem>, source: FileTreeItemSearchResult) => {
+  if (targetChildren === source.parent) return
 
-  targetList.push(source.item)
-  source.parent.splice(source.index, 1)
+  targetChildren.set(source.key, source.item)
+  source.parent.delete(source.key)
 }
 
 function moveElementFromOneFolderToAnother(fileTreeItemSearchResult: FileTreeItemSearchResult, targetBranch: FileTreeFolder, targetUuid: string) {
@@ -61,7 +58,7 @@ function moveElementFromOneFolderToAnother(fileTreeItemSearchResult: FileTreeIte
   performMove(targetBranch.children, fileTreeItemSearchResult)
 }
 
-function moveFolderToTopLevel(fileTree: FileTreeItem[], sourceUuid: string) {
+function moveFolderToTopLevel(fileTree: Map<string, FileTreeItem>, sourceUuid: string) {
   const sourceContainingList = searchTreeForContainingList(fileTree, sourceUuid)
   if (sourceContainingList == null) {
     console.error('moveFolderToTopLevel found a null sourceContainingList. What causes this?', sourceUuid)
@@ -70,7 +67,8 @@ function moveFolderToTopLevel(fileTree: FileTreeItem[], sourceUuid: string) {
   performMove(fileTree, sourceContainingList)
 }
 
-function removeElementFromFileTree(fileTree: FileTreeItem[], sourceUuid: string) {
+// todo check if now unnecessary due to .delete being an option
+function removeElementFromFileTree(fileTree: Map<string, FileTreeItem>, sourceUuid: string) {
   const fileTreeItemSearchResult = searchTreeForContainingList(fileTree, sourceUuid)
   if (fileTreeItemSearchResult == null) {
     // Didn't find the sourceUuid in the file tree.
@@ -78,11 +76,11 @@ function removeElementFromFileTree(fileTree: FileTreeItem[], sourceUuid: string)
     return
   }
 
-  const { parent, index } = fileTreeItemSearchResult
-  parent.splice(index, 1)
+  const { parent, key } = fileTreeItemSearchResult
+  parent.delete(key)
 }
 
-export const moveElementToFolder = (fileTree: FileTreeItem[], itemToMoveUuid: string, targetUuid: string | undefined, sourceIsFolder: boolean) => {
+export const moveElementToFolder = (fileTree: Map<string, FileTreeItem>, itemToMoveUuid: string, targetUuid: string | undefined, sourceIsFolder: boolean) => {
   if (itemToMoveUuid === targetUuid) return
 
   if (targetUuid === undefined) {

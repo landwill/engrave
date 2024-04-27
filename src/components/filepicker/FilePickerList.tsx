@@ -20,11 +20,11 @@ const DIV_STYLE: CSSProperties = {
   height: '100%'
 }
 
-const flattenFileTreeUuids = (fileTree: FileTreeItem[]) => {
+const flattenFileTreeUuids = (fileTree: Map<string, FileTreeItem>) => {
   const uuids: string[] = []
-  ;(function traverse(items: FileTreeItem[]) {
-    for (const item of items) {
-      uuids.push(item.uuid)
+  ;(function traverse(items: Map<string, FileTreeItem>) {
+    for (const [uuid, item] of items) {
+      uuids.push(uuid)
       if ('children' in item) traverse(item.children)
     }
   })(fileTree)
@@ -58,12 +58,12 @@ export const FilePickerList = observer(() => {
 
   return <div style={DIV_STYLE} id='file-picker-list' ref={ref}>
     {
-      fileTreeStore.fileTreeData.map(item => <FileTreeComponent key={item.uuid} item={item} />)
+      Array.from(fileTreeStore.fileTreeData.entries()).map(([uuid, item]) => <FileTreeComponent key={uuid} item={item} uuid={uuid} />)
     }
     {
       documentStore.documentIdentifiers
         .filter(f => !fileTreeUuids.includes(f.documentUuid))
-        .map(f => <FileTreeComponent key={f.documentUuid} item={{ uuid: f.documentUuid, isFolder: false } satisfies FileTreeItem} />)
+        .map(f => <FileTreeComponent key={f.documentUuid} item={{ isFolder: false } satisfies FileTreeItem} uuid={f.documentUuid} />)
     }
   </div>
 })

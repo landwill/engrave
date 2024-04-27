@@ -21,6 +21,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
+    --panel-background-color-hover: var(--primary-purple);
+
     --blue: #0080ff;
     --purple: #a15cff;
     --dnd-hover-border: #8437ef;
@@ -73,10 +75,10 @@ body {
 
 .active, .list-item:hover, .toolbar-item:hover:not([disabled]) {
     background-color: var(--panel-background-color-hover);
-    color: white;
+    color: var(--color);
 
     svg {
-        stroke: white;
+        stroke: var(--color);
     }
 }
 
@@ -121,11 +123,11 @@ body {
 
     --border-color: #ddd;
     --panel-background-color: var(--light-panel-background-color);
-    --panel-background-color-hover: var(--purple);
 
     --tooltip-background-color: #666;
     --tooltip-font-color: #eee;
 
+    --primary-purple: #D2BDF9;
     --dnd-hover-background: #e6d9f7;
 }
 
@@ -136,11 +138,11 @@ body {
 
     --border-color: #555;
     --panel-background-color: var(--dark-panel-background-color);
-    --panel-background-color-hover: var(--purple);
 
     --tooltip-background-color: #777;
     --tooltip-font-color: #eee;
 
+    --primary-purple: #624096;
     --dnd-hover-background: #3a2d4c;
 }
 

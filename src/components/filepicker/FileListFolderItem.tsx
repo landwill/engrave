@@ -43,14 +43,14 @@ export const FileListFolderItem = observer(
       lineHeight: 'normal',
       alignItems: 'center',
       marginLeft: '8px',
-      paddingLeft: `${String(level * 16)}px`,
+      paddingLeft: `${String(level * 20)}px`,
       marginRight: '6px',
       borderRadius: COMMON_BORDER_RADIUS,
       opacity: isDragging ? 0.5 : undefined,
       outline: isDraggedOver ? '1px solid transparent' : undefined
     }} className={className} onClick={onClick}>
       {
-        isFolder && <ChevronRight className={chevronClassName} style={{ flexShrink: 0 }} size={CHEVRON_WIDTH} />
+        isFolder && <ChevronRight className={chevronClassName} style={{ flexShrink: 0, marginRight: '4px' }} size={CHEVRON_WIDTH} />
       }
       <FolderOrFileIcon size={16} style={{ flexShrink: 0, color: 'var(--color)' }} />
       {useMemo(() => {

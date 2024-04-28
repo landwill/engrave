@@ -1,5 +1,5 @@
 import { SerializedEditorState, SerializedLexicalNode } from 'lexical'
-import { DocumentDetail } from '../interfaces.ts'
+import { DocumentDetail, StoredDocument } from '../interfaces.ts'
 import { INDEXEDDB_DATABASE_NAME, INDEXEDDB_STORE_NAME_FILES } from './consts.ts'
 
 const hasChildren = (node: SerializedLexicalNode): node is { children: unknown[] } & SerializedLexicalNode => {
@@ -11,6 +11,11 @@ export class IndexedDB {
 
   constructor(idb: IDBDatabase) {
     this.idb = idb
+  }
+
+  private putDocument(document: StoredDocument) {
+    const store = this.getStore('readwrite')
+    return store.put(document)
   }
 
   static async open(): Promise<IndexedDB> {
@@ -31,10 +36,10 @@ export class IndexedDB {
     return tx.objectStore(INDEXEDDB_STORE_NAME_FILES)
   }
 
-  private getDocument = (documentUuid: string): Promise<DocumentDetail | undefined> => {
+  private getDocument = (documentUuid: string): Promise<StoredDocument | undefined> => {
     return new Promise((resolve, reject) => {
       const store = this.getStore('readonly')
-      const request = store.get(documentUuid) as IDBRequest<DocumentDetail | undefined>
+      const request = store.get(documentUuid) as IDBRequest<StoredDocument | undefined>
       request.onsuccess = () => {resolve(request.result)}
       request.onerror = () => {reject(new Error(request.error?.message))}
     })
@@ -45,7 +50,7 @@ export class IndexedDB {
     return document?.body ?? ''
   }
 
-  getDocuments = (): Promise<DocumentDetail[]> => {
+  getDocuments = (): Promise<(DocumentDetail & { documentUuid: string })[]> => {
     return new Promise((resolve, reject) => {
       const store = this.getStore('readonly')
       const allDocuments = store.getAll()
@@ -55,7 +60,11 @@ export class IndexedDB {
   }
 
   updateDocumentTitle = async (documentUuid: string, documentTitle: string): Promise<void> => {
-    const document: DocumentDetail = await this.getDocument(documentUuid) ?? { documentUuid, documentTitle: '', lastModified: 0 }
+    const documentInfo = await this.getDocument(documentUuid)
+    const document: DocumentDetail & { documentUuid: string } = documentInfo == null ? { documentUuid, documentTitle: '', lastModified: 0 } : {
+      ...documentInfo,
+      documentUuid
+    }
     document.documentTitle = documentTitle
     document.lastModified = Date.now()
 
@@ -67,7 +76,7 @@ export class IndexedDB {
   }
 
   updateDocumentBody = async (documentUuid: string, body: SerializedEditorState) => {
-    let document: DocumentDetail | undefined = await this.getDocument(documentUuid)
+    let document: StoredDocument | undefined = await this.getDocument(documentUuid)
     if (document == null) {
       if (body.root.children.length == 1
         && hasChildren(body.root.children[0])
@@ -80,8 +89,7 @@ export class IndexedDB {
     document.lastModified = Date.now()
 
     return new Promise<void>((resolve, reject) => {
-      const store = this.getStore('readwrite')
-      const request = store.put(document)
+      const request = this.putDocument(document satisfies StoredDocument)
       request.onsuccess = () => {resolve()}
       request.onerror = () => {reject(new Error(request.error?.message))}
     })

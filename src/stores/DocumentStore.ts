@@ -5,12 +5,14 @@ import { IndexedDB } from '../indexeddx/indexeddb.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../misc/utils.ts'
 import { contextMenuStore } from './ContextMenuStore.ts'
+import { fileSelectionStore } from './FileSelectionStore.ts'
+import { fileTreeStore } from './FileTreeStore.ts'
 
 const NEW_FILE_NAME = ''
+type MapInitializer = [string, DocumentIdentifier][]
 
 export class DocumentStore {
-  documentIdentifiers: DocumentIdentifier[] = []
-  selectedDocumentUuid: string | null = null
+  documentIdentifiers = new Map<string, DocumentIdentifier>()
   _idb: IndexedDB | null = null
 
   get idb() {
@@ -29,34 +31,24 @@ export class DocumentStore {
     flowResult(this.loadDocuments()).catch(lazyErrorHandler)
   }
 
-  * loadDocuments(): Generator<Promise<DocumentDetail[]>, void, DocumentDetail[]> {
-    const documents: DocumentDetail[] = yield this.idb.getDocuments()
-    this.documentIdentifiers = documents.map(document => ({
-      documentUuid: document.documentUuid,
+  * loadDocuments(): Generator<Promise<(DocumentDetail & { documentUuid: string })[]>, void, (DocumentDetail & { documentUuid: string })[]> {
+    const documents: (DocumentDetail & { documentUuid: string })[] = yield this.idb.getDocuments()
+    const documentIdentifiersList: MapInitializer = documents.map(document => [document.documentUuid, {
       documentTitle: document.documentTitle,
       lastModified: document.lastModified
-    } as DocumentIdentifier))
-  }
-
-  selectDocument(documentUuid: string) {
-    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
-    if (document == null) throw new Error('No document found for the given uuid.')
-    this.selectedDocumentUuid = documentUuid
-  }
-
-  deselectDocument() {
-    this.selectedDocumentUuid = null
+    } as DocumentIdentifier])
+    this.documentIdentifiers = new Map<string, DocumentIdentifier>(documentIdentifiersList)
   }
 
   renameDocumentInIDB(documentUuid: string, documentTitle: string) {
-    const documentIdentifier = this.documentIdentifiers.find(d => d.documentUuid == documentUuid)
+    const documentIdentifier = this.documentIdentifiers.get(documentUuid)
     if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
     this.idb.updateDocumentTitle(documentUuid, documentTitle)
       .catch(lazyErrorHandler)
   }
 
   updateDocumentBody(documentUuid: string, body: SerializedEditorState) {
-    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
+    const document = this.documentIdentifiers.get(documentUuid)
     if (!document) throw new Error('Document not found.')
     this.idb.updateDocumentBody(documentUuid, body)
       .catch(lazyErrorHandler)
@@ -64,23 +56,28 @@ export class DocumentStore {
 
   createAndSelectNewDocument(): string {
     const documentUuid = uuid()
-    this.documentIdentifiers.push({ documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
-    this.selectDocument(documentUuid)
+    this.documentIdentifiers.set(documentUuid, { documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
+    fileSelectionStore.selectDocument(documentUuid)
     return documentUuid
   }
 
   deleteDocument(documentUuid: string) {
-    const documentIndex = this.documentIdentifiers.findIndex(d => d.documentUuid === documentUuid)
-    this.documentIdentifiers.splice(documentIndex, 1)
+    this.documentIdentifiers.delete(documentUuid)
+    fileTreeStore.removeFileReferenceFromFileTree(documentUuid)
     this.verifySelectedDocument()
     contextMenuStore.setClosed()
     this.idb.deleteDocument(documentUuid)
       .catch(lazyErrorHandler)
   }
 
+  deleteDocuments(orphanedChildren: string[]) {
+    for (const uuid of orphanedChildren) this.deleteDocument(uuid)
+  }
+
   verifySelectedDocument() {
-    if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => uuid === this.selectedDocumentUuid)) {
-      this.deselectDocument()
+    if (fileSelectionStore.selectedDocumentUuids.size === 1) {
+      const [selectedUuid] = fileSelectionStore.selectedDocumentUuids
+      if (!this.documentIdentifiers.has(selectedUuid)) fileSelectionStore.deselectDocument()
     }
   }
 

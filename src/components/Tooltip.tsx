@@ -3,8 +3,10 @@ interface TooltipProps {
 }
 
 export function Tooltip({ tooltip }: TooltipProps) {
-  return <div className='fade-in' style={{
+  return <div style={{
     position: 'fixed',
+    opacity: tooltip.isOpen ? 1 : 0,
+    transition: 'opacity 300ms',
     left: tooltip.x,
     top: tooltip.y,
     pointerEvents: 'none',

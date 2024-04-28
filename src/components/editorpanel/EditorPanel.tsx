@@ -1,7 +1,8 @@
 import type { LexicalEditor } from 'lexical'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
-import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
+import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { CenteringDiv } from '../CenteringDiv.tsx'
 import { ErrorBoundary } from '../ErrorBoundary.tsx'
 import { WelcomePage } from '../WelcomePage.tsx'
@@ -15,13 +16,15 @@ const Fallback = () => <CenteringDiv>
 
 export const EditorPanel = observer(() => {
   const editorBodyRef = useRef<LexicalEditor | null>(null)
-  if (documentStore.selectedDocumentUuid == null) return <WelcomePage />
+  if (fileSelectionStore.selectedDocumentUuids.size !== 1) return <WelcomePage />
+  const [documentUuid] = fileSelectionStore.selectedDocumentUuids
+  if (fileTreeStore.isFolder(documentUuid)) return <WelcomePage />
 
   return <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
     <ErrorBoundary fallback={<Fallback />}>
       <EditorTitlePanel editorBodyRef={editorBodyRef} />
       <EditorBodyPanel
-        documentUuid={documentStore.selectedDocumentUuid}
+        documentUuid={documentUuid}
         editorBodyRef={editorBodyRef}
       />
     </ErrorBoundary>

@@ -21,8 +21,13 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
+    --panel-background-color-active: var(--primary-purple);
+    --panel-background-color-hover: var(--secondary-purple);
+
     --blue: #0080ff;
     --purple: #a15cff;
+    --dnd-hover-border: #8437ef;
+    --light-pink: #d0b0fc;
 }
 
 .logo {
@@ -69,13 +74,19 @@ body {
     text-decoration: line-through;
 }
 
-.active, .list-item:hover, .toolbar-item:hover:not([disabled]) {
-    background-color: var(--panel-background-color-hover);
-    color: white;
+.active, .toolbar-item:hover:not([disabled]) {
+    background-color: var(--panel-background-color-active);
+    outline: 1px solid var(--panel-background-color-active);
+    /*color: var(--color);*/
 
     svg {
-        stroke: white;
+        stroke: var(--color);
     }
+}
+
+.list-item:hover {
+    background-color: var(--panel-background-color-hover);
+    /*outline: 1px solid var(--panel-background-color-hover);*/
 }
 
 .untitled {
@@ -88,7 +99,7 @@ body {
 }
 
 .link:hover {
-    color: #D0B0FC;
+    color: var(--light-pink);
 }
 
 .icon:hover {
@@ -119,10 +130,13 @@ body {
 
     --border-color: #ddd;
     --panel-background-color: var(--light-panel-background-color);
-    --panel-background-color-hover: var(--purple);
 
     --tooltip-background-color: #666;
     --tooltip-font-color: #eee;
+
+    --primary-purple: #D2BDF9;
+    --secondary-purple: #e6d9f7;
+    --dnd-hover-background: #e6d9f7;
 }
 
 .dark-mode {
@@ -132,24 +146,13 @@ body {
 
     --border-color: #555;
     --panel-background-color: var(--dark-panel-background-color);
-    --panel-background-color-hover: var(--purple);
 
     --tooltip-background-color: #777;
     --tooltip-font-color: #eee;
-}
 
-.fade-in {
-    animation: fade-in-opacity 300ms;
-}
-
-@keyframes fade-in-opacity {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
+    --primary-purple: #624096;
+    --secondary-purple: #735E93;
+    --dnd-hover-background: #3a2d4c;
 }
 
 .toolbar {
@@ -196,7 +199,7 @@ body {
 }
 
 .toolbar button.toolbar-item.active {
-    background-color: var(--panel-background-color-hover);
+    background-color: var(--panel-background-color-active);
 }
 
 .toolbar button.toolbar-item.active {
@@ -223,4 +226,15 @@ body {
 .paragraph {
     margin-top: 5px;
     margin-bottom: 0;
+}
+/* End Lexical themes */
+
+.expanded {
+    transition: transform 200ms;
+    transform: rotate(90deg);
+}
+
+.collapsed {
+    transition: transform 200ms;
+    transform: rotate(0deg);
 }

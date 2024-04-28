@@ -1,19 +1,28 @@
 import { BugIcon, DownloadIcon, FileIcon, GitCommitIcon, HelpCircleIcon, SearchIcon, SunMoonIcon, UploadIcon } from 'lucide-react'
+import { action } from 'mobx'
 import React, { useMemo } from 'react'
 import { useContextMenu } from '../../hooks/useContextMenu.tsx'
-import { toggleDarkMode } from '../../misc/utils.ts'
+import { lazyErrorHandler, toggleDarkMode } from '../../misc/utils.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
+import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { IconPanel } from '../IconPanel.tsx'
 import { PanelIcon } from '../IconPanelButton.tsx'
-import { ListItem } from '../ListItem.tsx'
+import { ListItemSpan } from '../ListItemSpan.tsx'
 
 const createV1Document = () => {
   const documentUuid = documentStore.createAndSelectNewDocument()
   documentStore.$TEST_createBrokenFile(documentUuid)
 }
 
+const dumpFileTreeStructure = action(() => {
+  navigator.clipboard.writeText(JSON.stringify(fileTreeStore.fileTreeData))
+    .catch(lazyErrorHandler)
+})
+
 const contextMenuItems = <>
-  <ListItem onClick={createV1Document}>Create test/broken document</ListItem>
+  <ListItemSpan onClick={createV1Document}>Create test/broken document</ListItemSpan>
+  <ListItemSpan onClick={dumpFileTreeStructure}>Copy file tree structure to clipboard</ListItemSpan>
 </>
 
 export const LeftPanel = React.memo(function LeftPanel() {
@@ -37,7 +46,7 @@ export const LeftPanel = React.memo(function LeftPanel() {
     }, {
       buttonName: 'About',
       Icon: HelpCircleIcon,
-      action: () => {documentStore.deselectDocument()}
+      action: () => {fileSelectionStore.deselectDocument()}
     }, {
       buttonName: 'Debug Tools',
       Icon: BugIcon,

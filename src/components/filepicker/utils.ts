@@ -131,7 +131,7 @@ interface FilePickerListEntry {
   item: FileTreeItem
   level: number
   uuid: string
-  parentUuid?: string // todo populate
+  parentUuid?: string
 }
 
 export const flattenTreeWithLevels = (fileTreeData: Map<string, FileTreeItem>, fileIdentifiers: Map<string, DocumentIdentifier>): FilePickerListEntry[] => {

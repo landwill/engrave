@@ -9,6 +9,7 @@ import ReactDOM from 'react-dom/client'
 import { useContextMenu } from '../../hooks/useContextMenu.tsx'
 import { DraggableSource, DropTargetLocation, FileTreeItem } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { ListItemSpan } from '../ListItemSpan.tsx'
 import { FileListFolderItem } from './FileListFolderItem.tsx'
@@ -83,7 +84,6 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
   const [dragging, setDragging] = useState<boolean>(false)
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
   const { isFolder } = item
-  const isOpen = item.isFolder && fileTreeStore.folderDetails.get(uuid)?.isOpen
 
   const fileName = item.isFolder ? fileTreeStore.folderDetails.get(uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.get(uuid)?.documentTitle ?? 'Filename not found'
 
@@ -97,7 +97,17 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
   }, [fileName, isFolder, parentUuid, uuid])
 
   const { openContextMenu } = useContextMenu()
-  const onClick = action(() => {item.isFolder ? fileTreeStore.collapseFolder(uuid) : documentStore.selectDocument(uuid)})
+  const onClick = action<MouseEventHandler>((event) => {
+    if (event.shiftKey && event.ctrlKey) {
+      fileSelectionStore.shiftClickDocument(uuid, false)
+    } else if (event.ctrlKey) {
+      fileSelectionStore.controlClickDocument(uuid)
+    } else if (event.shiftKey) {
+      fileSelectionStore.shiftClickDocument(uuid, true)
+    } else {
+      item.isFolder ? fileTreeStore.collapseFolder(uuid) : fileSelectionStore.selectDocument(uuid)
+    }
+  })
 
   const onContextMenu: MouseEventHandler = (e) => {
     e.preventDefault()
@@ -113,19 +123,14 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
       border: '1px solid transparent'
     }
 
-  return <>
-    <div ref={ref} style={style}>
-      <FileListFolderItem uuid={uuid}
-                          title={fileName}
-                          onClick={onClick}
-                          onContextMenu={onContextMenu}
-                          isDragging={dragging}
-                          isFolder={item.isFolder}
-                          isDraggedOver={isDraggedOver}
-                          level={level} />
-    </div>
-    {isOpen && Array.from(item.children.entries()).map(([childUuid, child]) => {
-      return <FileTreeComponent key={childUuid} uuid={childUuid} item={child} level={level + 1} parentUuid={uuid} />
-    })}
-  </>
+  return <div ref={ref} style={style}>
+    <FileListFolderItem uuid={uuid}
+                        title={fileName}
+                        onClick={onClick}
+                        onContextMenu={onContextMenu}
+                        isDragging={dragging}
+                        isFolder={item.isFolder}
+                        isDraggedOver={isDraggedOver}
+                        level={level} />
+  </div>
 })

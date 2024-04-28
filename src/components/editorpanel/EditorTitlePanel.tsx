@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 import React, { ChangeEventHandler, CSSProperties, useEffect } from 'react'
 import { COMMON_BORDER_STYLE } from '../../consts.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 
 interface EditorTitlePanelObserverProps {
   editorBodyRef: React.MutableRefObject<LexicalEditor | null>
@@ -22,7 +23,7 @@ const INPUT_STYLE: CSSProperties = {
 }
 
 export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObserverProps) => {
-  const selectedDocumentUuids = documentStore.selectedDocumentUuids
+  const selectedDocumentUuids = fileSelectionStore.selectedDocumentUuids
   if (selectedDocumentUuids.size !== 1) throw new Error('Title Editor was rendered with multiple or zero selected documents.')
   const [selectedDocumentUuid] = selectedDocumentUuids
   const selectedDocument = documentStore.documentIdentifiers.get(selectedDocumentUuid)

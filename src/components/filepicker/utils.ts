@@ -1,4 +1,6 @@
-import { FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
+import { DocumentIdentifier, FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
+import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 
 export function searchTreeForFolder(items: Map<string, FileTreeItem>, targetFolderUuid: string): { folder: FileTreeFolder, parent: Map<string, FileTreeItem> } | null {
   for (const [key, item] of items) {
@@ -122,4 +124,42 @@ export const flattenFileTreeUuids = (fileTree: Map<string, FileTreeItem>, type: 
     }
   })(fileTree)
   return uuids
+}
+
+interface FilePickerListEntry {
+  key: string
+  item: FileTreeItem
+  level: number
+  uuid: string
+  parentUuid?: string // todo populate
+}
+
+export const flattenTreeWithLevels = (fileTreeData: Map<string, FileTreeItem>, fileIdentifiers: Map<string, DocumentIdentifier>): FilePickerListEntry[] => {
+  const flattenedTree: FilePickerListEntry[] = []
+  const seen = new Set()
+
+  ;(function flattenTree(data: Map<string, FileTreeItem>, level = 0, visible = true, parentUuid: string | undefined = undefined) {
+    Array.from(data.entries())
+      .map(([uuid, item]) => ({
+        uuid,
+        item,
+        name: (item.isFolder ? fileTreeStore.folderDetails.get(uuid)?.name : documentStore.documentIdentifiers.get(uuid)?.documentTitle) ?? 'Untitled'
+      }))
+      .sort((a, b) => {
+        return a.name.localeCompare(b.name)
+      })
+      .forEach(({ uuid, item }) => {
+        // track 'visible' to continue traversing children (for the purpose of maintaining 'seen'), despite a parent folder being collapsed
+        if (visible) flattenedTree.push({ uuid, item, key: uuid, level, parentUuid })
+        seen.add(uuid)
+        if (item.isFolder) flattenTree(item.children, level + 1, visible && (fileTreeStore.folderDetails.get(uuid)?.isOpen == true), uuid)
+      })
+  })(fileTreeData)
+
+  Array.from(fileIdentifiers.entries())
+    .filter(([fileUuid]) => !seen.has(fileUuid))
+    .sort(([, item1], [, item2]) => item1.documentTitle.localeCompare(item2.documentTitle))
+    .forEach(([fileUuid]) => flattenedTree.push({ uuid: fileUuid, key: fileUuid, item: { isFolder: false } satisfies FileTreeItem, level: 0 }))
+
+  return flattenedTree
 }

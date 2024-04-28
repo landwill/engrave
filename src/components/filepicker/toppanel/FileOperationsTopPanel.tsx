@@ -10,8 +10,8 @@ const DIV_PROPS = { marginBottom: '0.5em' }
 
 function useNamingModal() {
   const openNamingModal = (title: string, callback: (title: string) => void) => {
-    const name = prompt(`${title}: `)
-    callback(name ?? '')
+    const name = prompt(`${title}:`)
+    if (name) callback(name)
   }
   return { openNamingModal }
 }

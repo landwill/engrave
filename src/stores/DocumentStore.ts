@@ -5,13 +5,14 @@ import { IndexedDB } from '../indexeddx/indexeddb.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
 import { lazyErrorHandler } from '../misc/utils.ts'
 import { contextMenuStore } from './ContextMenuStore.ts'
+import { fileSelectionStore } from './FileSelectionStore.ts'
+import { fileTreeStore } from './FileTreeStore.ts'
 
 const NEW_FILE_NAME = ''
 type MapInitializer = [string, DocumentIdentifier][]
 
 export class DocumentStore {
   documentIdentifiers = new Map<string, DocumentIdentifier>()
-  selectedDocumentUuids = new Set<string>()
   _idb: IndexedDB | null = null
 
   get idb() {
@@ -39,16 +40,6 @@ export class DocumentStore {
     this.documentIdentifiers = new Map<string, DocumentIdentifier>(documentIdentifiersList)
   }
 
-  selectDocument(documentUuid: string) {
-    const document = this.documentIdentifiers.get(documentUuid)
-    if (document == null) throw new Error('No document found for the given uuid: ' + documentUuid)
-    this.selectedDocumentUuids = new Set([documentUuid])
-  }
-
-  deselectDocument() {
-    this.selectedDocumentUuids.clear()
-  }
-
   renameDocumentInIDB(documentUuid: string, documentTitle: string) {
     const documentIdentifier = this.documentIdentifiers.get(documentUuid)
     if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
@@ -66,12 +57,13 @@ export class DocumentStore {
   createAndSelectNewDocument(): string {
     const documentUuid = uuid()
     this.documentIdentifiers.set(documentUuid, { documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
-    this.selectDocument(documentUuid)
+    fileSelectionStore.selectDocument(documentUuid)
     return documentUuid
   }
 
   deleteDocument(documentUuid: string) {
     this.documentIdentifiers.delete(documentUuid)
+    fileTreeStore.removeFileReferenceFromFileTree(documentUuid)
     this.verifySelectedDocument()
     contextMenuStore.setClosed()
     this.idb.deleteDocument(documentUuid)
@@ -83,9 +75,9 @@ export class DocumentStore {
   }
 
   verifySelectedDocument() {
-    if (this.selectedDocumentUuids.size === 1) {
-      const [selectedUuid] = this.selectedDocumentUuids
-      if (!this.documentIdentifiers.has(selectedUuid)) this.deselectDocument()
+    if (fileSelectionStore.selectedDocumentUuids.size === 1) {
+      const [selectedUuid] = fileSelectionStore.selectedDocumentUuids
+      if (!this.documentIdentifiers.has(selectedUuid)) fileSelectionStore.deselectDocument()
     }
   }
 

@@ -1,14 +1,15 @@
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine'
 import { dropTargetForElements, monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { DropTargetRecord } from '@atlaskit/pragmatic-drag-and-drop/types'
-import { action } from 'mobx'
+import { action, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { CSSProperties, useEffect, useRef } from 'react'
-import { DraggableSource, DropTargetLocation, FileTreeItem } from '../../interfaces.ts'
+import { DraggableSource, DropTargetLocation } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { FileTreeComponent } from './FileTreeComponents.tsx'
-import { flattenFileTreeUuids, moveElementToFolder } from './utils.ts'
+import { flattenTreeWithLevels, moveElementToFolder } from './utils.ts'
 
 const DIV_STYLE: CSSProperties = {
   display: 'flex',
@@ -21,7 +22,6 @@ const DIV_STYLE: CSSProperties = {
 }
 
 export const FilePickerList = observer(() => {
-  const fileTreeUuids = flattenFileTreeUuids(fileTreeStore.fileTreeData, 'all')
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -45,22 +45,21 @@ export const FilePickerList = observer(() => {
       dropTargetForElements({ element, getData: () => ({ location: { uuid: undefined } as DropTargetLocation }) }))
   }, [])
 
-  const displayedOrder: string[] = []
+  const orderedFileAndFolderList = flattenTreeWithLevels(fileTreeStore.fileTreeData, documentStore.documentIdentifiers)
+
+  runInAction(() => {
+    fileSelectionStore.displayedDocumentOrder = orderedFileAndFolderList.map(f => f.uuid)
+  })
 
   return <div style={DIV_STYLE} id='file-picker-list' ref={ref}>
     {
-      Array.from(fileTreeStore.fileTreeData.entries()).map(([uuid, item]) => {
-        displayedOrder.push(uuid)
-        return <FileTreeComponent key={uuid} item={item} uuid={uuid} />
+      orderedFileAndFolderList.map(filePickerListEntry => {
+        return <FileTreeComponent key={filePickerListEntry.key}
+                                  item={filePickerListEntry.item}
+                                  uuid={filePickerListEntry.uuid}
+                                  level={filePickerListEntry.level}
+                                  parentUuid={filePickerListEntry.parentUuid} />
       })
-    }
-    {
-      Array.from(documentStore.documentIdentifiers.entries())
-        .filter(([fileUuid]) => !fileTreeUuids.includes(fileUuid))
-        .map(([fileUuid]) => {
-          displayedOrder.push(fileUuid)
-          return <FileTreeComponent key={fileUuid} item={{ isFolder: false } satisfies FileTreeItem} uuid={fileUuid} />
-        })
     }
   </div>
 })

@@ -4,6 +4,7 @@ import React, { useMemo } from 'react'
 import { useContextMenu } from '../../hooks/useContextMenu.tsx'
 import { lazyErrorHandler, toggleDarkMode } from '../../misc/utils.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { IconPanel } from '../IconPanel.tsx'
 import { PanelIcon } from '../IconPanelButton.tsx'
@@ -45,7 +46,7 @@ export const LeftPanel = React.memo(function LeftPanel() {
     }, {
       buttonName: 'About',
       Icon: HelpCircleIcon,
-      action: () => {documentStore.deselectDocument()}
+      action: () => {fileSelectionStore.deselectDocument()}
     }, {
       buttonName: 'Debug Tools',
       Icon: BugIcon,

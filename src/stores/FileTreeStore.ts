@@ -18,7 +18,9 @@ export class FileTreeStore {
       folderDetails: observable,
       collapseFolder: action,
       createFolder: action,
-      deleteFolderAndChildFolders: action
+      deleteFolderAndChildFolders: action,
+      removeFileReferenceFromFileTree: action,
+      isFolder: observable
     })
   }
 
@@ -55,6 +57,25 @@ export class FileTreeStore {
     }
 
     return fileUuids
+  }
+
+  removeFileReferenceFromFileTree(documentUuid: string) {
+    (function traverseAndDeleteIfFound(branch: Map<string, FileTreeItem>): boolean {
+      for (const [folderOrFileUuid, folderDetails] of branch) {
+        if (!folderDetails.isFolder && folderOrFileUuid === documentUuid) {
+          branch.delete(documentUuid)
+          return true
+        } else if (folderDetails.isFolder) {
+          const done = traverseAndDeleteIfFound(folderDetails.children)
+          if (done) return true
+        }
+      }
+      return false
+    })(this.fileTreeData)
+  }
+
+  isFolder(documentUuid: string) {
+    return this.folderDetails.has(documentUuid)
   }
 }
 

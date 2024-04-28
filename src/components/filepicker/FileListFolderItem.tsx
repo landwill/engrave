@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { CHEVRON_WIDTH, COMMON_BORDER_RADIUS } from '../../consts.ts'
 import { ListItemProps } from '../../interfaces.ts'
-import { documentStore } from '../../stores/DocumentStore.ts'
+import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { ListItemSpan } from '../ListItemSpan.tsx'
 
@@ -20,7 +20,7 @@ export const FileListFolderItem = observer(
     }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number, isDraggedOver: boolean }>
   ) => {
     const isOpen = fileTreeStore.folderDetails.get(uuid)?.isOpen ?? false
-    const isActive = documentStore.selectedDocumentUuids.has(uuid)
+    const isActive = fileSelectionStore.selectedDocumentUuids.has(uuid)
 
     const classNames = ['list-item']
     if (isActive) classNames.push('active')
@@ -54,7 +54,8 @@ export const FileListFolderItem = observer(
       }
       <FolderOrFileIcon size={16} style={{ flexShrink: 0, color: 'var(--color)' }} />
       {useMemo(() => {
-          return <ListItemSpan additionalClassName={spanClassName} actionItem={false}
+          return <ListItemSpan additionalClassName={spanClassName}
+                               actionItem={false}
                                onContextMenu={onContextMenu}
                                coloredHover={false}>{title || 'Untitled'}</ListItemSpan>
         },

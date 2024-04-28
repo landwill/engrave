@@ -85,7 +85,7 @@ export const FileTreeComponent = observer(({ item, uuid, parentUuid, level = 0 }
   const { isFolder } = item
   const isOpen = item.isFolder && fileTreeStore.folderDetails.get(uuid)?.isOpen
 
-  const fileName = item.isFolder ? fileTreeStore.folderDetails.get(uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.find(d => d.documentUuid === uuid)?.documentTitle ?? 'Filename not found'
+  const fileName = item.isFolder ? fileTreeStore.folderDetails.get(uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.get(uuid)?.documentTitle ?? 'Filename not found'
 
   useEffect(() => {
     const element = ref.current

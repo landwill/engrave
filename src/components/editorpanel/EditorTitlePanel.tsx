@@ -25,7 +25,7 @@ export const EditorTitlePanel = observer(({ editorBodyRef }: EditorTitlePanelObs
   const selectedDocumentUuids = documentStore.selectedDocumentUuids
   if (selectedDocumentUuids.size !== 1) throw new Error('Title Editor was rendered with multiple or zero selected documents.')
   const [selectedDocumentUuid] = selectedDocumentUuids
-  const selectedDocument = documentStore.documentIdentifiers.find(d => d.documentUuid === selectedDocumentUuid)
+  const selectedDocument = documentStore.documentIdentifiers.get(selectedDocumentUuid)
 
   useEffect(() => {
     const dispose = reaction(

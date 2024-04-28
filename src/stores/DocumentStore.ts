@@ -7,9 +7,10 @@ import { lazyErrorHandler } from '../misc/utils.ts'
 import { contextMenuStore } from './ContextMenuStore.ts'
 
 const NEW_FILE_NAME = ''
+type MapInitializer = [string, DocumentIdentifier][]
 
 export class DocumentStore {
-  documentIdentifiers: DocumentIdentifier[] = []
+  documentIdentifiers = new Map<string, DocumentIdentifier>()
   selectedDocumentUuids = new Set<string>()
   _idb: IndexedDB | null = null
 
@@ -29,17 +30,17 @@ export class DocumentStore {
     flowResult(this.loadDocuments()).catch(lazyErrorHandler)
   }
 
-  * loadDocuments(): Generator<Promise<DocumentDetail[]>, void, DocumentDetail[]> {
-    const documents: DocumentDetail[] = yield this.idb.getDocuments()
-    this.documentIdentifiers = documents.map(document => ({
-      documentUuid: document.documentUuid,
+  * loadDocuments(): Generator<Promise<(DocumentDetail & { documentUuid: string })[]>, void, (DocumentDetail & { documentUuid: string })[]> {
+    const documents: (DocumentDetail & { documentUuid: string })[] = yield this.idb.getDocuments()
+    const documentIdentifiersList: MapInitializer = documents.map(document => [document.documentUuid, {
       documentTitle: document.documentTitle,
       lastModified: document.lastModified
-    } as DocumentIdentifier))
+    } as DocumentIdentifier])
+    this.documentIdentifiers = new Map<string, DocumentIdentifier>(documentIdentifiersList)
   }
 
   selectDocument(documentUuid: string) {
-    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
+    const document = this.documentIdentifiers.get(documentUuid)
     if (document == null) throw new Error('No document found for the given uuid: ' + documentUuid)
     this.selectedDocumentUuids = new Set([documentUuid])
   }
@@ -49,14 +50,14 @@ export class DocumentStore {
   }
 
   renameDocumentInIDB(documentUuid: string, documentTitle: string) {
-    const documentIdentifier = this.documentIdentifiers.find(d => d.documentUuid == documentUuid)
+    const documentIdentifier = this.documentIdentifiers.get(documentUuid)
     if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
     this.idb.updateDocumentTitle(documentUuid, documentTitle)
       .catch(lazyErrorHandler)
   }
 
   updateDocumentBody(documentUuid: string, body: SerializedEditorState) {
-    const document = this.documentIdentifiers.find(d => d.documentUuid === documentUuid)
+    const document = this.documentIdentifiers.get(documentUuid)
     if (!document) throw new Error('Document not found.')
     this.idb.updateDocumentBody(documentUuid, body)
       .catch(lazyErrorHandler)
@@ -64,14 +65,13 @@ export class DocumentStore {
 
   createAndSelectNewDocument(): string {
     const documentUuid = uuid()
-    this.documentIdentifiers.push({ documentUuid, documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
+    this.documentIdentifiers.set(documentUuid, { documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
     this.selectDocument(documentUuid)
     return documentUuid
   }
 
   deleteDocument(documentUuid: string) {
-    const documentIndex = this.documentIdentifiers.findIndex(d => d.documentUuid === documentUuid)
-    this.documentIdentifiers.splice(documentIndex, 1)
+    this.documentIdentifiers.delete(documentUuid)
     this.verifySelectedDocument()
     contextMenuStore.setClosed()
     this.idb.deleteDocument(documentUuid)
@@ -83,8 +83,9 @@ export class DocumentStore {
   }
 
   verifySelectedDocument() {
-    if (!this.documentIdentifiers.map(d => d.documentUuid).some(uuid => this.selectedDocumentUuids.has(uuid))) {
-      this.deselectDocument()
+    if (this.selectedDocumentUuids.size === 1) {
+      const [selectedUuid] = this.selectedDocumentUuids
+      if (!this.documentIdentifiers.has(selectedUuid)) this.deselectDocument()
     }
   }
 

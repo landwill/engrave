@@ -55,11 +55,11 @@ export const FilePickerList = observer(() => {
       })
     }
     {
-      documentStore.documentIdentifiers
-        .filter(f => !fileTreeUuids.includes(f.documentUuid))
-        .map(f => {
-          displayedOrder.push(f.documentUuid)
-          return <FileTreeComponent key={f.documentUuid} item={{ isFolder: false } satisfies FileTreeItem} uuid={f.documentUuid} />
+      Array.from(documentStore.documentIdentifiers.entries())
+        .filter(([fileUuid]) => !fileTreeUuids.includes(fileUuid))
+        .map(([fileUuid]) => {
+          displayedOrder.push(fileUuid)
+          return <FileTreeComponent key={fileUuid} item={{ isFolder: false } satisfies FileTreeItem} uuid={fileUuid} />
         })
     }
   </div>

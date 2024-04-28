@@ -2,13 +2,16 @@ import { SerializedEditorState } from 'lexical'
 import { MouseEventHandler } from 'react'
 
 export interface DocumentIdentifier {
-  documentUuid: string
   documentTitle: string
   lastModified: number
 }
 
 export interface DocumentDetail extends DocumentIdentifier {
   body?: SerializedEditorState
+}
+
+export interface StoredDocument extends DocumentDetail {
+  documentUuid: string
 }
 
 export interface IDBWorkerMessage {

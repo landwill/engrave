@@ -1,4 +1,4 @@
-import { DocumentIdentifier, DraggableSource, FileTree, FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
+import { DocumentIdentifier, DraggableSource, FilePickerListEntry, FileTree, FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 
@@ -140,14 +140,6 @@ export const flattenFileTreeUuids = (fileTree: Map<string, FileTreeItem>, type: 
     }
   })(fileTree)
   return uuids
-}
-
-interface FilePickerListEntry {
-  key: string
-  item: FileTreeItem
-  level: number
-  uuid: string
-  parentUuid?: string
 }
 
 export const flattenTreeWithLevels = (fileTreeData: Map<string, FileTreeItem>, fileIdentifiers: Map<string, DocumentIdentifier>): FilePickerListEntry[] => {

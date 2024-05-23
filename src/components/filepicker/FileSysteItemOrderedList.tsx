@@ -6,7 +6,7 @@ import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { FileTreeComponent } from './FileTreeComponents.tsx'
 import { flattenTreeWithLevels } from './utils.ts'
 
-export const FileOrFolderEntryCollection = observer(() => {
+export const FileSysteItemOrderedList = observer(() => {
   const orderedFileAndFolderList = flattenTreeWithLevels(fileTreeStore.fileTreeData, documentStore.documentIdentifiers)
 
   runInAction(() => {
@@ -15,8 +15,8 @@ export const FileOrFolderEntryCollection = observer(() => {
 
   return <>
     {
-      orderedFileAndFolderList.map(({ key, item, uuid, level, parentUuid }) => {
-        return <FileTreeComponent key={key} item={item} uuid={uuid} level={level} parentUuid={parentUuid} />
+      orderedFileAndFolderList.map(fileOrFolderDetails => {
+        return <FileTreeComponent key={fileOrFolderDetails.key} fileSystemItemDetails={fileOrFolderDetails} />
       })
     }
   </>

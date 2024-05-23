@@ -67,3 +67,11 @@ export interface TooltipDispatch {
 }
 
 export type FileTree = Map<string, FileTreeItem>
+
+export interface FilePickerListEntry {
+  key: string
+  item: FileTreeItem
+  level: number
+  uuid: string
+  parentUuid?: string
+}

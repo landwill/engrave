@@ -3,9 +3,10 @@ import { BaseEventPayload, DropTargetRecord, ElementDragType } from '@atlaskit/p
 import { dropTargetForElements, monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { action } from 'mobx'
 import { useEffect, useRef } from 'react'
+import invariant from 'tiny-invariant'
 import { DraggableSource, DropTargetLocation } from '../../interfaces.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
-import { FileOrFolderEntryCollection } from './FileOrFolderEntryCollection.tsx'
+import { FileSysteItemOrderedList } from './FileSysteItemOrderedList.tsx'
 import { FilePickerListWrapper } from './FilePickerListWrapper.tsx'
 import { moveElementToFolderIfApplicable } from './utils.ts'
 
@@ -26,7 +27,7 @@ export const FilePickerList = () => {
 
   useEffect(() => {
     const element = filePickerListRef.current
-    if (element == null) throw new Error('FilePickerListRef\'s .current was null')
+    invariant(element)
 
     return combine(monitorForElements({
         onDrop: action(moveDraggedElementToDestination)
@@ -38,6 +39,6 @@ export const FilePickerList = () => {
   }, [])
 
   return <FilePickerListWrapper innerRef={filePickerListRef}>
-    <FileOrFolderEntryCollection />
+    <FileSysteItemOrderedList />
   </FilePickerListWrapper>
 }

@@ -65,7 +65,6 @@ function customDroppable(element: HTMLDivElement, uuid: string | undefined, setI
     element,
     onDragEnter: () => {setIsDraggedOver(true)},
     onDragLeave: () => {setIsDraggedOver(false)},
-    // onDropTargetChange: () => {console.log(element.)},
     onDrop: () => {
       setIsDraggedOver(false)
     },

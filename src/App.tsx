@@ -1,14 +1,15 @@
 import { configure } from 'mobx'
-import { CSSProperties, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ContextMenu } from './components/ContextMenu.tsx'
-import { FilePickerAndEditor } from './components/filepicker/FilePickerAndEditor.tsx'
-import { LeftPanel } from './components/leftpanel/LeftPanel.tsx'
+import { EditorPanel } from './components/editorpanel/EditorPanel.tsx'
+import { FilePickerPanel } from './components/filepicker/FilePickerPanel.tsx'
+import { LeftActionsPanel } from './components/leftpanel/LeftActionsPanel.tsx'
+import { MainSiteWrapper } from './components/MainSiteWrapper.tsx'
 import { IndexedDB } from './indexeddx/indexeddb.ts'
-import { lazyDarkModeRetrieve, lazyErrorHandler } from './misc/utils.ts'
+import { lazyCheckAndSetDarkMode, logError } from './misc/utils.ts'
 import { documentStore } from './stores/DocumentStore.ts'
 
-const DIV_STYLE: CSSProperties = { display: 'flex', flexDirection: 'row', height: '100%' }
-
+// MobX strict rules
 configure({
   enforceActions: 'always',
   computedRequiresReaction: true,
@@ -24,7 +25,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
 }
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown)
@@ -33,22 +34,23 @@ function App() {
         setIsLoading(false)
         documentStore.setup(db)
       })
-      .catch(lazyErrorHandler)
+      .catch(logError)
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
 
-  lazyDarkModeRetrieve()
+  lazyCheckAndSetDarkMode()
 
   if (isLoading) return <div>Loading...</div>
 
-  return <div style={DIV_STYLE}>
-    <LeftPanel />
-    <FilePickerAndEditor />
+  return <MainSiteWrapper>
+    <LeftActionsPanel />
+    <FilePickerPanel />
+    <EditorPanel />
     <ContextMenu />
-  </div>
+  </MainSiteWrapper>
 }
 
 export default App

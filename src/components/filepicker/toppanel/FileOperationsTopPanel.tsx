@@ -4,34 +4,30 @@ import { fileTreeStore } from '../../../stores/FileTreeStore.ts'
 import { IconPanel } from '../../IconPanel.tsx'
 import { PanelIcon } from '../../IconPanelButton.tsx'
 
+type NamingModalOpenerCallback = (title: string) => void
+type NamingModalOpener = (title: string, callback: NamingModalOpenerCallback) => void
 
-const DIV_PROPS = { marginBottom: '0.5em' }
-
-
-function useNamingModal() {
-  const openNamingModal = (title: string, callback: (title: string) => void) => {
-    const name = prompt(`${title}:`)
-    if (name) callback(name)
-  }
-  return { openNamingModal }
+const openNamingModal: NamingModalOpener = (title: string, callback: (title: string) => void) => {
+  const name = prompt(`${title}:`)
+  if (name) callback(name)
 }
 
-export const FileOperationsTopPanel = () => {
-  const { openNamingModal } = useNamingModal()
-  const icons: PanelIcon[] = [
-    {
-      buttonName: 'New file',
-      Icon: FilePlusIcon,
-      action: () => {
-        documentStore.createAndSelectNewDocument()
-      }
-    }, {
-      buttonName: 'New folder',
-      Icon: FolderPlusIcon,
-      action: () => {
-        openNamingModal('New folder', (name) => { fileTreeStore.createFolder(name)})
-      }
+const icons: PanelIcon[] = [
+  {
+    buttonName: 'New file',
+    Icon: FilePlusIcon,
+    action: () => {
+      documentStore.createAndSelectNewDocument()
     }
-  ]
-  return <IconPanel icons={icons} direction='horizontal' centered divProps={DIV_PROPS} />
+  }, {
+    buttonName: 'New folder',
+    Icon: FolderPlusIcon,
+    action: () => {
+      openNamingModal('New folder', name => { fileTreeStore.createFolder(name)})
+    }
+  }
+]
+
+export const FileOperationsTopPanel = () => {
+  return <IconPanel icons={icons} direction='horizontal' centered divProps={{ marginBottom: '0.5em' }} />
 }

@@ -65,3 +65,5 @@ export interface TooltipDispatch {
   x?: number
   y?: number
 }
+
+export type FileTree = Map<string, FileTreeItem>

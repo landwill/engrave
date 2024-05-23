@@ -1,8 +1,11 @@
-import { DocumentIdentifier, FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
+import { DocumentIdentifier, DraggableSource, FileTree, FileTreeFolder, FileTreeItem, FileTreeItemSearchResult } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 
-export function searchTreeForFolder(items: Map<string, FileTreeItem>, targetFolderUuid: string): { folder: FileTreeFolder, parent: Map<string, FileTreeItem> } | null {
+export function searchTreeForFolder(items: Map<string, FileTreeItem>, targetFolderUuid: string): {
+  folder: FileTreeFolder,
+  parent: Map<string, FileTreeItem>
+} | null {
   for (const [key, item] of items) {
     if (key === targetFolderUuid) {
       if (!item.isFolder) throw new Error(`Unexpected; searchTreeForFolder landed on a non-folder (${targetFolderUuid})`)
@@ -16,7 +19,7 @@ export function searchTreeForFolder(items: Map<string, FileTreeItem>, targetFold
   return null
 }
 
-export function searchTreeForContainingList(items: Map<string, FileTreeItem>, itemUuid: string): FileTreeItemSearchResult | null {
+export function searchTreeForContainingList(items: FileTree, itemUuid: string): FileTreeItemSearchResult | null {
   for (const [key, item] of items) {
     if (key === itemUuid) return { item, parent: items, key }
     if (item.isFolder) {
@@ -37,13 +40,6 @@ function addForeignElementToFileTree(targetBranch: FileTreeFolder, sourceUuid: s
   targetBranch.children.set(sourceUuid, newFileTreeEntry)
 }
 
-const performMove = (targetChildren: Map<string, FileTreeItem>, source: FileTreeItemSearchResult) => {
-  if (targetChildren === source.parent) return
-
-  targetChildren.set(source.key, source.item)
-  source.parent.delete(source.key)
-}
-
 function moveElementFromOneFolderToAnother(fileTreeItemSearchResult: FileTreeItemSearchResult, targetBranch: FileTreeFolder, targetUuid: string) {
   // item found in fileTree; move its corresponding info (isFolder, children, etc.) from the source
   const { item } = fileTreeItemSearchResult
@@ -51,13 +47,20 @@ function moveElementFromOneFolderToAnother(fileTreeItemSearchResult: FileTreeIte
   // Quit early if we're dragging a folder into one of its child (even nested) folders
   if (
     item.isFolder // this risk only exists for folders
-    && searchTreeForContainingList(item.children, targetUuid) // i.e. the target was found in the
+    && searchTreeForContainingList(item.children, targetUuid) // i.e. the target was found in the dragged element's child tree
   ) {
     console.info('Cannot move folders into their own subfolders (even if nested).')
     return
   }
 
   performMove(targetBranch.children, fileTreeItemSearchResult)
+}
+
+const performMove = (targetChildren: Map<string, FileTreeItem>, source: FileTreeItemSearchResult) => {
+  if (targetChildren === source.parent) return
+
+  targetChildren.set(source.key, source.item)
+  source.parent.delete(source.key)
 }
 
 function moveFolderToTopLevel(fileTree: Map<string, FileTreeItem>, sourceUuid: string) {
@@ -82,35 +85,48 @@ function removeElementFromFileTree(fileTree: Map<string, FileTreeItem>, sourceUu
   parent.delete(key)
 }
 
-export const moveElementToFolder = (fileTree: Map<string, FileTreeItem>, itemToMoveUuid: string, targetUuid: string | undefined, sourceIsFolder: boolean) => {
-  if (itemToMoveUuid === targetUuid) return
+function moveElementToTopLevel(fileTree: Map<string, FileTreeItem>, sourceData: DraggableSource) {
+  const { isFolder, uuid } = sourceData
+  if (isFolder) {
+    moveFolderToTopLevel(fileTree, uuid)
+  } else {
+    removeElementFromFileTree(fileTree, uuid)
+  }
+}
+
+export const moveElementToFolderIfApplicable = (sourceData: DraggableSource, targetUuid: string | undefined, fileTree: FileTree) => {
+  if (targetUuid === sourceData.uuid) {
+    // element was dropped onto itself; nothing to move
+    return
+  }
 
   if (targetUuid === undefined) {
-    if (sourceIsFolder) {
-      moveFolderToTopLevel(fileTree, itemToMoveUuid)
-      return
-    } else {
-      removeElementFromFileTree(fileTree, itemToMoveUuid)
-      return
-    }
-  }
-
-  const searchResult = searchTreeForFolder(fileTree, targetUuid)
-  if (searchResult == null) {
-    console.error('Target branch not found when moving element to folder. Unknown scenario. Source: {}. Target: {}.', itemToMoveUuid, targetUuid)
+    // element was dragged to the top level (dropped on the filepicker background)
+    moveElementToTopLevel(fileTree, sourceData)
     return
   }
 
-  const { folder: targetBranch } = searchResult
-  const sourceContainingList = searchTreeForContainingList(fileTree, itemToMoveUuid)
+  moveElementToBranch(sourceData, targetUuid, fileTree)
+}
+
+const moveElementToBranch = (sourceData: DraggableSource, targetUuid: string, fileTree: FileTree): void => {
+  const { uuid: sourceUuid, isFolder: sourceIsFolder } = sourceData
+  const searchResult = searchTreeForFolder(fileTree, targetUuid)
+
+  if (searchResult == null) {
+    throw new Error(`Target branch not found when moving element to folder. Unknown scenario. Source: ${sourceUuid}. Target: ${targetUuid}.`)
+  }
+
+  const targetBranch = searchResult.folder
+  const sourceContainingList = searchTreeForContainingList(fileTree, sourceUuid)
 
   if (sourceContainingList == null) {
-    addForeignElementToFileTree(targetBranch, itemToMoveUuid, sourceIsFolder)
-    return
+    // File is separate from the folder hierarchy; it resides outside any folders
+    addForeignElementToFileTree(targetBranch, sourceUuid, sourceIsFolder)
   } else {
     moveElementFromOneFolderToAnother(sourceContainingList, targetBranch, targetUuid)
-    return
   }
+  return
 }
 
 export const flattenFileTreeUuids = (fileTree: Map<string, FileTreeItem>, type: 'file' | 'folder' | 'all') => {

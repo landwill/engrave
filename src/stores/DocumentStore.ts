@@ -3,7 +3,7 @@ import { flow, flowResult, makeAutoObservable } from 'mobx'
 import { v4 as uuid } from 'uuid'
 import { IndexedDB } from '../indexeddx/indexeddb.ts'
 import { DocumentDetail, DocumentIdentifier } from '../interfaces.ts'
-import { lazyErrorHandler } from '../misc/utils.ts'
+import { logError } from '../misc/utils.ts'
 import { contextMenuStore } from './ContextMenuStore.ts'
 import { fileSelectionStore } from './FileSelectionStore.ts'
 import { fileTreeStore } from './FileTreeStore.ts'
@@ -28,7 +28,7 @@ export class DocumentStore {
 
   setup(idb: IndexedDB) {
     this._idb = idb
-    flowResult(this.loadDocuments()).catch(lazyErrorHandler)
+    flowResult(this.loadDocuments()).catch(logError)
   }
 
   * loadDocuments(): Generator<Promise<(DocumentDetail & { documentUuid: string })[]>, void, (DocumentDetail & { documentUuid: string })[]> {
@@ -44,14 +44,14 @@ export class DocumentStore {
     const documentIdentifier = this.documentIdentifiers.get(documentUuid)
     if (documentIdentifier == null) throw new Error('renameDocument called but failed to find the documentIdentifier.')
     this.idb.updateDocumentTitle(documentUuid, documentTitle)
-      .catch(lazyErrorHandler)
+      .catch(logError)
   }
 
   updateDocumentBody(documentUuid: string, body: SerializedEditorState) {
     const document = this.documentIdentifiers.get(documentUuid)
     if (!document) throw new Error('Document not found.')
     this.idb.updateDocumentBody(documentUuid, body)
-      .catch(lazyErrorHandler)
+      .catch(logError)
   }
 
   createAndSelectNewDocument(): string {
@@ -67,7 +67,7 @@ export class DocumentStore {
     this.verifySelectedDocument()
     contextMenuStore.setClosed()
     this.idb.deleteDocument(documentUuid)
-      .catch(lazyErrorHandler)
+      .catch(logError)
   }
 
   deleteDocuments(orphanedChildren: string[]) {
@@ -83,7 +83,7 @@ export class DocumentStore {
 
   $TEST_createBrokenFile(documentUuid: string) {
     this.idb.$TEST_createBrokenFile(documentUuid)
-      .catch(lazyErrorHandler)
+      .catch(logError)
   }
 }
 

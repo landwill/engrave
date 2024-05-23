@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
-import { contextMenuStore, ContextMenuOpenProps } from '../stores/ContextMenuStore.ts'
+import { ContextMenuOpenProps, contextMenuStore } from '../stores/ContextMenuStore.ts'
 
-export const useContextMenu = () => {
+export type ContextMenuOpener = (param: ContextMenuOpenProps) => void
+
+export const useContextMenu = (): { openContextMenu: ContextMenuOpener } => {
 
   useEffect(() => {
     const handleClickOutside = () => {

@@ -7,8 +7,9 @@ interface PanelBoxProps {
   style?: CSSProperties
 }
 
-export const PanelBox = ({ direction, children, style }: PanelBoxProps) => {
+export const PanelBox = ({ direction, style, children }: PanelBoxProps) => {
   const borderRight = direction === 'horizontal' ? undefined : COMMON_BORDER_STYLE
+
   return <div
     className='panelBox'
     onContextMenu={e => { e.preventDefault()}}

@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest'
 import { FileTreeItem } from '../../interfaces.ts'
 
-import { moveElementToFolder, searchTreeForContainingList } from './utils.ts'
+import { moveElementToFolderIfApplicable, searchTreeForContainingList } from './utils.ts'
 
 const mockFileList = new Map<string, FileTreeItem>([
   ['someFolder', {
@@ -20,7 +20,7 @@ describe('moveElementToFolder', () => {
   it.each([true, false])('should do nothing when the source is the target', (isFolder) => {
     const initialStructure = JSON.stringify(mockFileList)
 
-    moveElementToFolder(mockFileList, 'someFolder', 'someFolder', isFolder)
+    moveElementToFolderIfApplicable(mockFileList, 'someFolder', 'someFolder', isFolder)
 
     expect(JSON.stringify(mockFileList)).toBe(initialStructure)
   })
@@ -40,7 +40,7 @@ describe('moveElementToFolder', () => {
     expect(searchTreeForContainingList(initialFileData, fileUuidToMove)).not.toBeNull()
 
     // test
-    moveElementToFolder(initialFileData, '53c0031f-f80b-4940-9a23-6c7f28f6d9ed', undefined, false)
+    moveElementToFolderIfApplicable(initialFileData, '53c0031f-f80b-4940-9a23-6c7f28f6d9ed', undefined, false)
 
     // after
     expect(searchTreeForContainingList(initialFileData, fileUuidToMove)).toBeNull()
@@ -60,7 +60,7 @@ describe('moveElementToFolder', () => {
     const initialStructure = JSON.stringify(mockFileList)
 
     // test
-    expect(() => {moveElementToFolder(initialFileData, 'someNonexistentUuid', undefined, false)}).not.toThrowError()
+    expect(() => {moveElementToFolderIfApplicable(initialFileData, 'someNonexistentUuid', undefined, false)}).not.toThrowError()
 
     // after
     expect(JSON.stringify(mockFileList)).toBe(initialStructure)

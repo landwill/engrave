@@ -46,7 +46,7 @@ function getThemeFromDarkModePreference(darkModePreference: string | null) {
   }
 }
 
-export const lazyDarkModeRetrieve = () => {
+export const lazyCheckAndSetDarkMode = () => {
   try {
     const darkModePreference = localStorage.getItem(DARK_MODE_LOCALSTORAGE_KEY)
     const theme = getThemeFromDarkModePreference(darkModePreference)
@@ -57,6 +57,6 @@ export const lazyDarkModeRetrieve = () => {
 }
 
 // Extracted primarily to silence ESLint's issue with the otherwise lack of 'unknown' typing.
-export const lazyErrorHandler = (error: unknown) => {
+export const logError = (error: unknown) => {
   console.error(error)
 }

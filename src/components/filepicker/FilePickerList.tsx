@@ -1,6 +1,6 @@
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine'
+import { BaseEventPayload, ElementDragType } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types'
 import { dropTargetForElements, monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
-import { DropTargetRecord } from '@atlaskit/pragmatic-drag-and-drop/types'
 import { action, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { CSSProperties, useEffect, useRef } from 'react'
@@ -9,7 +9,7 @@ import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { FileTreeComponent } from './FileTreeComponents.tsx'
-import { flattenTreeWithLevels, moveElementToFolder } from './utils.ts'
+import { flattenTreeWithLevels, moveElementToFolderIfApplicable } from './utils.ts'
 
 const DIV_STYLE: CSSProperties = {
   display: 'flex',
@@ -21,28 +21,31 @@ const DIV_STYLE: CSSProperties = {
   height: '100%'
 }
 
+const moveDraggedElementToDestination = ({ source, location }: BaseEventPayload<ElementDragType>) => {
+  const sourceData = source.data.source as DraggableSource | null | undefined
+  if (!sourceData) return
+
+  const destination = location.current.dropTargets[0]
+  if (!destination) return
+
+  const destinationLocation = destination.data.location as DropTargetLocation
+  moveElementToFolderIfApplicable(sourceData, destinationLocation.uuid, fileTreeStore.fileTreeData)
+}
+
 export const FilePickerList = observer(() => {
-  const ref = useRef<HTMLDivElement>(null)
+  // the ref is primarily for using the background div as a droptarget for files, to move them out of any folders
+  const filePickerListRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const element = ref.current
-    if (element == null) throw new Error('null FilePickerList ref.current')
+    const element = filePickerListRef.current
+    if (element == null) throw new Error('FilePickerListRef\'s .current was null')
 
     return combine(monitorForElements({
-        onDrop: action(({ source, location }) => {
-          const sourceData = source.data.source as DraggableSource | null | undefined // unsure if null or defined, so declaring both
-          if (sourceData == null) return
-          const { uuid, isFolder: sourceIsFolder } = sourceData
-          const destination: DropTargetRecord | undefined = location.current.dropTargets[0]
-
-          // suppressed because despite Pragmatic's type-hinting, null/undefined is possible
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          if (destination == null) return
-          const destinationLocation = destination.data.location as DropTargetLocation
-          moveElementToFolder(fileTreeStore.fileTreeData, uuid, destinationLocation.uuid, sourceIsFolder)
-        })
+        onDrop: action(moveDraggedElementToDestination)
       }),
-      dropTargetForElements({ element, getData: () => ({ location: { uuid: undefined } as DropTargetLocation }) }))
+      dropTargetForElements({
+        element,
+        getData: () => ({ location: { uuid: undefined } as DropTargetLocation }) }))
   }, [])
 
   const orderedFileAndFolderList = flattenTreeWithLevels(fileTreeStore.fileTreeData, documentStore.documentIdentifiers)
@@ -51,7 +54,7 @@ export const FilePickerList = observer(() => {
     fileSelectionStore.displayedDocumentOrder = orderedFileAndFolderList.map(f => f.uuid)
   })
 
-  return <div style={DIV_STYLE} id='file-picker-list' ref={ref}>
+  return <div style={DIV_STYLE} id='file-picker-list' ref={filePickerListRef}>
     {
       orderedFileAndFolderList.map(filePickerListEntry => {
         return <FileTreeComponent key={filePickerListEntry.key}

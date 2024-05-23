@@ -74,6 +74,10 @@ body {
     text-decoration: line-through;
 }
 
+.textUnderline {
+    text-decoration: underline;
+}
+
 .active, .toolbar-item:hover:not([disabled]) {
     background-color: var(--panel-background-color-active);
     outline: 1px solid var(--panel-background-color-active);

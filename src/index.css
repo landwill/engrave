@@ -62,26 +62,8 @@ body {
     background-color: var(--scrollbar-color);
 }
 
-.textBold {
-    font-weight: bold;
-}
-
-.textItalic {
-    font-style: italic;
-}
-
-.textStrikethrough {
-    text-decoration: line-through;
-}
-
-.textUnderline {
-    text-decoration: underline;
-}
-
 .active, .toolbar-item:hover:not([disabled]) {
     background-color: var(--panel-background-color-active);
-    outline: 1px solid var(--panel-background-color-active);
-    /*color: var(--color);*/
 
     svg {
         stroke: var(--color);
@@ -90,7 +72,6 @@ body {
 
 .list-item:hover {
     background-color: var(--panel-background-color-hover);
-    /*outline: 1px solid var(--panel-background-color-hover);*/
 }
 
 .untitled {
@@ -231,6 +212,22 @@ body {
     margin-top: 5px;
     margin-bottom: 0;
 }
+
+.textBold {
+    font-weight: bold;
+}
+
+.textItalic {
+    font-style: italic;
+}
+
+.textStrikethrough {
+    text-decoration: line-through;
+}
+
+.textUnderline {
+    text-decoration: underline;
+}
 /* End Lexical themes */
 
 .expanded {
@@ -241,4 +238,20 @@ body {
 .collapsed {
     transition: transform 200ms;
     transform: rotate(0deg);
+}
+
+.inline-border-on-hover {
+    position: relative; /* to keep the ::after border element contained to the parent div */
+}
+
+.inline-border-on-hover::after {
+    content: '';
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    border: 1px solid var(--dnd-hover-border);
 }

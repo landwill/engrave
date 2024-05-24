@@ -23,10 +23,9 @@ export const FileSystemItemHoverDiv = observer(
       uuid,
       title,
       isDragging,
-      isDraggedOver,
       isFolder,
       level = 0
-    }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number, isDraggedOver: boolean }>
+    }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number }>
   ) => {
     const isOpen = fileTreeStore.folderDetails.get(uuid)?.isOpen ?? false
     const className = getClassName(uuid)
@@ -43,8 +42,7 @@ export const FileSystemItemHoverDiv = observer(
       paddingLeft: `${String(indentationLevel * 20)}px`,
       marginRight: '6px',
       borderRadius: COMMON_BORDER_RADIUS,
-      opacity: isDragging ? 0.5 : undefined,
-      outline: isDraggedOver ? '1px solid transparent' : undefined
+      opacity: isDragging ? 0.5 : undefined
     }
 
     return <div style={style} className={className} onClick={onClick}>

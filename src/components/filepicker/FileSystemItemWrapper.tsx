@@ -2,19 +2,13 @@ import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine'
 import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview'
 import { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/types'
-import React, { useEffect, useRef } from 'react'
+import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import invariant from 'tiny-invariant'
 import { DraggableSource, DropTargetLocation } from '../../interfaces.ts'
 
-const STYLES = {
-  hovered: {
-    border: '1px solid var(--dnd-hover-border)',
-    backgroundColor: 'var(--dnd-hover-background)'
-  },
-  idle: {
-    border: '1px solid transparent'
-  }
+const HOVERED_STYLE: CSSProperties = {
+  backgroundColor: 'var(--dnd-hover-background)'
 }
 
 export interface DraggableFileDetailsBase {
@@ -76,23 +70,20 @@ export interface FileSystemItemIdentity {
 }
 
 interface FileSystemItemWrapperProps {
-  hovered: boolean
   fileName: string
   itemIdentity: FileSystemItemIdentity
   setDragging: React.Dispatch<React.SetStateAction<boolean>>
-  setIsDraggedOver: React.Dispatch<React.SetStateAction<boolean>>
   children: React.ReactNode | React.ReactNode[]
 }
 
 export const FileSystemItemWrapper = ({
-  hovered,
   fileName,
   itemIdentity,
   setDragging,
-  setIsDraggedOver,
   children
 }: FileSystemItemWrapperProps) => {
   const ref = useRef<HTMLDivElement>(null)
+  const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
 
   const { uuid, isFolder, parentUuid } = itemIdentity
   const folderUuid = isFolder ? uuid : parentUuid
@@ -107,9 +98,10 @@ export const FileSystemItemWrapper = ({
     )
   }, [fileName, folderUuid, isFolder, setDragging, setIsDraggedOver, uuid])
 
-  const style = hovered ? STYLES.hovered : STYLES.idle
+  const style = isDraggedOver ? HOVERED_STYLE : undefined
+  const className = isDraggedOver ? 'inline-border-on-hover' : undefined
 
-  return <div ref={ref} style={style}>
+  return <div ref={ref} style={style} className={className}>
     {children}
   </div>
 }

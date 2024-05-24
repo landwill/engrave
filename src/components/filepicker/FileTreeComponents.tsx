@@ -35,7 +35,6 @@ const ContextMenuFileItems = ({ uuid }: { uuid: string }) => <>
 export const FileTreeComponent = observer(({ fileSystemItemDetails }: FileTreeComponentProps) => {
   const { item, uuid, parentUuid } = fileSystemItemDetails
   const [dragging, setDragging] = useState<boolean>(false)
-  const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false)
   const isFolder = item.isFolder
 
   const fileName = isFolder ? fileTreeStore.folderDetails.get(uuid)?.name ?? 'Folder name not found' : documentStore.documentIdentifiers.get(uuid)?.documentTitle ?? 'Filename not found'
@@ -61,14 +60,13 @@ export const FileTreeComponent = observer(({ fileSystemItemDetails }: FileTreeCo
 
   const itemIdentity: FileSystemItemIdentity = { uuid, isFolder, parentUuid }
 
-  return <FileSystemItemWrapper setDragging={setDragging} hovered={isDraggedOver} itemIdentity={itemIdentity} setIsDraggedOver={setIsDraggedOver} fileName={fileName}>
+  return <FileSystemItemWrapper setDragging={setDragging} itemIdentity={itemIdentity} fileName={fileName}>
     <FileSystemItemHoverDiv uuid={uuid}
                             title={fileName}
                             onClick={onClick}
                             onContextMenu={onContextMenu}
                             isDragging={dragging}
                             isFolder={isFolder}
-                            isDraggedOver={isDraggedOver}
                             level={fileSystemItemDetails.level} />
   </FileSystemItemWrapper>
 })

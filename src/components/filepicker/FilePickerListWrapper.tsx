@@ -10,7 +10,7 @@ export const FilePickerListWrapper = ({ innerRef, children }: FilePickerListWrap
     display: 'flex',
     flexDirection: 'column',
     paddingTop: '1em',
-    width: '200px',
+    width: '240px',
     userSelect: 'none',
     overflowY: 'auto',
     height: '100%'

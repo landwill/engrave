@@ -75,3 +75,8 @@ export interface FilePickerListEntry {
   uuid: string
   parentUuid?: string
 }
+
+export interface RelativeItemUuids {
+  above: string | null
+  below: string | null
+}

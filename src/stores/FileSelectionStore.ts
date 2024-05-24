@@ -64,6 +64,11 @@ class FileSelectionStore {
       if (selecting) this.selectedDocumentUuids.add(item)
     }
   }
+
+  isSelected(documentUuid: string | null): boolean {
+    if (documentUuid == null) return false
+    return this.selectedDocumentUuids.has(documentUuid)
+  }
 }
 
 export const fileSelectionStore = new FileSelectionStore()

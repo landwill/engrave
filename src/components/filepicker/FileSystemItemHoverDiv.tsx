@@ -2,18 +2,30 @@ import { FileIcon, FolderIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { CSSProperties } from 'react'
 import { COMMON_BORDER_RADIUS } from '../../consts.ts'
-import { ListItemProps } from '../../interfaces.ts'
+import { ListItemProps, RelativeItemUuids } from '../../interfaces.ts'
 import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { FileSystemItemText } from './FileSystemItemText.tsx'
 import { OptionalFolderExpander } from './OptionalFolderExpander.tsx'
 
-function getClassName(uuid: string) {
+const getClassName = (uuid: string) => {
   const isActive = fileSelectionStore.selectedDocumentUuids.has(uuid)
 
   const classNames = ['list-item']
   if (isActive) classNames.push('active')
   return classNames.join(' ')
+}
+
+const getBorderRadius = (relativeItemUuids: RelativeItemUuids): CSSProperties => {
+  const isAboveItemSelected = fileSelectionStore.isSelected(relativeItemUuids.above)
+  const isBelowItemSelected = fileSelectionStore.isSelected(relativeItemUuids.below)
+
+  return {
+    borderTopRightRadius: isAboveItemSelected ? undefined : COMMON_BORDER_RADIUS,
+    borderTopLeftRadius: isAboveItemSelected ? undefined : COMMON_BORDER_RADIUS,
+    borderBottomRightRadius: isBelowItemSelected ? undefined : COMMON_BORDER_RADIUS,
+    borderBottomLeftRadius: isBelowItemSelected ? undefined : COMMON_BORDER_RADIUS
+  }
 }
 
 export const FileSystemItemHoverDiv = observer(
@@ -24,8 +36,9 @@ export const FileSystemItemHoverDiv = observer(
       title,
       isDragging,
       isFolder,
+      relativeItemUuids,
       level = 0
-    }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number }>
+    }: Readonly<ListItemProps & { isDragging: boolean, isFolder: boolean, level: number, relativeItemUuids: RelativeItemUuids }>
   ) => {
     const isOpen = fileTreeStore.folderDetails.get(uuid)?.isOpen ?? false
     const className = getClassName(uuid)
@@ -42,6 +55,7 @@ export const FileSystemItemHoverDiv = observer(
       paddingLeft: `${String(indentationLevel * 20)}px`,
       marginRight: '6px',
       borderRadius: COMMON_BORDER_RADIUS,
+      ...getBorderRadius(relativeItemUuids),
       opacity: isDragging ? 0.5 : undefined
     }
 

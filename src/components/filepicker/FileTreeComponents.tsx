@@ -2,7 +2,7 @@ import { action } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { MouseEventHandler, useState } from 'react'
 import { useContextMenu } from '../../hooks/useContextMenu.tsx'
-import { FilePickerListEntry } from '../../interfaces.ts'
+import { FilePickerListEntry, RelativeItemUuids } from '../../interfaces.ts'
 import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
@@ -12,6 +12,7 @@ import { FileSystemItemIdentity, FileSystemItemWrapper } from './FileSystemItemW
 
 interface FileTreeComponentProps {
   fileSystemItemDetails: FilePickerListEntry
+  relativeItemUuids: RelativeItemUuids
 }
 
 const deleteFolderWithConfirmation = (uuid: string) => {
@@ -32,7 +33,11 @@ const ContextMenuFileItems = ({ uuid }: { uuid: string }) => <>
   <ListItemSpan onClick={() => { documentStore.deleteDocument(uuid) }}>Delete</ListItemSpan>
 </>
 
-export const FileTreeComponent = observer(({ fileSystemItemDetails }: FileTreeComponentProps) => {
+export const FileTreeComponent = observer((
+  {
+    fileSystemItemDetails,
+    relativeItemUuids
+  }: FileTreeComponentProps) => {
   const { item, uuid, parentUuid } = fileSystemItemDetails
   const [dragging, setDragging] = useState<boolean>(false)
   const isFolder = item.isFolder
@@ -67,6 +72,7 @@ export const FileTreeComponent = observer(({ fileSystemItemDetails }: FileTreeCo
                             onContextMenu={onContextMenu}
                             isDragging={dragging}
                             isFolder={isFolder}
+                            relativeItemUuids={relativeItemUuids}
                             level={fileSystemItemDetails.level} />
   </FileSystemItemWrapper>
 })

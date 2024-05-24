@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react'
 import invariant from 'tiny-invariant'
 import { DraggableSource, DropTargetLocation } from '../../interfaces.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
-import { FileSysteItemOrderedList } from './FileSysteItemOrderedList.tsx'
+import { FileSystemItemOrderedList } from './FileSystemItemOrderedList.tsx'
 import { FilePickerListWrapper } from './FilePickerListWrapper.tsx'
 import { moveElementToFolderIfApplicable } from './utils.ts'
 
@@ -39,6 +39,6 @@ export const FilePickerList = () => {
   }, [])
 
   return <FilePickerListWrapper innerRef={filePickerListRef}>
-    <FileSysteItemOrderedList />
+    <FileSystemItemOrderedList />
   </FilePickerListWrapper>
 }

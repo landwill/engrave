@@ -17,7 +17,6 @@ const SPAN_STYLE: CSSProperties = {
 
 interface ListItemProps {
   children: React.ReactNode
-  onContextMenu?: MouseEventHandler
   onClick?: MouseEventHandler
   additionalClassName?: string
   marginY?: Property.Margin
@@ -25,7 +24,7 @@ interface ListItemProps {
   actionItem?: boolean
 }
 
-export const ListItemSpan = ({ children, onContextMenu, onClick, additionalClassName, marginY, coloredHover = true, actionItem = true }: ListItemProps) => {
+export const ListItemSpan = ({ children, onClick, additionalClassName, marginY, coloredHover = true, actionItem = true }: ListItemProps) => {
   const classNames = coloredHover ? ['list-item'] : []
   if (additionalClassName) classNames.push(additionalClassName)
   const className = classNames.join(' ')
@@ -40,5 +39,5 @@ export const ListItemSpan = ({ children, onContextMenu, onClick, additionalClass
     style.marginBottom = marginY
   }
 
-  return <span className={className} style={style} onClick={onClick} onContextMenu={onContextMenu}>{children}</span>
+  return <span className={className} style={style} onClick={onClick}>{children}</span>
 }

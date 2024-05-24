@@ -9,7 +9,7 @@ import { FileSystemItemText } from './FileSystemItemText.tsx'
 import { OptionalFolderExpander } from './OptionalFolderExpander.tsx'
 
 const getClassName = (uuid: string) => {
-  const isActive = fileSelectionStore.selectedDocumentUuids.has(uuid)
+  const isActive = fileSelectionStore.selectedItems.has(uuid)
 
   const classNames = ['list-item']
   if (isActive) classNames.push('active')
@@ -59,9 +59,9 @@ export const FileSystemItemHoverDiv = observer(
       opacity: isDragging ? 0.5 : undefined
     }
 
-    return <div style={style} className={className} onClick={onClick}>
+    return <div style={style} className={className} onClick={onClick} onContextMenu={onContextMenu}>
       <OptionalFolderExpander isFolder={isFolder} isOpen={isOpen} title={title} />
       <FileSystemIcon size={16} style={{ flexShrink: 0, color: 'var(--color)' }} />
-      <FileSystemItemText title={title} onContextMenu={onContextMenu} />
+      <FileSystemItemText title={title} />
     </div>
   })

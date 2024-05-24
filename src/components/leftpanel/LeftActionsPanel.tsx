@@ -30,7 +30,7 @@ const getLeftPanelIcons = (openContextMenu: ContextMenuOpener): PanelIcon[] => [
   }, {
     buttonName: 'About',
     Icon: HelpCircleIcon,
-    action: () => {fileSelectionStore.deselectDocument()}
+    action: () => {fileSelectionStore.deselectItems()}
   }, {
     buttonName: 'Debug Tools',
     Icon: BugIcon,

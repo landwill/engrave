@@ -16,8 +16,8 @@ const Fallback = () => <CenteringDiv>
 
 export const EditorPanel = observer(() => {
   const editorBodyRef = useRef<LexicalEditor | null>(null)
-  if (fileSelectionStore.selectedDocumentUuids.size !== 1) return <WelcomePage />
-  const [documentUuid] = fileSelectionStore.selectedDocumentUuids
+  if (fileSelectionStore.selectedItems.size !== 1) return <WelcomePage />
+  const [documentUuid] = fileSelectionStore.selectedItems
   if (fileTreeStore.isFolder(documentUuid)) return <WelcomePage />
 
   return <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>

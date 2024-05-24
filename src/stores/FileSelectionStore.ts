@@ -1,75 +1,77 @@
 import { action, makeObservable, observable } from 'mobx'
 import { documentStore } from './DocumentStore.ts'
+import { fileTreeStore } from './FileTreeStore.ts'
 
-class FileSelectionStore {
-  selectedDocumentUuids = new Set<string>()
-  displayedDocumentOrder: string[] = []
+// 'file system item' referring to files/folders in the structured tree view
+class FileSystemItemSelectionStore {
+  selectedItems = new Set<string>()
+  displayedItemOrder: string[] = []
   selectionCursor: string | null = null
 
   constructor() {
     makeObservable(this, {
-      selectedDocumentUuids: observable,
+      selectedItems: observable,
       selectionCursor: observable,
-      displayedDocumentOrder: observable,
-      deselectDocument: action,
-      selectDocument: action,
-      controlClickDocument: action,
-      shiftClickDocument: action,
+      displayedItemOrder: observable,
+      deselectItems: action,
+      selectItem: action,
+      controlClickItem: action,
+      shiftClickItem: action,
       isSelected: observable
     })
   }
 
-  deselectDocument() {
-    this.selectedDocumentUuids.clear()
+  deselectItems() {
+    this.selectedItems.clear()
   }
 
-  selectDocument(documentUuid: string) {
-    if (!documentStore.documentIdentifiers.has(documentUuid)) throw new Error('No document found for the given uuid: ' + documentUuid)
-    this.selectedDocumentUuids = new Set([documentUuid])
-    this.selectionCursor = documentUuid
+  selectItem(itemUuid: string): void {
+    if (!documentStore.documentIdentifiers.has(itemUuid) && !fileTreeStore.isFolder(itemUuid)) throw new Error('No file system item found for the given uuid: ' + itemUuid)
+    this.selectedItems = new Set([itemUuid])
+    this.selectionCursor = itemUuid
   }
 
-  controlClickDocument(documentUuid: string) {
-    if (this.selectedDocumentUuids.has(documentUuid)) {
-      if (this.selectedDocumentUuids.size !== 1) {
+  controlClickItem(itemUuid: string) {
+    if (this.selectedItems.has(itemUuid)) {
+      if (this.selectedItems.size !== 1) {
         // this condition is to avoid deselecting the only selected file.
         // Not for safety/usability, but to correspond with how other applications operate.
-        this.selectedDocumentUuids.delete(documentUuid)
+        this.selectedItems.delete(itemUuid)
       }
     } else {
-      this.selectedDocumentUuids.add(documentUuid)
+      this.selectedItems.add(itemUuid)
     }
-    this.selectionCursor = documentUuid
+    this.selectionCursor = itemUuid
   }
 
-  shiftClickDocument(documentUuid: string, clearSelection: boolean) {
-    if (this.selectionCursor === documentUuid) {
+  shiftClickItem(itemUuid: string, clearSelection: boolean) {
+    if (this.selectionCursor === itemUuid) {
       // already selected; do nothing
-      this.selectDocument(documentUuid)
+      this.selectItem(itemUuid)
       return
     }
 
     // clearSelection is false for control-shift-clicks
-    if (clearSelection) this.selectedDocumentUuids.clear()
+    if (clearSelection) this.selectedItems.clear()
 
     let selecting = false
-    for (const item of this.displayedDocumentOrder) {
-      if ([documentUuid, this.selectionCursor].includes(item)) {
+    for (const item of this.displayedItemOrder) {
+      if ([itemUuid, this.selectionCursor].includes(item)) {
         if (!selecting) {
           selecting = true
         } else {
-          this.selectedDocumentUuids.add(item)
+          this.selectedItems.add(item)
           break
         }
       }
-      if (selecting) this.selectedDocumentUuids.add(item)
+      if (selecting) this.selectedItems.add(item)
     }
   }
 
-  isSelected(documentUuid: string | null): boolean {
-    if (documentUuid == null) return false
-    return this.selectedDocumentUuids.has(documentUuid)
+  isSelected(itemUuid: string | null): boolean {
+    if (itemUuid == null) return false
+    return this.selectedItems.has(itemUuid)
   }
 }
 
-export const fileSelectionStore = new FileSelectionStore()
+export const fileSelectionStore = new FileSystemItemSelectionStore()

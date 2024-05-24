@@ -18,7 +18,7 @@ export const FileSystemItemOrderedList = observer(() => {
   const orderedFileAndFolderList = flattenTreeWithLevels(fileTreeStore.fileTreeData, documentStore.documentIdentifiers)
 
   runInAction(() => {
-    fileSelectionStore.displayedDocumentOrder = orderedFileAndFolderList.map(f => f.uuid)
+    fileSelectionStore.displayedItemOrder = orderedFileAndFolderList.map(f => f.uuid)
   })
 
   return <>

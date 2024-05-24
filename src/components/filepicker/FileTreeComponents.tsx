@@ -48,20 +48,22 @@ export const FileTreeComponent = observer((
 
   const onClick = action<MouseEventHandler>((event) => {
     if (event.shiftKey && event.ctrlKey) {
-      fileSelectionStore.shiftClickDocument(uuid, false)
+      fileSelectionStore.shiftClickItem(uuid, false)
     } else if (event.ctrlKey) {
-      fileSelectionStore.controlClickDocument(uuid)
+      fileSelectionStore.controlClickItem(uuid)
     } else if (event.shiftKey) {
-      fileSelectionStore.shiftClickDocument(uuid, true)
+      fileSelectionStore.shiftClickItem(uuid, true)
     } else {
-      isFolder ? fileTreeStore.collapseFolder(uuid) : fileSelectionStore.selectDocument(uuid)
+      isFolder ? fileTreeStore.collapseFolder(uuid) : fileSelectionStore.selectItem(uuid)
     }
   })
 
-  const onContextMenu: MouseEventHandler = (e) => {
-    e.preventDefault()
-    openContextMenu({ x: e.pageX, y: e.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems uuid={uuid} /> : <ContextMenuFileItems uuid={uuid} /> })
-  }
+  const onContextMenu: MouseEventHandler = action((event) => {
+    event.preventDefault()
+    if (!fileSelectionStore.isSelected(uuid)) fileSelectionStore.selectItem(uuid)
+    if (event.shiftKey || event.ctrlKey) return
+    openContextMenu({ x: event.pageX, y: event.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems uuid={uuid} /> : <ContextMenuFileItems uuid={uuid} /> })
+  })
 
   const itemIdentity: FileSystemItemIdentity = { uuid, isFolder, parentUuid }
 

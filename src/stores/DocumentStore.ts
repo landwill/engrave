@@ -57,7 +57,7 @@ export class DocumentStore {
   createAndSelectNewDocument(): string {
     const documentUuid = uuid()
     this.documentIdentifiers.set(documentUuid, { documentTitle: NEW_FILE_NAME, lastModified: Date.now() } as DocumentIdentifier)
-    fileSelectionStore.selectDocument(documentUuid)
+    fileSelectionStore.selectItem(documentUuid)
     return documentUuid
   }
 
@@ -75,9 +75,9 @@ export class DocumentStore {
   }
 
   verifySelectedDocument() {
-    if (fileSelectionStore.selectedDocumentUuids.size === 1) {
-      const [selectedUuid] = fileSelectionStore.selectedDocumentUuids
-      if (!this.documentIdentifiers.has(selectedUuid)) fileSelectionStore.deselectDocument()
+    if (fileSelectionStore.selectedItems.size === 1) {
+      const [selectedUuid] = fileSelectionStore.selectedItems
+      if (!this.documentIdentifiers.has(selectedUuid)) fileSelectionStore.deselectItems()
     }
   }
 

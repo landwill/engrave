@@ -14,7 +14,8 @@ class FileSelectionStore {
       deselectDocument: action,
       selectDocument: action,
       controlClickDocument: action,
-      shiftClickDocument: action
+      shiftClickDocument: action,
+      isSelected: observable
     })
   }
 

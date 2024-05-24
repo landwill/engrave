@@ -16,7 +16,7 @@ function getClassName(uuid: string) {
   return classNames.join(' ')
 }
 
-export const FileSystemItemBase = observer(
+export const FileSystemItemHoverDiv = observer(
   ({
       onContextMenu,
       onClick,
@@ -32,6 +32,7 @@ export const FileSystemItemBase = observer(
     const className = getClassName(uuid)
 
     const FileSystemIcon = isFolder ? FolderIcon : FileIcon
+    const indentationLevel = isFolder ? level : level + 1
 
     const style: CSSProperties = {
       display: 'flex',
@@ -39,7 +40,7 @@ export const FileSystemItemBase = observer(
       lineHeight: 'normal',
       alignItems: 'center',
       marginLeft: '8px',
-      paddingLeft: `${String(level * 20)}px`,
+      paddingLeft: `${String(indentationLevel * 20)}px`,
       marginRight: '6px',
       borderRadius: COMMON_BORDER_RADIUS,
       opacity: isDragging ? 0.5 : undefined,

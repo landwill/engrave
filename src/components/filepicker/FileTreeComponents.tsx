@@ -7,7 +7,7 @@ import { documentStore } from '../../stores/DocumentStore.ts'
 import { fileSelectionStore } from '../../stores/FileSelectionStore.ts'
 import { fileTreeStore } from '../../stores/FileTreeStore.ts'
 import { ListItemSpan } from '../ListItemSpan.tsx'
-import { FileSystemItemBase } from './FileSystemItemBase.tsx'
+import { FileSystemItemHoverDiv } from './FileSystemItemHoverDiv.tsx'
 import { FileSystemItemIdentity, FileSystemItemWrapper } from './FileSystemItemWrapper.tsx'
 
 interface FileTreeComponentProps {
@@ -62,13 +62,13 @@ export const FileTreeComponent = observer(({ fileSystemItemDetails }: FileTreeCo
   const itemIdentity: FileSystemItemIdentity = { uuid, isFolder, parentUuid }
 
   return <FileSystemItemWrapper setDragging={setDragging} hovered={isDraggedOver} itemIdentity={itemIdentity} setIsDraggedOver={setIsDraggedOver} fileName={fileName}>
-    <FileSystemItemBase uuid={uuid}
-                        title={fileName}
-                        onClick={onClick}
-                        onContextMenu={onContextMenu}
-                        isDragging={dragging}
-                        isFolder={isFolder}
-                        isDraggedOver={isDraggedOver}
-                        level={fileSystemItemDetails.level} />
+    <FileSystemItemHoverDiv uuid={uuid}
+                            title={fileName}
+                            onClick={onClick}
+                            onContextMenu={onContextMenu}
+                            isDragging={dragging}
+                            isFolder={isFolder}
+                            isDraggedOver={isDraggedOver}
+                            level={fileSystemItemDetails.level} />
   </FileSystemItemWrapper>
 })

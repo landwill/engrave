@@ -5,6 +5,7 @@ import { COMMON_BORDER_RADIUS } from '../consts.ts'
 const SPAN_STYLE: CSSProperties = {
   paddingBottom: '0.15em',
   paddingTop: '0.15em',
+  fontSize: 14,
   textOverflow: 'ellipsis',
   textWrap: 'nowrap',
   overflow: 'hidden',

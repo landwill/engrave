@@ -51,9 +51,9 @@ export const FileSystemItemHoverDiv = observer(
       flexDirection: 'row',
       lineHeight: 'normal',
       alignItems: 'center',
-      marginLeft: '8px',
+      marginLeft: 12,
+      marginRight: 12,
       paddingLeft: `${String(indentationLevel * 20)}px`,
-      marginRight: '6px',
       borderRadius: COMMON_BORDER_RADIUS,
       ...getBorderRadius(relativeItemUuids),
       opacity: isDragging ? 0.5 : undefined

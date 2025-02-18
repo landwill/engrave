@@ -47,11 +47,14 @@ export const FileTreeComponent = observer((
   const { openContextMenu } = useContextMenu()
 
   const onClick = action<MouseEventHandler>((event) => {
-    if (event.shiftKey && event.ctrlKey) {
+    const metaHeld = event.getModifierState("Control") || event.getModifierState("Meta")
+    const shiftHeld = event.getModifierState("Shift")
+
+    if (shiftHeld && metaHeld) {
       fileSelectionStore.shiftClickItem(uuid, false)
-    } else if (event.ctrlKey) {
+    } else if (metaHeld) {
       fileSelectionStore.controlClickItem(uuid)
-    } else if (event.shiftKey) {
+    } else if (shiftHeld) {
       fileSelectionStore.shiftClickItem(uuid, true)
     } else {
       isFolder ? fileTreeStore.collapseFolder(uuid) : fileSelectionStore.selectItem(uuid)
@@ -61,7 +64,7 @@ export const FileTreeComponent = observer((
   const onContextMenu: MouseEventHandler = action((event) => {
     event.preventDefault()
     if (!fileSelectionStore.isSelected(uuid)) fileSelectionStore.selectItem(uuid)
-    if (event.shiftKey || event.ctrlKey) return
+    if (event.shiftKey || event.getModifierState("Meta") || event.getModifierState("Control")) return
     openContextMenu({ x: event.pageX, y: event.pageY, contextMenuItems: isFolder ? <ContextMenuFolderItems uuid={uuid} /> : <ContextMenuFileItems uuid={uuid} /> })
   })
 

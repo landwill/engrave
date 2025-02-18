@@ -5,9 +5,10 @@ interface FileSystemItemTextProps {
 }
 
 export const FileSystemItemText = ({ title }: FileSystemItemTextProps) => {
-  const isUntitled = !title.trim()
+  const trimmedTitle = title.trim()
+  const isUntitled = !trimmedTitle
   const spanClassName = isUntitled ? 'untitled' : undefined
-  const displayedTitle = title || 'Untitled'
+  const displayedTitle = trimmedTitle || 'Untitled'
 
   return <ListItemSpan additionalClassName={spanClassName}
                        actionItem={false}

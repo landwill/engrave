@@ -32,7 +32,7 @@ export class FileTreeStore {
 
   createFolder(name: string) {
     const folderUuid = uuid()
-    this.folderDetails.set(folderUuid, { name, isOpen: true })
+    this.folderDetails.set(folderUuid, { name: name.trim() || 'Untitled', isOpen: true })
     this.fileTreeData.set(folderUuid, { isFolder: true, children: new Map() })
   }
 

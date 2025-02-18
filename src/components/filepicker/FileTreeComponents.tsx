@@ -16,7 +16,10 @@ interface FileTreeComponentProps {
 }
 
 const deleteFolderWithConfirmation = (uuid: string) => {
-  const deleteConfirmed = confirm('Are you sure you want to delete folder and all the files which it contains?\nThis cannot be undone!')
+  const folderName = fileTreeStore.folderDetails.get(uuid)?.name
+  const displayName = folderName ? `folder ${folderName}` : 'this folder'
+
+  const deleteConfirmed = confirm(`Are you sure you want to delete ${displayName} and all the files which it contains?\nThis cannot be undone!`)
   if (deleteConfirmed) {
     const orphanedChildren: string[] = fileTreeStore.deleteFolderAndChildFolders(uuid)
     documentStore.deleteDocuments(orphanedChildren)
